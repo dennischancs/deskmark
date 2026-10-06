@@ -267,7 +267,19 @@
       "today": "오늘",
       "upcoming": "나중에",
       "overdue": "기한 지남",
-      "done": "완료"
+      "done": "완료",
+      "due": "날짜",
+      "remind": "알림",
+      "priority": "우선순위",
+      "repeat": "반복",
+      "save": "저장",
+      "low": "낮음",
+      "normal": "보통",
+      "high": "높음",
+      "none": "없음",
+      "daily": "매일",
+      "weekly": "매주",
+      "monthly": "매월"
     }
   },
   "commandPalette": {

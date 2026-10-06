@@ -267,7 +267,19 @@
       "today": "Bugün",
       "upcoming": "Sonra",
       "overdue": "Gecikmiş",
-      "done": "Bitti"
+      "done": "Bitti",
+      "due": "Tarih",
+      "remind": "Anımsatıcı",
+      "priority": "Öncelik",
+      "repeat": "Yinele",
+      "save": "Kaydet",
+      "low": "Düşük",
+      "normal": "Normal",
+      "high": "Yüksek",
+      "none": "Yok",
+      "daily": "Her gün",
+      "weekly": "Her hafta",
+      "monthly": "Her ay"
     }
   },
   "commandPalette": {

@@ -418,3 +418,20 @@ function unquote(value: string): string {
 export function isAllDay(due: string | null): boolean {
   return Boolean(due && parseDue(due)?.time == null)
 }
+
+export function applyTaskEdit(
+  markdown: string,
+  lineNumber: number,
+  patch: InlinePatch,
+  now: Date,
+  timeZone: string,
+  allocateId: () => string = () => createUlid()
+): EditResult {
+  const task = parseNote(markdown).tasks.find(item => item.line === lineNumber)
+  if (!task) return unchanged(markdown, '这一行不是待办')
+  const repeating = task.repeat === 'daily' || task.repeat === 'weekly' || task.repeat === 'monthly'
+  if (patch.checked === true && !task.checked && repeating && task.due) {
+    return completeInlineTask(markdown, lineNumber, now, timeZone, allocateId)
+  }
+  return updateInlineTask(markdown, lineNumber, patch, allocateId)
+}

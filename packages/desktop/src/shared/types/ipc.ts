@@ -55,6 +55,9 @@ export interface DeskmarkTaskRef {
   text: string
   status: 'open' | 'done'
   due: string | null
+  remindAt?: string | null
+  priority?: string
+  repeat?: string
 }
 
 export interface DeskmarkTaskGroups {
@@ -63,6 +66,30 @@ export interface DeskmarkTaskGroups {
   upcoming: DeskmarkTaskRef[]
   overdue: DeskmarkTaskRef[]
   done: DeskmarkTaskRef[]
+}
+
+export interface DeskmarkTaskPatch {
+  checked?: boolean
+  due?: string | null
+  remind?: string | null
+  priority?: 'low' | 'normal' | 'high' | null
+  repeat?: string | null
+}
+
+export interface DeskmarkEditRequest {
+  root: string
+  notePath: string
+  line: number
+  patch: DeskmarkTaskPatch
+  content: string | null
+  write: boolean
+}
+
+export interface DeskmarkEditResult {
+  markdown: string
+  changed: boolean
+  error: string | null
+  groups: DeskmarkTaskGroups | null
 }
 
 export interface IpcInvokeChannels {
@@ -79,6 +106,7 @@ export interface IpcInvokeChannels {
   'mt::dialog::show-save': { args: [request: SaveDialogRequest]; ret: string | null }
   'mt::fonts::list': { args: []; ret: string[] }
   'mt::deskmark::tasks': { args: [root: string]; ret: DeskmarkTaskGroups | null }
+  'mt::deskmark::edit-task': { args: [request: DeskmarkEditRequest]; ret: DeskmarkEditResult | null }
   'mt::fs-trash-item': { args: [pathname: string]; ret: void }
   'mt::fs::copy': { args: [src: string, dest: string]; ret: void }
   'mt::fs::copy-with-content-hash': { args: [src: string, outputDir: string]; ret: string }

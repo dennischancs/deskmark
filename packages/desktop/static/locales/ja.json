@@ -267,7 +267,19 @@
       "today": "今日",
       "upcoming": "このあと",
       "overdue": "期限超過",
-      "done": "完了"
+      "done": "完了",
+      "due": "日付",
+      "remind": "リマインダー",
+      "priority": "優先度",
+      "repeat": "繰り返し",
+      "save": "保存",
+      "low": "低",
+      "normal": "普通",
+      "high": "高",
+      "none": "なし",
+      "daily": "毎日",
+      "weekly": "毎週",
+      "monthly": "毎月"
     }
   },
   "commandPalette": {

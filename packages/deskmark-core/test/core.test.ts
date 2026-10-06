@@ -3,12 +3,14 @@ import test from 'node:test'
 import { addMonths } from '../src/time.ts'
 import {
   agendaFromMarkdown,
+  applyTaskEdit,
   appendJournalTask,
   calendarGroup,
   completeInlineTask,
   completeNote,
   idQueue,
   journalPath,
+  localDateTimeToIso,
   markedDates,
   parseNote,
   smartList,
@@ -162,4 +164,32 @@ test('从日历新建落在日记的一行', () => {
   const again = appendJournalTask(created, '再补一条', '2026-10-08', 'NEW2')
   assert.equal(again.match(/^- \[ \]/gm)?.length, 2)
   assert.equal(again.match(/deskmark:/g)?.length, 3)
+})
+
+test('给一行设日期和提醒时，其他行不变', () => {
+  const markdown = [
+    '前文',
+    '- [ ] 买牛奶',
+    '后文',
+    ''
+  ].join('\n')
+  const result = applyTaskEdit(markdown, 2, {
+    due: '2026-10-09',
+    remind: '2026-10-09T09:00:00+08:00'
+  }, new Date('2026-10-06T01:00:00.000Z'), 'Asia/Shanghai', idQueue(['ID']))
+  const lines = result.markdown.split('\n')
+  assert.equal(lines[0], '前文')
+  assert.equal(lines[2], '后文')
+  assert.match(lines[1], /^- \[ \] 买牛奶 <!-- deskmark: id=ID; due=2026-10-09; remind=2026-10-09T09:00:00\+08:00 -->$/)
+})
+
+test('勾选普通待办只改方括号', () => {
+  const markdown = '保持\n- [ ] 买牛奶\n保持\n'
+  const result = applyTaskEdit(markdown, 2, { checked: true }, new Date('2026-10-06T10:00:00.000Z'), 'Asia/Shanghai', idQueue(['NO']))
+  assert.equal(result.advanced, false)
+  assert.match(result.markdown, /^保持\n- \[x\] 买牛奶\n保持\n$/)
+})
+
+test('本地时间 9 点写成带时区的提醒', () => {
+  assert.equal(localDateTimeToIso('2026-10-09T09:00', 'Asia/Shanghai'), '2026-10-09T09:00:00+08:00')
 })

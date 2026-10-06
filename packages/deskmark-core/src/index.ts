@@ -2,6 +2,7 @@ export { agendaFromMarkdown, calendarGroup, isOverdue, markedDates, smartList, t
 export {
   appendJournalTask,
   completeInlineTask,
+  applyTaskEdit,
   completeNote,
   isAllDay,
   journalPath,
@@ -10,7 +11,7 @@ export {
   temporaryKey,
   updateInlineTask
 } from './note.ts'
-export { addMonths, formatInZone, shiftDue, shiftRemind } from './time.ts'
+export { addMonths, formatInZone, localDateTimeToIso, shiftDue, shiftRemind } from './time.ts'
 export { createUlid, idQueue } from './ulid.ts'
 export type {
   AgendaItem,

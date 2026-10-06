@@ -267,7 +267,19 @@
       "today": "Vandaag",
       "upcoming": "Later",
       "overdue": "Te laat",
-      "done": "Klaar"
+      "done": "Klaar",
+      "due": "Datum",
+      "remind": "Herinnering",
+      "priority": "Prioriteit",
+      "repeat": "Herhalen",
+      "save": "Bewaren",
+      "low": "Laag",
+      "normal": "Normaal",
+      "high": "Hoog",
+      "none": "Nooit",
+      "daily": "Elke dag",
+      "weekly": "Elke week",
+      "monthly": "Elke maand"
     }
   },
   "commandPalette": {

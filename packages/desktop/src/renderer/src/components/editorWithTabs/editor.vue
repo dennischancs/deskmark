@@ -1260,6 +1260,15 @@ const scrollToAnchorElement = (element: unknown) => {
   if (element instanceof Element) scrollElementIntoView(element)
 }
 
+const revealDeskmarkLine = (line: unknown) => {
+  if (!editor.value || typeof line !== 'number' || !Number.isInteger(line) || line < 1) return
+  const index = line - 1
+  editor.value.setCursorByOffset({
+    anchor: { line: index, ch: 0 },
+    focus: { line: index, ch: 0 }
+  })
+}
+
 const scrollToElement = (selector: string) => {
   // Scroll to search highlight word
   scrollElementIntoView(document.querySelector(selector))
@@ -1869,6 +1878,7 @@ onMounted(() => {
   bus.on('insertParagraph', handleInsertParagraph)
   bus.on('scroll-to-header', scrollToHeader)
   bus.on('scroll-to-anchor-element', scrollToAnchorElement)
+  bus.on('deskmark:reveal-line', revealDeskmarkLine)
   bus.on('screenshot-captured', handleScreenShot)
   bus.on('show-command-palette', handleModalOpening)
   bus.on('switch-spellchecker-language', switchSpellcheckLanguage)
@@ -2033,6 +2043,7 @@ onBeforeUnmount(() => {
   bus.off('insertParagraph', handleInsertParagraph)
   bus.off('scroll-to-header', scrollToHeader)
   bus.off('scroll-to-anchor-element', scrollToAnchorElement)
+  bus.off('deskmark:reveal-line', revealDeskmarkLine)
   bus.off('screenshot-captured', handleScreenShot)
   bus.off('show-command-palette', handleModalOpening)
   bus.off('switch-spellchecker-language', switchSpellcheckLanguage)

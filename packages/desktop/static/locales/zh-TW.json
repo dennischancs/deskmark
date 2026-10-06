@@ -267,7 +267,19 @@
       "today": "今天",
       "upcoming": "以後",
       "overdue": "逾期",
-      "done": "已完成"
+      "done": "已完成",
+      "due": "日期",
+      "remind": "提醒",
+      "priority": "優先級",
+      "repeat": "重複",
+      "save": "儲存",
+      "low": "低",
+      "normal": "普通",
+      "high": "高",
+      "none": "不重複",
+      "daily": "每天",
+      "weekly": "每週",
+      "monthly": "每月"
     }
   },
   "commandPalette": {

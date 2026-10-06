@@ -11,14 +11,23 @@
       :key="group.id"
     >
       <h3>{{ t(group.label) }}</h3>
-      <button
+      <div
         v-for="task of group.items"
         :key="`${task.notePath}:${task.taskKey}`"
-        type="button"
-        @click="openTask(task)"
+        class="task-row"
       >
-        {{ task.text }}
-      </button>
+        <input
+          type="checkbox"
+          :checked="task.status === 'done'"
+          @change="toggle(task)"
+        >
+        <button
+          type="button"
+          @click="openTask(task)"
+        >
+          {{ task.text }}
+        </button>
+      </div>
     </section>
   </div>
 </template>
@@ -28,11 +37,15 @@ import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useProjectStore } from '@/store/project'
+import { useDeskmarkStore } from '@/store/deskmark'
+import { editDeskmarkTask } from '@/util/deskmarkEdit'
 import type { DeskmarkTaskGroups, DeskmarkTaskRef } from '@shared/types/ipc'
 
 const { t } = useI18n()
 const projectStore = useProjectStore()
+const deskmarkStore = useDeskmarkStore()
 const { projectTree } = storeToRefs(projectStore)
+const { revision } = storeToRefs(deskmarkStore)
 const groups = ref<DeskmarkTaskGroups | null>(null)
 
 const root = computed(() => projectTree.value?.pathname || '')
@@ -62,9 +75,27 @@ watch(root, () => {
   })
 }, { immediate: true })
 
+watch(revision, () => {
+  load().catch((error) => {
+    console.error(error)
+  })
+})
+
 const openTask = (task: DeskmarkTaskRef): void => {
+  deskmarkStore.select(task)
   const fullPath = window.path.join(root.value, task.notePath)
-  window.electron.ipcRenderer.send('mt::open-file', fullPath, {})
+  window.electron.ipcRenderer.send('mt::open-file', fullPath, task.line ? { deskmarkLine: task.line } : {})
+}
+
+const toggle = (task: DeskmarkTaskRef): void => {
+  if (!root.value || !task.line) return
+  editDeskmarkTask(root.value, task.notePath, task.line, {
+    checked: task.status !== 'done'
+  }).then((next) => {
+    if (next) groups.value = next
+  }).catch((error) => {
+    console.error(error)
+  })
 }
 </script>
 
@@ -83,7 +114,8 @@ h3 {
 }
 button {
   display: block;
-  width: 100%;
+  width: auto;
+  flex: 1;
   margin: 0 0 4px;
   padding: 4px 6px;
   border: 0;
@@ -92,6 +124,13 @@ button {
   color: inherit;
   text-align: left;
   cursor: pointer;
+}
+input {
+  margin: 0 6px 0 0;
+}
+.task-row {
+  display: flex;
+  align-items: center;
 }
 button:hover {
   background: var(--sideBarItemHoverBgColor);

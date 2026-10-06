@@ -267,7 +267,19 @@
       "today": "Hoy",
       "upcoming": "Más tarde",
       "overdue": "Atrasadas",
-      "done": "Hechas"
+      "done": "Hechas",
+      "due": "Fecha",
+      "remind": "Aviso",
+      "priority": "Prioridad",
+      "repeat": "Repetir",
+      "save": "Guardar",
+      "low": "Baja",
+      "normal": "Normal",
+      "high": "Alta",
+      "none": "Nunca",
+      "daily": "Cada día",
+      "weekly": "Cada semana",
+      "monthly": "Cada mes"
     }
   },
   "commandPalette": {

@@ -97,3 +97,27 @@ function normalizeOffset(name: string): string {
   if (!match) return '+00:00'
   return `${match[1]}${match[2].padStart(2, '0')}:${match[3] ?? '00'}`
 }
+
+export function localDateTimeToIso(value: string, timeZone: string): string | null {
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value.trim())
+  if (!match) return null
+  const year = Number(match[1])
+  const month = Number(match[2])
+  const day = Number(match[3])
+  const hour = Number(match[4])
+  const minute = Number(match[5])
+  let utc = Date.UTC(year, month - 1, day, hour, minute, 0)
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const next = Date.UTC(year, month - 1, day, hour, minute, 0) - offsetMinutes(new Date(utc), timeZone) * 60000
+    if (next === utc) break
+    utc = next
+  }
+  return formatInZone(new Date(utc), timeZone)
+}
+
+function offsetMinutes(date: Date, timeZone: string): number {
+  const match = /([+-])(\d{2}):(\d{2})$/.exec(formatInZone(date, timeZone))
+  if (!match) return 0
+  const sign = match[1] === '-' ? -1 : 1
+  return sign * (Number(match[2]) * 60 + Number(match[3]))
+}

@@ -1238,6 +1238,7 @@ export const useEditorStore = defineStore('editor', {
       if (!next) return
       this.UPDATE_CURRENT_FILE(next)
       if (options.anchor) this.SCROLL_TO_ANCHOR(options.anchor)
+      revealDeskmarkLine(options.deskmarkLine)
     },
 
     SWITCH_TAB_BY_INDEX(nextTabIndex: number): void {
@@ -1354,6 +1355,7 @@ export const useEditorStore = defineStore('editor', {
         this.UPDATE_CURRENT_FILE(docState)
         bus.emit('file-loaded', { id, markdown, cursor })
         if (options.anchor) this.SCROLL_TO_ANCHOR(options.anchor)
+        revealDeskmarkLine(options.deskmarkLine)
       } else {
         this.tabs.push(docState)
         this.updateTabIdToIndex()
@@ -2144,4 +2146,11 @@ const createBufferedEditorState = (state: unknown): BufferedEditorState | null =
         .filter((w): w is BufferedRestoreWarning => w !== null)
       : []
   }
+}
+
+function revealDeskmarkLine(line: unknown): void {
+  if (typeof line !== 'number' || !Number.isInteger(line) || line < 1) return
+  window.setTimeout(() => {
+    bus.emit('deskmark:reveal-line', line)
+  }, 0)
 }
