@@ -773,9 +773,10 @@
     }
   },
   "about": {
-    "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "Copyright Contribuidores"
-  },
+      "copyright": "Copyright © Luo Ran 2017-{year}",
+      "copyrightContributors": "Copyright Contribuidores",
+      "addon": "Um complemento funciona dentro de Nota de mesa, não como outro programa."
+    },
   "commands": {
     "mt": {
       "hide": "Ocultar Nota de mesa",

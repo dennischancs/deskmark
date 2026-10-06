@@ -4,11 +4,24 @@ import { join } from 'node:path'
 import type { InlinePatch } from '../../../../deskmark-core/src/index.ts'
 import { getStickyHost } from '../deskmark/stickies'
 import { setReminderVault } from '../deskmark/reminderLoop'
+import { handlePluginCall, loadSamplePlugin, registerPluginGuestGuard, rememberPluginNote } from '../deskmark/pluginGuest'
 import { appendJournalTask, createUlid, journalPath } from '../../../../deskmark-core/src/index.ts'
 import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 
 export const registerDeskmarkHandlers = (): void => {
+  registerPluginGuestGuard()
+  ipcMain.handle('mt::deskmark::plugin-info', async() => loadSamplePlugin())
+  ipcMain.handle('mt::deskmark::plugin-note', async(_event, note: { vault?: string, path?: string, markdown?: string } | null) => {
+    if (!note?.vault || !note.path) {
+      rememberPluginNote(null)
+      return
+    }
+    rememberPluginNote({ vault: note.vault, path: note.path, markdown: note.markdown || '' })
+  })
+  ipcMain.handle('mt::deskmark::plugin-call', async(_event, call: { id?: string, method?: string, path?: string }) => {
+    return handlePluginCall(call || {})
+  })
   ipcMain.handle('mt::deskmark::tasks', async(_event, root: string) => {
     try {
       if (!root) return null

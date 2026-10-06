@@ -174,3 +174,43 @@ export function createDeadline(timeoutMs: number, now = Date.now()): { expired: 
     }
   }
 }
+
+export interface PluginCall {
+  id: string
+  method: string
+  path?: string
+}
+
+export interface NoteSnapshot {
+  vault: string
+  path: string
+  markdown: string
+}
+
+export function answerPluginCall(input: {
+  manifest: PluginManifest
+  call: PluginCall
+  snapshot: NoteSnapshot | null
+  readVaultFile: (relativePath: string) => string | null
+}): { id: string, ok: boolean, result?: unknown, error?: string } {
+  const id = input.call.id || ''
+  if (!input.call.id || !input.call.method) {
+    return { id, ok: false, error: '没有这个操作' }
+  }
+  try {
+    const permission = authorize(input.manifest, input.call.method)
+    if (permission !== 'notes.read') {
+      return { id, ok: true, result: { accepted: true } }
+    }
+    const requested = input.call.path || input.snapshot?.path || ''
+    if (!noteInsideVault(requested)) throw new PluginError('这个小功能没有得到相应允许')
+    if (input.snapshot && input.snapshot.path === requested) {
+      return { id, ok: true, result: { path: requested, markdown: input.snapshot.markdown } }
+    }
+    const markdown = input.readVaultFile(requested)
+    if (markdown == null) throw new PluginError('这个小功能没有得到相应允许')
+    return { id, ok: true, result: { path: requested, markdown } }
+  } catch (error) {
+    return { id, ok: false, error: error instanceof Error ? error.message : '这个小功能没能打开' }
+  }
+}

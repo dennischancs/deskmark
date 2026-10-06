@@ -773,9 +773,10 @@
     }
   },
   "about": {
-    "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "Gemaakt met <3 door GitHub-bijdragers"
-  },
+      "copyright": "Copyright © Luo Ran 2017-{year}",
+      "copyrightContributors": "Gemaakt met <3 door GitHub-bijdragers",
+      "addon": "Een extra functie draait in Bureaubriefje, niet als een apart programma."
+    },
   "commands": {
     "mt": {
       "hide": "Bureaubriefje verbergen",

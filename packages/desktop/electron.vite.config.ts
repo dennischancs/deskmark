@@ -46,6 +46,12 @@ export default defineConfig({
     // (plus a few built-ins). Inline `pathe` (ESM-only) so the bundled preload
     // doesn't try to require it from node_modules at runtime.
     build: {
+      rollupOptions: {
+        input: {
+          index: resolve(__dirname, 'src/preload/index.ts'),
+          plugin: resolve(__dirname, 'src/preload/plugin.ts')
+        }
+      },
       externalizeDeps: {
         exclude: ['pathe']
       }

@@ -773,9 +773,10 @@
     }
   },
   "about": {
-    "copyright": "Telif Hakkı © Luo Ran 2017-{year}",
-    "copyrightContributors": "Github Katkıda Bulunanlar tarafından <3 ile yapıldı"
-  },
+      "copyright": "Telif Hakkı © Luo Ran 2017-{year}",
+      "copyrightContributors": "Github Katkıda Bulunanlar tarafından <3 ile yapıldı",
+      "addon": "Bir ek, Masa notu içinde çalışır, ayrı bir program değildir."
+    },
   "commands": {
     "mt": {
       "hide": "Masa notu'i Gizle",

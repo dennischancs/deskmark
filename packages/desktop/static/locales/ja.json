@@ -773,9 +773,10 @@
     }
   },
   "about": {
-    "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "著作権貢献者"
-  },
+      "copyright": "Copyright © Luo Ran 2017-{year}",
+      "copyrightContributors": "著作権貢献者",
+      "addon": "追加機能はデスクメモの中で動きます。別のプログラムではありません。"
+    },
   "commands": {
     "mt": {
       "hide": "デスクメモ を隠す",

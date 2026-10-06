@@ -773,9 +773,10 @@
     }
   },
   "about": {
-    "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "Urheberrecht Mitwirkende"
-  },
+      "copyright": "Copyright © Luo Ran 2017-{year}",
+      "copyrightContributors": "Urheberrecht Mitwirkende",
+      "addon": "Eine Ergänzung läuft in Tischzettel, nicht als eigenes Programm."
+    },
   "commands": {
     "mt": {
       "hide": "Tischzettel ausblenden",

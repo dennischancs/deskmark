@@ -773,9 +773,10 @@
     }
   },
   "about": {
-    "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "Contributeurs aux droits d'auteur"
-  },
+      "copyright": "Copyright © Luo Ran 2017-{year}",
+      "copyrightContributors": "Contributeurs aux droits d'auteur",
+      "addon": "Un complément tourne dans Pense-bête, pas comme un programme à part."
+    },
   "commands": {
     "mt": {
       "hide": "Masquer Pense-bête",

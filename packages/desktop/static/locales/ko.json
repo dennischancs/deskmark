@@ -773,9 +773,10 @@
     }
   },
   "about": {
-    "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "저작권 기여자"
-  },
+      "copyright": "Copyright © Luo Ran 2017-{year}",
+      "copyrightContributors": "저작권 기여자",
+      "addon": "추가 기능은 책상메모 안에서 실행되며, 다른 프로그램이 아닙니다."
+    },
   "commands": {
     "mt": {
       "hide": "책상메모 숨기기",

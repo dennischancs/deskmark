@@ -115,6 +115,18 @@ export interface IpcInvokeChannels {
     args: [root: string, day: string, text: string]
     ret: { path: string, relative: string, line: number } | null
   }
+  'mt::deskmark::plugin-info': {
+    args: []
+    ret: { src: string, preload: string, manifest: { id: string, name: string, api: number, entry: string, permissions: string[] } } | null
+  }
+  'mt::deskmark::plugin-note': {
+    args: [note: { vault: string, path: string, markdown: string } | null]
+    ret: void
+  }
+  'mt::deskmark::plugin-call': {
+    args: [call: { id?: string, method?: string, path?: string }]
+    ret: { id: string, ok: boolean, result?: unknown, error?: string }
+  }
   'mt::fs-trash-item': { args: [pathname: string]; ret: void }
   'mt::fs::copy': { args: [src: string, dest: string]; ret: void }
   'mt::fs::copy-with-content-hash': { args: [src: string, outputDir: string]; ret: string }

@@ -773,9 +773,10 @@
     }
   },
   "about": {
-    "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "Made with <3 by Github Contributors"
-  },
+      "copyright": "Copyright © Luo Ran 2017-{year}",
+      "copyrightContributors": "Made with <3 by Github Contributors",
+      "addon": "An added feature runs inside Deskmark, not as its own program."
+    },
   "commands": {
     "mt": {
       "hide": "Hide Deskmark",

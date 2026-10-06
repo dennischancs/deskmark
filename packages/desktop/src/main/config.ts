@@ -17,6 +17,7 @@ export const editorWinOptions: Readonly<BrowserWindowConstructorOptions> = Objec
     spellcheck: true,
     nodeIntegration: false,
     webSecurity: false,
+    webviewTag: true,
     preload: path.join(__dirname, '../preload/index.js')
   },
   useContentSize: true,

@@ -773,9 +773,10 @@
     }
   },
   "about": {
-    "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "Сделано с <3 участниками GitHub"
-  },
+      "copyright": "Copyright © Luo Ran 2017-{year}",
+      "copyrightContributors": "Сделано с <3 участниками GitHub",
+      "addon": "Дополнение работает внутри Листок, а не как отдельная программа."
+    },
   "commands": {
     "mt": {
       "hide": "Скрыть Листок",

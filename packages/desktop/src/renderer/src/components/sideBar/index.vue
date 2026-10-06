@@ -41,9 +41,6 @@
       <task-lists v-else-if="rightColumn === 'tasks'" />
       <plugin-panel
         v-else-if="pluginView"
-        :root="pluginRoot"
-        :entry="pluginView.entry"
-        :manifest="pluginView.manifest"
         :close-label="t('plugin.close')"
         @close="unloadSample"
       />
@@ -102,7 +99,6 @@ const sampleManifest: PluginManifest = {
   entry: 'index.html',
   permissions: ['notes.read', 'ui.command', 'ui.panel']
 }
-const pluginRoot = window.path.resolve(window.path.join(window.path.dirname(decodeURIComponent(window.location.pathname.replace(/^\//, ''))), '../../../../../../plugins/sample-wordcount'))
 const pluginLoaded = ref(false)
 try {
   const loaded = pluginHost.load(readManifest(sampleManifest), {

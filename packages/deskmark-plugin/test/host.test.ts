@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { PluginHost, authorize, createDeadline, noteInsideVault, readManifest } from '../src/index.ts'
+import { PluginHost, answerPluginCall, authorize, createDeadline, noteInsideVault, readManifest } from '../src/index.ts'
 
 const good = {
   id: 'wordcount',
@@ -51,4 +51,31 @@ test('超过时限就停下来，不继续做', () => {
   const deadline = createDeadline(5, Date.now() - 10)
   assert.equal(deadline.expired(), true)
   assert.throws(() => deadline.assert(), /及时/)
+})
+
+test('主进程只把当前笔记交给已允许的读取，外面的路径读不到', () => {
+  const manifest = readManifest(good)
+  const snapshot = { vault: 'D:/notes', path: 'a.md', markdown: '两个词' }
+  const ok = answerPluginCall({
+    manifest,
+    call: { id: '1', method: 'notes.read' },
+    snapshot,
+    readVaultFile: () => null
+  })
+  assert.equal(ok.ok, true)
+  assert.equal((ok.result as { markdown: string }).markdown, '两个词')
+  const outside = answerPluginCall({
+    manifest,
+    call: { id: '2', method: 'notes.read', path: '../secret.md' },
+    snapshot,
+    readVaultFile: () => '秘密'
+  })
+  assert.equal(outside.ok, false)
+  const write = answerPluginCall({
+    manifest,
+    call: { id: '3', method: 'notes.write', path: 'a.md' },
+    snapshot,
+    readVaultFile: () => null
+  })
+  assert.equal(write.ok, false)
 })

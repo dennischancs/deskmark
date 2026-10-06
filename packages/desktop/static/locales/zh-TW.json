@@ -773,9 +773,10 @@
     }
   },
   "about": {
-    "copyright": "Copyright © Luo Ran 2017-{year}",
-    "copyrightContributors": "版權貢獻者"
-  },
+      "copyright": "Copyright © Luo Ran 2017-{year}",
+      "copyrightContributors": "版權貢獻者",
+      "addon": "加入的小功能在桌箋裡面執行，不是另一個單獨的程式。"
+    },
   "commands": {
     "mt": {
       "hide": "隱藏桌箋",

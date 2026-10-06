@@ -12,28 +12,16 @@
   <div id="count">0</div>
   <script>
     const count = document.querySelector("#count")
-    const request = (method, extra) => new Promise((resolve, reject) => {
-      const id = String(Date.now()) + Math.random().toString(16).slice(2)
-      const onMessage = (event) => {
-        const data = event.data || {}
-        if (data.id !== id) return
-        window.removeEventListener("message", onMessage)
-        if (data.ok) resolve(data.result)
-        else reject(new Error(data.error || "failed"))
-      }
-      window.addEventListener("message", onMessage)
-      parent.postMessage({ id, method, ...extra }, "*")
-    })
     const show = async () => {
-      const note = await request("notes.read", {})
-      const text = String(note && note.markdown || "")
+      const bridge = window.deskmark
+      if (!bridge) throw new Error("missing")
+      const note = await bridge.call("notes.read", {})
+      const text = String(note && note.result && note.result.markdown || "")
+      if (!note.ok) throw new Error(note.error || "failed")
       const words = text.trim() ? text.trim().split(/\s+/).length : 0
       count.textContent = String(words)
     }
-    window.addEventListener("message", (event) => {
-      if (event.data && event.data.type === "note-changed") show().catch(() => { count.textContent = "-" })
-    })
-    parent.postMessage({ id: "ready", method: "ui.panel", title: "Words" }, "*")
+    if (window.deskmark && window.deskmark.onNote) window.deskmark.onNote(() => { show().catch(() => { count.textContent = "-" }) })
     show().catch(() => { count.textContent = "-" })
   </script>
 </body>

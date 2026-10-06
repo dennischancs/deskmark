@@ -34,6 +34,9 @@
           <div class="text">
             {{ copyrightContributors }}
           </div>
+          <div class="text">
+            {{ t('about.addon') }}
+          </div>
         </el-col>
       </el-row>
     </el-dialog>
