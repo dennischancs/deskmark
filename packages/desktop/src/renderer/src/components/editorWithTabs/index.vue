@@ -1,7 +1,7 @@
 <template>
   <div
     class="editor-with-tabs"
-    :style="{ 'max-width': `calc(100vw - ${effectiveSideBarWidth}px)` }"
+    :style="{ 'max-width': stickyLayout ? '100%' : `calc(100vw - ${effectiveSideBarWidth}px)` }"
   >
     <tabs v-show="showTabBar" />
     <div class="container">
@@ -44,6 +44,7 @@ defineProps<{
 }>()
 
 const { effectiveSideBarWidth } = storeToRefs(useLayoutStore())
+const stickyLayout = new URLSearchParams(window.location.search).get('sticky') === '1'
 </script>
 
 <style scoped>
