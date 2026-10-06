@@ -39,7 +39,7 @@ import { useEditorStore } from '@/store/editor'
 import { useDeskmarkStore } from '@/store/deskmark'
 import { editDeskmarkTask } from '@/util/deskmarkEdit'
 import TaskLine from '@/components/taskLine.vue'
-import { calendarGroup } from '../../../../../deskmark-core/src/query.ts'
+import { calendarGroup } from '../../../../../../deskmark-core/src/agenda.ts'
 import type { DeskmarkTaskGroups, DeskmarkTaskRef } from '@shared/types/ipc'
 
 const { t } = useI18n()
