@@ -1,8 +1,34 @@
 <template>
   <div class="editor-container">
     <side-bar v-if="init && !stickyProbe" />
-
     <div class="editor-middle">
+      <div
+        v-if="stickyProbe"
+        class="sticky-toolbar"
+      >
+        <p
+          v-if="waylandLimit"
+          class="sticky-limit"
+        >
+          {{ t('sticky.wayland') }}
+        </p>
+        <label>
+          <input
+            v-model="pinned"
+            type="checkbox"
+            @change="setPinned"
+          >
+          {{ t('sticky.pin') }}
+        </label>
+        <button
+          v-for="color of stickyColors"
+          :key="color"
+          type="button"
+          class="sticky-color"
+          :style="{ background: color }"
+          @click="setStickyColor(color)"
+        />
+      </div>
       <title-bar
         :project="projectTree"
         :pathname="pathname"
@@ -54,6 +80,8 @@ import ExportSettingDialog from '@/components/exportSettings/index.vue'
 import Rename from '@/components/rename/index.vue'
 import ImportModal from '@/components/import/index.vue'
 import TaskProperties from '@/components/taskProperties.vue'
+import { useI18n } from 'vue-i18n'
+import { STICKY_COLORS } from 'common/stickyModel'
 import bus from '@/bus'
 import { DEFAULT_STYLE } from '@/config'
 import { useLayoutStore } from '@/store/layout'
@@ -77,6 +105,25 @@ const notificationStore = useNotificationStore()
 
 const timer = ref<ReturnType<typeof setTimeout> | null>(null)
 const stickyProbe = new URLSearchParams(window.location.search).get('sticky') === '1'
+const waylandLimit = new URLSearchParams(window.location.search).get('stickyLimit') === 'wayland'
+const stickyNote = new URLSearchParams(window.location.search).get('note') || ''
+const stickyColors = STICKY_COLORS
+const pinned = ref(true)
+const { t } = useI18n()
+
+const setPinned = (): void => {
+  if (!stickyNote) return
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-pin', stickyNote, pinned.value).catch((error) => {
+    console.error(error)
+  })
+}
+
+const setStickyColor = (color: string): void => {
+  if (!stickyNote) return
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-color', stickyNote, color).catch((error) => {
+    console.error(error)
+  })
+}
 
 const { windowActive, platform, init } = storeToRefs(mainStore)
 const { showTabBar } = storeToRefs(layoutStore)
@@ -254,5 +301,25 @@ onMounted(async () => {
   & > .editor {
     flex: 1;
   }
+}
+.sticky-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  background: #fff4cc;
+}
+.sticky-limit {
+  flex: 1 0 100%;
+  margin: 0;
+  font-size: 12px;
+}
+.sticky-color {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: 1px solid rgb(0 0 0 / 20%);
+  border-radius: 2px;
 }
 </style>

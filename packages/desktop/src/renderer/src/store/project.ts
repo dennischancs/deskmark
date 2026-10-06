@@ -123,6 +123,9 @@ export const useProjectStore = defineStore('project', () => {
     if (scheduleBufferUpdate) {
       debouncedSendBufferedState()
     }
+    window.electron.ipcRenderer.invoke('mt::deskmark::sticky-restore', pathname).catch((error) => {
+      console.error(error)
+    })
   }
 
   function CREATE_BUFFERED_STATE(): BufferedProjectState {

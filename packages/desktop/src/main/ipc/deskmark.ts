@@ -2,6 +2,7 @@ import { ipcMain } from 'electron'
 import log from 'electron-log'
 import { join } from 'node:path'
 import type { InlinePatch } from '../../../../deskmark-core/src/index.ts'
+import { getStickyHost } from '../deskmark/stickies'
 
 export const registerDeskmarkHandlers = (): void => {
   ipcMain.handle('mt::deskmark::tasks', async(_event, root: string) => {
@@ -42,5 +43,21 @@ export const registerDeskmarkHandlers = (): void => {
       log.error('Failed to edit task', error)
       return null
     }
+  })
+
+  ipcMain.handle('mt::deskmark::sticky-open', async(_event, vault: string, notePath: string) => {
+    getStickyHost()?.open(vault, notePath)
+  })
+
+  ipcMain.handle('mt::deskmark::sticky-restore', async(_event, vault: string) => {
+    getStickyHost()?.restore(vault)
+  })
+
+  ipcMain.handle('mt::deskmark::sticky-pin', async(_event, notePath: string, pinned: boolean) => {
+    getStickyHost()?.setPinned(notePath, pinned)
+  })
+
+  ipcMain.handle('mt::deskmark::sticky-color', async(_event, notePath: string, color: string) => {
+    getStickyHost()?.setColor(notePath, color)
   })
 }

@@ -1024,5 +1024,14 @@
       "switchError": "Erro ao alternar corretor para {languageCode}, {error}",
       "title": "Verificação Ortográfica"
     }
+  },
+  "sticky": {
+    "open": "Colar na área de trabalho",
+    "pin": "Fixar",
+    "wayland": "Esta área de trabalho pode não manter a nota à frente.",
+    "capture": "Nova nota",
+    "show": "Mostrar Nota de mesa",
+    "login": "Abrir ao iniciar sessão",
+    "quit": "Sair"
   }
 }

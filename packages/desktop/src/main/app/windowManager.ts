@@ -12,6 +12,7 @@ import type Preference from '../preferences'
 import { WindowType } from '../windows/base'
 import type { WindowTypeValue } from '../windows/base'
 import type EditorWindow from '../windows/editor'
+import { getStickyHost, isQuitting } from '../deskmark/stickies'
 
 class WindowActivityList {
   // Oldest             Newest
@@ -380,6 +381,20 @@ class WindowManager extends TypedEmitter<WindowManagerEvents> {
     // Force close a BrowserWindow
     ipcMain.on('mt::close-window', (e) => {
       const win = BrowserWindow.fromWebContents(e.sender)
+      const editor = win ? this.get(win.id) as EditorWindow | undefined : undefined
+      if (editor?.stickyPath) {
+        if (!isQuitting()) getStickyHost()?.forget(editor.stickyPath)
+        this.editorBufferStore.handleClose(
+          (win as unknown as { restoreBufferId?: string })?.restoreBufferId,
+          this.getWindowsByType('editor')
+        )
+        this.forceClose(win)
+        return
+      }
+      if (win && getStickyHost()?.trayAvailable) {
+        win.hide()
+        return
+      }
       // Before closing, update the buffer store if needed
       this.editorBufferStore.handleClose(
         (win as unknown as { restoreBufferId?: string })?.restoreBufferId,

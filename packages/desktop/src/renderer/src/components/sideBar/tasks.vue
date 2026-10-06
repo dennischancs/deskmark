@@ -6,6 +6,13 @@
     >
       {{ t('sideBar.tasks.empty') }}
     </p>
+    <button
+      v-if="currentPath"
+      type="button"
+      @click="stickCurrent"
+    >
+      {{ t('sticky.open') }}
+    </button>
     <section
       v-for="group of visibleGroups"
       :key="group.id"
@@ -37,6 +44,7 @@ import { computed, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useProjectStore } from '@/store/project'
+import { useEditorStore } from '@/store/editor'
 import { useDeskmarkStore } from '@/store/deskmark'
 import { editDeskmarkTask } from '@/util/deskmarkEdit'
 import type { DeskmarkTaskGroups, DeskmarkTaskRef } from '@shared/types/ipc'
@@ -44,9 +52,12 @@ import type { DeskmarkTaskGroups, DeskmarkTaskRef } from '@shared/types/ipc'
 const { t } = useI18n()
 const projectStore = useProjectStore()
 const deskmarkStore = useDeskmarkStore()
+const editorStore = useEditorStore()
 const { projectTree } = storeToRefs(projectStore)
 const { revision } = storeToRefs(deskmarkStore)
+const { currentFile } = storeToRefs(editorStore)
 const groups = ref<DeskmarkTaskGroups | null>(null)
+const currentPath = computed(() => currentFile.value?.pathname || '')
 
 const root = computed(() => projectTree.value?.pathname || '')
 const visibleGroups = computed(() => {
@@ -94,6 +105,13 @@ const toggle = (task: DeskmarkTaskRef): void => {
   }).then((next) => {
     if (next) groups.value = next
   }).catch((error) => {
+    console.error(error)
+  })
+}
+
+const stickCurrent = (): void => {
+  if (!root.value || !currentPath.value) return
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-open', root.value, currentPath.value).catch((error) => {
     console.error(error)
   })
 }

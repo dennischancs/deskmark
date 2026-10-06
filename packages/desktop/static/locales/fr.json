@@ -1024,5 +1024,14 @@
       "switchError": "Erreur de changement du correcteur pour {languageCode}, {error}",
       "title": "Vérification orthographique"
     }
+  },
+  "sticky": {
+    "open": "Coller sur le bureau",
+    "pin": "Épingler",
+    "wayland": "Ce bureau peut ne pas garder le pense-bête devant.",
+    "capture": "Nouvelle note",
+    "show": "Afficher Pense-bête",
+    "login": "Ouvrir à la connexion",
+    "quit": "Quitter"
   }
 }

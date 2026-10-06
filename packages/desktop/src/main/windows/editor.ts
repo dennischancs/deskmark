@@ -62,6 +62,10 @@ class EditorWindow extends BaseWindow {
 
   public bufferStoreInfo: BufferStoreInfo | null
   public stickyProbe = false
+  public stickyPath: string | null = null
+  public stickyPinned = true
+  public stickyColor = '#fff4cc'
+  public onStickyBounds: ((bounds: { x: number, y: number, width: number, height: number }) => void) | null = null
 
   /**
    * @param accessor The application accessor for application instances.
@@ -104,6 +108,10 @@ class EditorWindow extends BaseWindow {
     let height: number
     if (this.stickyProbe) {
       this.extraQuery = { sticky: '1' }
+      if (process.platform === 'linux' && (process.env.XDG_SESSION_TYPE === 'wayland' || process.env.WAYLAND_DISPLAY)) {
+        this.extraQuery.stickyLimit = 'wayland'
+      }
+      if (this.stickyPath) this.extraQuery.note = this.stickyPath
       const displays = screen.getAllDisplays().map((display) => ({
         x: display.workArea.x,
         y: display.workArea.y,
@@ -165,8 +173,8 @@ class EditorWindow extends BaseWindow {
     if (this.stickyProbe) {
       winOptions.frame = false
       winOptions.transparent = false
-      winOptions.alwaysOnTop = true
-      winOptions.backgroundColor = '#fff4cc'
+      winOptions.alwaysOnTop = this.stickyPinned
+      winOptions.backgroundColor = this.stickyColor
     }
     if (env.disableSpellcheck) {
       // winOptions.webPreferences is set by editorWinOptions spread above
@@ -323,9 +331,11 @@ class EditorWindow extends BaseWindow {
       const userDataPath = env.paths.userDataPath
       const persistBounds = (): void => {
         if (!win || win.isDestroyed()) return
-        writeProbeBounds(userDataPath, win.getBounds())
+        const bounds = win.getBounds()
+        if (this.onStickyBounds) this.onStickyBounds(bounds)
+        else writeProbeBounds(userDataPath, bounds)
       }
-      win.setAlwaysOnTop(true, 'floating')
+      win.setAlwaysOnTop(this.stickyPinned, 'floating')
       win.on('move', persistBounds)
       win.on('resize', persistBounds)
       persistBounds()

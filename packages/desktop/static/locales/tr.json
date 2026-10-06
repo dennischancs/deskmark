@@ -1024,5 +1024,14 @@
       "switchError": "{languageCode} için yazım denetimi değiştirme hatası, {error}",
       "title": "Yazım Denetimi"
     }
+  },
+  "sticky": {
+    "open": "Masaüstüne yapıştır",
+    "pin": "Sabitle",
+    "wayland": "Bu masaüstü notu önde tutamayabilir.",
+    "capture": "Yeni not",
+    "show": "Masa notunu göster",
+    "login": "Oturum açınca aç",
+    "quit": "Çık"
   }
 }

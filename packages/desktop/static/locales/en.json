@@ -1024,5 +1024,14 @@
       "switchError": "Spellcheck switch error for {languageCode}, {error}",
       "title": "Spellcheck"
     }
+  },
+  "sticky": {
+    "open": "Stick on desktop",
+    "pin": "Pin",
+    "wayland": "This desktop may not keep the note in front.",
+    "capture": "New note",
+    "show": "Show Deskmark",
+    "login": "Open at login",
+    "quit": "Quit"
   }
 }

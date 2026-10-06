@@ -1024,5 +1024,14 @@
       "switchError": "Rechtschreibprüfung-Wechselfehler für {languageCode}, {error}",
       "title": "Rechtschreibprüfung"
     }
+  },
+  "sticky": {
+    "open": "Auf den Desktop",
+    "pin": "Anheften",
+    "wayland": "Diese Oberfläche kann den Zettel vielleicht nicht vorne halten.",
+    "capture": "Neue Notiz",
+    "show": "Tischzettel zeigen",
+    "login": "Beim Anmelden öffnen",
+    "quit": "Beenden"
   }
 }

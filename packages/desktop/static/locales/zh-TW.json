@@ -1024,5 +1024,14 @@
       "switchError": "{languageCode} 拼字檢查切換錯誤，{error}",
       "title": "拼字檢查"
     }
+  },
+  "sticky": {
+    "open": "貼到桌面",
+    "pin": "釘住",
+    "wayland": "這個桌面可能無法讓便條一直留在最前面。",
+    "capture": "新建一條",
+    "show": "顯示桌箋",
+    "login": "登入時打開",
+    "quit": "結束"
   }
 }

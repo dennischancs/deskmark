@@ -107,6 +107,10 @@ export interface IpcInvokeChannels {
   'mt::fonts::list': { args: []; ret: string[] }
   'mt::deskmark::tasks': { args: [root: string]; ret: DeskmarkTaskGroups | null }
   'mt::deskmark::edit-task': { args: [request: DeskmarkEditRequest]; ret: DeskmarkEditResult | null }
+  'mt::deskmark::sticky-open': { args: [vault: string, notePath: string]; ret: void }
+  'mt::deskmark::sticky-restore': { args: [vault: string]; ret: void }
+  'mt::deskmark::sticky-pin': { args: [notePath: string, pinned: boolean]; ret: void }
+  'mt::deskmark::sticky-color': { args: [notePath: string, color: string]; ret: void }
   'mt::fs-trash-item': { args: [pathname: string]; ret: void }
   'mt::fs::copy': { args: [src: string, dest: string]; ret: void }
   'mt::fs::copy-with-content-hash': { args: [src: string, outputDir: string]; ret: string }

@@ -1024,5 +1024,14 @@
       "switchError": "Error del corrector ortográfico para {languageCode}, {error}",
       "title": "Corrector ortográfico"
     }
+  },
+  "sticky": {
+    "open": "Pegar en el escritorio",
+    "pin": "Fijar",
+    "wayland": "Este escritorio quizá no pueda dejar la nota delante.",
+    "capture": "Nueva nota",
+    "show": "Mostrar Nota de mesa",
+    "login": "Abrir al iniciar sesión",
+    "quit": "Salir"
   }
 }

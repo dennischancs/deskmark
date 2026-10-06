@@ -19,6 +19,7 @@ import { watchers } from '../utils/imagePathAutoComplement'
 import { onInternalChannel } from '../utils/internalIpc'
 import { WindowType } from '../windows/base'
 import EditorWindow from '../windows/editor'
+import { StickyHost, markQuitting, setStickyHost } from '../deskmark/stickies'
 import SettingWindow from '../windows/setting'
 import { setLanguage } from '../i18n'
 import { matchSupportedLanguage } from 'common/i18n'
@@ -123,6 +124,10 @@ class App {
       if (!isOsx) {
         app.quit()
       }
+    })
+
+    app.on('before-quit', () => {
+      markQuitting()
     })
 
     app.on('activate', () => {
@@ -389,6 +394,12 @@ class App {
       this._openProbeWindow()
     }
 
+    const stickyHost = new StickyHost(this._accessor, this._windowManager, () => {
+      this.showMainWindow()
+    })
+    setStickyHost(stickyHost)
+    stickyHost.createTray(path.join(process.cwd(), 'static', 'logo-small.png'))
+
     // this.shortcutCapture = new ShortcutCapture()
     // if (process.env.NODE_ENV === 'development') {
     //   this.shortcutCapture.dirname = path.resolve(path.join(__dirname, '../../../node_modules/shortcut-capture'))
@@ -466,6 +477,19 @@ class App {
       backgroundColor: '#fff4cc'
     })
     this._windowManager.add(editor)
+  }
+
+  private showMainWindow(): void {
+    const editors = this._windowManager.getWindowsByType('editor')
+    const main = editors.find(entry => !(entry.win as EditorWindow).stickyPath)
+    const browser = main?.win.browserWindow
+    if (browser && !browser.isDestroyed()) {
+      if (browser.isMinimized()) browser.restore()
+      browser.show()
+      browser.focus()
+      return
+    }
+    this._createEditorWindow()
   }
 
   /**
