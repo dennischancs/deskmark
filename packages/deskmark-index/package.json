@@ -1,0 +1,16 @@
+{
+  "name": "@deskmark/index",
+  "version": "1.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "@deskmark/core": "workspace:*"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "node --experimental-strip-types --test test/index.test.ts"
+  }
+}
