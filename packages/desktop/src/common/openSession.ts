@@ -42,8 +42,8 @@ export function tabsFromBufferState(state: unknown): { currentId: string | null,
   return { currentId, tabs }
 }
 
-export function shouldPreserveOpenSession(previousFileCount: number, nextFileCount: number, sessionReady: boolean): boolean {
-  return !sessionReady && previousFileCount > 0 && nextFileCount === 0
+export function shouldPreserveOpenSession(previousFileCount: number, nextFileCount: number, allowEmptySession: boolean): boolean {
+  return !allowEmptySession && previousFileCount > 0 && nextFileCount === 0
 }
 
 export class OpenSession {

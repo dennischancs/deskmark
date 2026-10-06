@@ -45,7 +45,7 @@ describe('open file session', () => {
     expect(prefersSourceMode('Notes.MD')).toBe(false)
   })
 
-  it('does not let a startup snapshot erase tabs that have not been restored', () => {
+  it('does not let a window that never had tabs erase the previous session', () => {
     expect(shouldPreserveOpenSession(2, 0, false)).toBe(true)
     expect(shouldPreserveOpenSession(2, 0, true)).toBe(false)
     expect(shouldPreserveOpenSession(0, 0, false)).toBe(false)

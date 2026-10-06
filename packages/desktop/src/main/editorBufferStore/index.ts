@@ -197,10 +197,10 @@ class EditorBufferStore extends TypedEmitter<EditorBufferStoreEvents> {
     }
 
     const session = tabsFromBufferState(newState)
-    const sessionReady = Boolean(
-      newState && typeof newState === 'object' && (newState as { sessionReady?: unknown }).sessionReady
+    const allowEmptySession = Boolean(
+      newState && typeof newState === 'object' && (newState as { allowEmptySession?: unknown }).allowEmptySession
     )
-    if (session && shouldPreserveOpenSession(this.previousFileCount(), session.tabs.length, sessionReady)) {
+    if (session && shouldPreserveOpenSession(this.previousFileCount(), session.tabs.length, allowEmptySession)) {
       return false
     }
 

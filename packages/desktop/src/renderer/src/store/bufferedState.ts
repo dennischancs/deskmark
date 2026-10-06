@@ -7,6 +7,7 @@ import { SNAPSHOT_INTERVAL_MS } from 'common/sessionRules'
 const BUFFERED_STATE_DEBOUNCE_MS = 1000
 const BUFFERED_STATE_VERSION = 1
 let sessionReady = false
+let sawOpenTabs = false
 
 interface StoreCache {
   editorStore: ReturnType<typeof useEditorStore> | null
@@ -33,10 +34,12 @@ export const createBufferedState = (): Record<string, unknown> | null => {
 
   const editorState = stores.editorStore.CREATE_BUFFERED_STATE()
   if (!editorState) return null
+  if (editorState.tabs.length > 0) sawOpenTabs = true
 
   return {
     version: BUFFERED_STATE_VERSION,
     sessionReady,
+    allowEmptySession: sawOpenTabs,
     ...editorState,
     project: stores.projectStore?.CREATE_BUFFERED_STATE?.() || null,
     layout: stores.layoutStore?.CREATE_BUFFERED_STATE?.() || null

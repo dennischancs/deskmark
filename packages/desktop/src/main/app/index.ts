@@ -1,4 +1,5 @@
 import path from 'path'
+import { readFileSync } from 'node:fs'
 import fsPromises from 'fs/promises'
 import { exec } from 'child_process'
 import dayjs from 'dayjs'
@@ -37,6 +38,19 @@ interface CliArgs {
 interface PathInfo {
   isDir: boolean
   path: string
+}
+
+function bufferMatchesDirectory(filePath: string | null, directories: readonly string[]): boolean {
+  if (!filePath) return false
+  try {
+    const state = JSON.parse(readFileSync(filePath, 'utf8')) as { project?: { rootDirectory?: unknown } }
+    const root = state.project?.rootDirectory
+    if (typeof root !== 'string' || !root) return false
+    const saved = path.resolve(root).toLowerCase()
+    return directories.some(directory => path.resolve(directory).toLowerCase() === saved)
+  } catch {
+    return false
+  }
 }
 
 class App {
@@ -368,7 +382,21 @@ class App {
           this._createEditorWindow(null, [], [], {}, bufferStoreInfo)
         })
       } else if (_openFilesCache.length) {
-        // We should wipe the buffer store if not it will keep creating new windows whenever we open files via double click in the file manager
+        const directories = _openFilesCache.filter(item => item.isDir).map(item => item.path)
+        const onlyDirectories = directories.length === _openFilesCache.length
+        if (onlyDirectories) {
+          const buffers = Object.values(editorBufferStore.getAll()) as Array<{ id: string, filePath: string | null }>
+          const matching = buffers.filter(buffer => bufferMatchesDirectory(buffer.filePath, directories))
+          if (matching.length) {
+            matching.forEach((bufferStoreInfo) => {
+              this._createEditorWindow(null, [], [], {}, bufferStoreInfo)
+            })
+            return
+          }
+          this._openFilesToOpen()
+          return
+        }
+        // Opening individual files should not also resurrect every saved window.
         editorBufferStore.clearBufferStoresWithAllSaved()
         this._openFilesToOpen()
       } else {
