@@ -1,8 +1,10 @@
 # V1 手测清单
 
-版本 7.0.0。这张表对应开发计划第 6 节。自动化测试不能代替这里的窗口、托盘和安装包。
+版本 7.0.1。这张表对应开发计划第 6 节。自动化测试不能代替这里的窗口、托盘和安装包。
 
-这台机器是 Windows。macOS 和 Linux 的安装包没有在这里生成，对应行保持未测。
+这台机器是 Windows。2026-10-06 在这里跑过：deskmark-core、deskmark-index、deskmark-plugin 共 32 项通过；桌面单元测试 981 项通过，36 项因平台跳过（登录 shell、可执行位），0 项失败。Electron 二进制原先没装上，测试会停在下载；装好 42.1.0 之后整套才跑完。
+
+Windows 安装包是 dist/release-7.0.1/marktext-win-x64-7.0.1-setup.exe。macOS 和 Linux 的安装包没有在这里生成，对应行保持未测。
 
 | 案例 | Windows 11 | macOS | Ubuntu X11 | GNOME Wayland |
 | --- | --- | --- | --- | --- |
