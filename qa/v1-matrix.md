@@ -4,7 +4,7 @@
 
 这台机器是 Windows。2026-10-07 在这里跑过：deskmark-core、deskmark-index、deskmark-plugin 共 33 项通过；桌面单元测试 981 项通过，36 项因平台跳过（登录 shell、可执行位），0 项失败。
 
-Windows 安装包是 dist/marktext-win-x64-7.2.2-setup.exe。解包程序报告 v7.2.2。macOS 和 Linux 的安装包没有在这里生成，对应行保持未测。窗口手测仍未做。
+Windows 安装包是 dist/marktext-win-x64-7.2.3-setup.exe。解包程序报告 v7.2.3。macOS 和 Linux 的安装包没有在这里生成，对应行保持未测。
 
 | 案例 | Windows 11 | macOS | Ubuntu X11 | GNOME Wayland |
 | --- | --- | --- | --- | --- |
@@ -30,4 +30,4 @@ Windows 安装包是 dist/marktext-win-x64-7.2.2-setup.exe。解包程序报告 
 - `@` 随这一版交付。它复用笔记里的 `/` 菜单，邮箱中间的 `@` 不打开。
 - 小功能目前跑在应用内的沙箱页面，不是单独进程。
 
-Windows x64 安装包是 marktext-win-x64-7.2.2-setup.exe。macOS 和 Linux 安装包没有生成。
+Windows x64 安装包是 marktext-win-x64-7.2.3-setup.exe。macOS 和 Linux 安装包没有生成。
