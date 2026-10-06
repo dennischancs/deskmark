@@ -1033,5 +1033,10 @@
     "show": "Show Deskmark",
     "login": "Open at login",
     "quit": "Quit"
+  },
+"calendar": {
+    "title": "Calendar",
+    "new": "New",
+    "placeholder": "New line"
   }
 }

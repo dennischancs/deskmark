@@ -1,4 +1,7 @@
 export { agendaFromMarkdown, calendarGroup, isOverdue, markedDates, smartList, tasksOnDate } from './query.ts'
+export { applyQuickAction, buildMonth, shouldOpenAtMention, slashQuery } from './calendar.ts'
+export { planReminders } from './reminders.ts'
+export type { MonthCell, QuickAction } from './calendar.ts'
 export {
   appendJournalTask,
   completeInlineTask,

@@ -70,6 +70,8 @@
 
 <script setup lang="ts">
 import { ref, shallowRef, reactive, watch, onMounted, onBeforeUnmount, nextTick, markRaw } from 'vue'
+import { applyQuickAction, type QuickAction } from '../../../../../../deskmark-core/src/calendar.ts'
+import { localDateTimeToIso } from '../../../../../../deskmark-core/src/time.ts'
 import log from 'electron-log'
 import {
   Muya,
@@ -1269,6 +1271,46 @@ const revealDeskmarkLine = (line: unknown) => {
   })
 }
 
+function actionFromLabel (label: string): QuickAction | null {
+  if (label === 'deskmark:todo') return 'todo'
+  if (label === 'deskmark:date') return 'date'
+  if (label === 'deskmark:remind') return 'remind'
+  if (label === 'deskmark:journal') return 'journal'
+  if (label === 'deskmark:today') return 'today'
+  if (label === 'deskmark:tomorrow') return 'tomorrow'
+  if (label.startsWith('deskmark:note:')) return 'note'
+  return null
+}
+
+const handleDeskmarkInsert = (payload: unknown) => {
+  const event = payload as {
+    label?: string
+    text?: string
+    insideTask?: boolean
+    replaceWithTask?: (text: string) => void
+    setText?: (text: string) => void
+  }
+  const action = actionFromLabel(event.label || '')
+  if (!action) return
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
+  const tomorrowDate = new Date(`${today}T00:00:00`)
+  tomorrowDate.setDate(tomorrowDate.getDate() + 1)
+  const tomorrow = new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(tomorrowDate)
+  const noteHref = event.label?.startsWith('deskmark:note:') ? decodeURIComponent(event.label.slice('deskmark:note:'.length)) : ''
+  const result = applyQuickAction(event.text || '', action, {
+    today,
+    tomorrow,
+    remind: localDateTimeToIso(`${today}T09:00`, timeZone) || `${today}T09:00:00+08:00`,
+    journalHref: `journal/${today}.md`,
+    noteHref,
+    noteLabel: noteHref.split('/').pop() || noteHref,
+    id: `deskmark-${Date.now()}`
+  })
+  if (event.insideTask || !result.asTask) event.setText?.(result.text)
+  else event.replaceWithTask?.(result.text)
+}
+
 const scrollToElement = (selector: string) => {
   // Scroll to search highlight word
   scrollElementIntoView(document.querySelector(selector))
@@ -1817,6 +1859,24 @@ onMounted(() => {
   // DOM via snabbdom; proxying them silently breaks identity checks so the
   // document tree never renders.
   const muya = markRaw(new Muya(ele, options))
+  const publishNotes = (): void => {
+    const root = projectTree.value
+    const notes: { title: string, href: string }[] = []
+    const walk = (folder: typeof root): void => {
+      if (!folder) return
+      for (const file of folder.files) {
+        if (!file.isMarkdown) continue
+        const href = window.path.relative(root!.pathname, file.pathname).replaceAll('\\', '/')
+        notes.push({ title: file.name.replace(/\.md$/i, ''), href })
+      }
+      for (const child of folder.folders) walk(child)
+    }
+    walk(root)
+    muya.deskmarkNotes = notes
+  }
+  publishNotes()
+  watch(projectTree, publishNotes, { deep: true })
+  muya.on('deskmark-insert', handleDeskmarkInsert)
   // The new engine requires an explicit init() after construction (it builds
   // the document tree and instantiates the registered UI plugins).
   muya.init()

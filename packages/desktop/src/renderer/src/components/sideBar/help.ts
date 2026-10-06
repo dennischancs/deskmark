@@ -3,6 +3,7 @@ import {
   Search as SearchIcon,
   Memo as TocIcon,
   List as TasksIcon,
+  Calendar as CalendarIcon,
   Setting as SettingIcon
 } from '@element-plus/icons-vue'
 import { t } from '@/i18n'
@@ -33,6 +34,11 @@ export const sideBarIcons: SideBarIconEntry[] = [
     id: 'tasks',
     name: () => t('sideBar.icons.tasks'),
     icon: TasksIcon
+  },
+  {
+    id: 'calendar',
+    name: () => t('calendar.title'),
+    icon: CalendarIcon
   }
 ]
 

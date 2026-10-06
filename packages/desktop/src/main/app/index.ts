@@ -20,6 +20,8 @@ import { onInternalChannel } from '../utils/internalIpc'
 import { WindowType } from '../windows/base'
 import EditorWindow from '../windows/editor'
 import { StickyHost, markQuitting, setStickyHost } from '../deskmark/stickies'
+import { startReminderLoop } from '../deskmark/reminderLoop'
+import { join as pathJoin } from 'node:path'
 import SettingWindow from '../windows/setting'
 import { setLanguage } from '../i18n'
 import { matchSupportedLanguage } from 'common/i18n'
@@ -399,6 +401,17 @@ class App {
     })
     setStickyHost(stickyHost)
     stickyHost.createTray(path.join(process.cwd(), 'static', 'logo-small.png'))
+    startReminderLoop({
+      userDataPath: this._accessor.paths.userDataPath,
+      openNote: (vault, notePath, line) => {
+        this.showMainWindow()
+        const editors = this._windowManager.getWindowsByType('editor')
+        const main = editors.find(entry => !(entry.win as EditorWindow).stickyPath)
+        const editor = main?.win as EditorWindow | undefined
+        if (!editor) return
+        editor.openTab(pathJoin(vault, notePath), line ? { deskmarkLine: line } : {}, true)
+      }
+    })
 
     // this.shortcutCapture = new ShortcutCapture()
     // if (process.env.NODE_ENV === 'development') {

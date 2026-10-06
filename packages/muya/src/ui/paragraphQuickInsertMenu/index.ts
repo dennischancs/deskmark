@@ -19,6 +19,11 @@ import './index.css';
 
 const checkQuickInsert = (text: string) => /^[/、]\S*$/.test(text);
 const checkShowPlaceholder = (text: string) => /^[/、]$/.test(text);
+const mentionQuery = (text: string): string | null => {
+    if (!/(?:^|\s)@\S*$/.test(text) || /\w@\S*$/.test(text))
+        return null;
+    return /(?:^|\s)@(\S*)$/.exec(text)?.[1] ?? '';
+};
 function checkCanInsertFrontMatter(muya: Muya, block: ParagraphContent) {
     const { frontMatter } = muya.options;
 
@@ -35,6 +40,7 @@ export class ParagraphQuickInsertMenu extends BaseScrollFloat {
 
     public oldVNode: VNode | null = null;
     private _block: ParagraphContent | null = null;
+    private _mention = false;
     public override activeItem: IQuickInsertMenuItem['children'][number] | null = null;
     public override renderArray: IQuickInsertMenuItem['children'] = [];
     private _renderData: IQuickInsertMenuItem[] = [];
@@ -75,16 +81,18 @@ export class ParagraphQuickInsertMenu extends BaseScrollFloat {
 
             const { text, domNode } = block;
             const needToShowQuickInsert = checkQuickInsert(text);
+            const atQuery = mentionQuery(text);
             const needToShowPlaceholder = checkShowPlaceholder(text);
             if (needToShowPlaceholder)
                 domNode!.setAttribute('placeholder', i18n.t('Search keyword...'));
             else
                 domNode!.removeAttribute('placeholder');
 
-            if (needToShowQuickInsert) {
+            if (needToShowQuickInsert || atQuery !== null) {
                 this._block = block;
+                this._mention = atQuery !== null && !needToShowQuickInsert;
                 this.show(domNode);
-                this._search(text.substring(1)); // remove `/` char
+                this._search(needToShowQuickInsert ? text.substring(1) : atQuery!);
             }
             else {
                 this.hide();
@@ -212,6 +220,20 @@ export class ParagraphQuickInsertMenu extends BaseScrollFloat {
     private _search(text: string) {
         const { muya, _block: block } = this;
         const { i18n } = muya;
+        if (this._mention) {
+            const base = deepClone(MENU_CONFIG).find(menu => menu.name === 'deskmark');
+            const mentions = (base?.children ?? []).filter(child => /today|tomorrow|journal/i.test(child.label) || child.label === 'deskmark:today' || child.label === 'deskmark:tomorrow' || child.label === 'deskmark:journal');
+            const notes = (muya.deskmarkNotes ?? []).map(note => ({
+                title: note.title,
+                subTitle: note.href,
+                label: `deskmark:note:${encodeURIComponent(note.href)}`,
+                icon: mentions[0]?.icon ?? '',
+            }));
+            const children = [...mentions, ...notes].filter(child => text === '' || child.title.toLowerCase().includes(text.toLowerCase()));
+            this.renderData = children.length ? [{ name: 'deskmark', children }] : [];
+            this.render();
+            return;
+        }
         const canInsertFrontMatter = checkCanInsertFrontMatter(muya, block!);
         const menuConfig = deepClone(MENU_CONFIG);
 
@@ -259,6 +281,26 @@ export class ParagraphQuickInsertMenu extends BaseScrollFloat {
 
     override selectItem({ label }: IQuickInsertMenuItem['children'][number]) {
         const { _block: block, muya } = this;
+        if (label.startsWith('deskmark:')) {
+            const parentName = block?.parent?.parent && 'blockName' in block.parent.parent
+                ? (block.parent.parent as { blockName?: string }).blockName
+                : '';
+            this.muya.eventCenter.emit('deskmark-insert', {
+                label,
+                text: block?.text ?? '',
+                insideTask: parentName === 'task-list-item',
+                replaceWithTask: (next: string) => {
+                    if (block?.parent)
+                        replaceBlockByLabel({ label: 'task-list', text: next, block: block.parent, muya });
+                },
+                setText: (next: string) => {
+                    if (block)
+                        block.text = next;
+                },
+            });
+            setTimeout(this.hide.bind(this));
+            return;
+        }
         if (block?.outMostBlock) {
             replaceBlockByLabel({
                 label,

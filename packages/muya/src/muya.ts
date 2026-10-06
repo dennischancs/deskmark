@@ -155,6 +155,7 @@ export class Muya {
     public readonly version = typeof window.MUYA_VERSION === 'undefined' ? 'dev' : window.MUYA_VERSION;
     public options: IMuyaOptions = MUYA_DEFAULT_OPTIONS;
     public eventCenter: EventCenter;
+    public deskmarkNotes: { title: string, href: string }[] = [];
     public domNode: HTMLElement;
     public editor: Editor;
     public ui: Ui;

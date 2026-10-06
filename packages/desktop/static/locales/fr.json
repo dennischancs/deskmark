@@ -1033,5 +1033,10 @@
     "show": "Afficher Pense-bête",
     "login": "Ouvrir à la connexion",
     "quit": "Quitter"
+  },
+"calendar": {
+    "title": "Calendrier",
+    "new": "Nouveau",
+    "placeholder": "Nouvelle ligne"
   }
 }

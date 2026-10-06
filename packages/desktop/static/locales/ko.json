@@ -1033,5 +1033,10 @@
     "show": "책상메모 보이기",
     "login": "로그인할 때 열기",
     "quit": "종료"
+  },
+"calendar": {
+    "title": "달력",
+    "new": "추가",
+    "placeholder": "새 줄"
   }
 }

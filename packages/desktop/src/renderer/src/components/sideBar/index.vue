@@ -53,6 +53,7 @@ import { ref, computed, onMounted, nextTick } from 'vue'
 import { useLayoutStore } from '@/store/layout'
 import { useProjectStore } from '@/store/project'
 import { useEditorStore } from '@/store/editor'
+import { useDeskmarkStore } from '@/store/deskmark'
 
 import { sideBarIcons, sideBarBottomIcons } from './help'
 import Tree from './tree.vue'
@@ -65,6 +66,7 @@ import type { TabDescriptor } from './types'
 const layoutStore = useLayoutStore()
 const projectStore = useProjectStore()
 const editorStore = useEditorStore()
+const deskmarkStore = useDeskmarkStore()
 
 const sideBar = ref<HTMLDivElement | null>(null)
 const dragBar = ref<HTMLDivElement | null>(null)
@@ -117,6 +119,11 @@ onMounted(() => {
 })
 
 const handleLeftIconClick = (name: string): void => {
+  if (name === 'calendar') {
+    deskmarkStore.calendarOpen = !deskmarkStore.calendarOpen
+    return
+  }
+  deskmarkStore.calendarOpen = false
   if (rightColumn.value === name) {
     // Capture the expanded width BEFORE collapsing: once rightColumn is '',
     // finalSideBarWidth evaluates to the 45px icon strip and would overwrite

@@ -1033,5 +1033,10 @@
     "show": "Masa notunu göster",
     "login": "Oturum açınca aç",
     "quit": "Çık"
+  },
+"calendar": {
+    "title": "Takvim",
+    "new": "Yeni",
+    "placeholder": "Yeni satır"
   }
 }

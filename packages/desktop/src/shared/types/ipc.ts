@@ -111,6 +111,10 @@ export interface IpcInvokeChannels {
   'mt::deskmark::sticky-restore': { args: [vault: string]; ret: void }
   'mt::deskmark::sticky-pin': { args: [notePath: string, pinned: boolean]; ret: void }
   'mt::deskmark::sticky-color': { args: [notePath: string, color: string]; ret: void }
+  'mt::deskmark::journal-task': {
+    args: [root: string, day: string, text: string]
+    ret: { path: string, relative: string, line: number } | null
+  }
   'mt::fs-trash-item': { args: [pathname: string]; ret: void }
   'mt::fs::copy': { args: [src: string, dest: string]; ret: void }
   'mt::fs::copy-with-content-hash': { args: [src: string, outputDir: string]; ret: string }

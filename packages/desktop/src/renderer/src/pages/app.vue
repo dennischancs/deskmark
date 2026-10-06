@@ -45,8 +45,9 @@
         class="editor-placeholder"
       />
       <recent v-if="!hasCurrentFile && init" />
+      <calendar-view v-if="calendarOpen && !stickyProbe" />
       <editor-with-tabs
-        v-if="hasCurrentFile && init"
+        v-if="hasCurrentFile && init && !calendarOpen"
         :markdown="markdown"
         :cursor="cursor"
         :muya-index-cursor="muyaIndexCursor"
@@ -80,6 +81,8 @@ import ExportSettingDialog from '@/components/exportSettings/index.vue'
 import Rename from '@/components/rename/index.vue'
 import ImportModal from '@/components/import/index.vue'
 import TaskProperties from '@/components/taskProperties.vue'
+import CalendarView from '@/components/calendarView.vue'
+import { useDeskmarkStore } from '@/store/deskmark'
 import { useI18n } from 'vue-i18n'
 import { STICKY_COLORS } from 'common/stickyModel'
 import bus from '@/bus'
@@ -98,6 +101,8 @@ const editorStore = useEditorStore()
 const preferencesStore = usePreferencesStore()
 const layoutStore = useLayoutStore()
 const projectStore = useProjectStore()
+const deskmarkStore = useDeskmarkStore()
+const { calendarOpen } = storeToRefs(deskmarkStore)
 const listenForMainStore = useListenForMainStore()
 const autoUpdateStore = useAutoUpdatesStore()
 const commandCenterStore = useCommandCenterStore()

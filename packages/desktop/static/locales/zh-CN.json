@@ -1033,5 +1033,10 @@
     "show": "显示桌笺",
     "login": "登录时打开",
     "quit": "退出"
+  },
+"calendar": {
+    "title": "日历",
+    "new": "新建",
+    "placeholder": "新的一行"
   }
 }

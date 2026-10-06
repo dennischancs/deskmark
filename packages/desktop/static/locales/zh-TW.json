@@ -1033,5 +1033,10 @@
     "show": "顯示桌箋",
     "login": "登入時打開",
     "quit": "結束"
+  },
+"calendar": {
+    "title": "日曆",
+    "new": "新增",
+    "placeholder": "新的一行"
   }
 }

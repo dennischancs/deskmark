@@ -1033,5 +1033,10 @@
     "show": "Mostrar Nota de mesa",
     "login": "Abrir ao iniciar sessão",
     "quit": "Sair"
+  },
+"calendar": {
+    "title": "Calendário",
+    "new": "Novo",
+    "placeholder": "Nova linha"
   }
 }

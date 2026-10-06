@@ -1033,5 +1033,10 @@
     "show": "Bureaubriefje tonen",
     "login": "Openen bij aanmelden",
     "quit": "Afsluiten"
+  },
+"calendar": {
+    "title": "Kalender",
+    "new": "Nieuw",
+    "placeholder": "Nieuwe regel"
   }
 }

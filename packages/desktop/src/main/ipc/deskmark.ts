@@ -3,6 +3,10 @@ import log from 'electron-log'
 import { join } from 'node:path'
 import type { InlinePatch } from '../../../../deskmark-core/src/index.ts'
 import { getStickyHost } from '../deskmark/stickies'
+import { setReminderVault } from '../deskmark/reminderLoop'
+import { appendJournalTask, createUlid, journalPath } from '../../../../deskmark-core/src/index.ts'
+import { existsSync, mkdirSync, readFileSync } from 'node:fs'
+import { dirname } from 'node:path'
 
 export const registerDeskmarkHandlers = (): void => {
   ipcMain.handle('mt::deskmark::tasks', async(_event, root: string) => {
@@ -50,6 +54,7 @@ export const registerDeskmarkHandlers = (): void => {
   })
 
   ipcMain.handle('mt::deskmark::sticky-restore', async(_event, vault: string) => {
+    setReminderVault(vault)
     getStickyHost()?.restore(vault)
   })
 
@@ -59,5 +64,24 @@ export const registerDeskmarkHandlers = (): void => {
 
   ipcMain.handle('mt::deskmark::sticky-color', async(_event, notePath: string, color: string) => {
     getStickyHost()?.setColor(notePath, color)
+  })
+
+  ipcMain.handle('mt::deskmark::journal-task', async(_event, root: string, day: string, text: string) => {
+    try {
+      const relative = journalPath(day)
+      const absolute = join(root, relative)
+      mkdirSync(dirname(absolute), { recursive: true })
+      const existing = existsSync(absolute) ? readFileSync(absolute, 'utf8') : null
+      const markdown = appendJournalTask(existing, text, day, createUlid())
+      const temporary = `${absolute}.deskmark-tmp`
+      const { writeFileSync, renameSync } = await import('node:fs')
+      writeFileSync(temporary, markdown)
+      renameSync(temporary, absolute)
+      const line = markdown.split(/\r?\n/).findIndex(item => item.includes(text)) + 1
+      return { path: absolute, relative, line }
+    } catch (error) {
+      log.error('Failed to create journal task', error)
+      return null
+    }
   })
 }

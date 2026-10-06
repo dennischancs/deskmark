@@ -333,6 +333,47 @@ export const MENU_CONFIG: IQuickInsertMenuItem[] = [
             },
         ],
     },
+    {
+        name: 'deskmark',
+        children: [
+            {
+                title: 'To-do',
+                subTitle: '- [ ]',
+                label: 'deskmark:todo',
+                icon: todoListIcon,
+            },
+            {
+                title: 'Date',
+                subTitle: 'due today',
+                label: 'deskmark:date',
+                icon: todoListIcon,
+            },
+            {
+                title: 'Reminder',
+                subTitle: '09:00',
+                label: 'deskmark:remind',
+                icon: todoListIcon,
+            },
+            {
+                title: "Today's journal",
+                subTitle: 'journal',
+                label: 'deskmark:journal',
+                icon: todoListIcon,
+            },
+            {
+                title: 'Today',
+                subTitle: '@',
+                label: 'deskmark:today',
+                icon: todoListIcon,
+            },
+            {
+                title: 'Tomorrow',
+                subTitle: '@',
+                label: 'deskmark:tomorrow',
+                icon: todoListIcon,
+            },
+        ],
+    },
 ];
 
 export function getLabelFromEvent(event: Event) {

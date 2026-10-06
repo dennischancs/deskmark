@@ -78,6 +78,11 @@ const load = async (): Promise<void> => {
     return
   }
   groups.value = await window.electron.ipcRenderer.invoke('mt::deskmark::tasks', root.value)
+  const names = new Map<string, string>()
+  for (const group of Object.values(groups.value ?? {})) {
+    for (const task of group) names.set(task.notePath, task.notePath.split('/').pop() || task.notePath)
+  }
+  deskmarkStore.notes = [...names.entries()].map(([href, title]) => ({ title, href }))
 }
 
 watch(root, () => {

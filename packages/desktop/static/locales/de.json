@@ -1033,5 +1033,10 @@
     "show": "Tischzettel zeigen",
     "login": "Beim Anmelden öffnen",
     "quit": "Beenden"
+  },
+"calendar": {
+    "title": "Kalender",
+    "new": "Neu",
+    "placeholder": "Neue Zeile"
   }
 }
