@@ -147,9 +147,12 @@ function unchanged(markdown: string, error: string): EditResult {
 }
 
 function splitLines(markdown: string): Lines {
-  const newline = markdown.includes('\r\n') ? '\r\n' : '\n'
-  const endsWithNewline = markdown.endsWith(newline)
-  const lines = markdown.length === 0 ? [] : markdown.split(newline)
+  const crlf = markdown.split('\r\n').length - 1
+  const lf = markdown.split('\n').length - 1 - crlf
+  const newline = crlf > lf ? '\r\n' : '\n'
+  const normalized = markdown.replace(/\r\n/g, '\n')
+  const endsWithNewline = normalized.endsWith('\n')
+  const lines = normalized.length === 0 ? [] : normalized.split('\n')
   if (endsWithNewline) lines.pop()
   return { lines, newline }
 }

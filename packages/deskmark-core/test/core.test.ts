@@ -162,6 +162,14 @@ test('全库待办按日期出现，完成的不在月历标记里', () => {
   assert.deepEqual(markedDates(items), ['2026-10-08', '2026-10-20'])
 })
 
+test('换行混在一起时，待办行仍然能被认出来', () => {
+  const markdown = '# 手测\n\n- [ ] 买牛奶 <!-- deskmark: id=hand722; due=2026-10-07; priority=high -->\n- [ ] 写信 a@b.com\r\n'
+  const items = agendaFromMarkdown('notes/milk.md', markdown)
+  assert.deepEqual(items.map(item => item.text), ['买牛奶', '写信 a@b.com'])
+  assert.equal(items[0]?.due, '2026-10-07')
+  assert.equal(items[0]?.priority, 'high')
+})
+
 test('从日历新建落在日记的一行', () => {
   assert.equal(journalPath('2026-10-08'), 'journal/2026-10-08.md')
   const created = appendJournalTask(null, '交表', '2026-10-08', 'NEW')
