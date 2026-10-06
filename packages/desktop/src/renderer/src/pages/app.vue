@@ -62,7 +62,7 @@
       <rename />
       <import-modal />
     </div>
-    <task-properties v-if="deskmarkTasks !== false" />
+    <task-properties v-if="deskmarkTasks !== false && !stickyProbe" />
   </div>
 </template>
 
