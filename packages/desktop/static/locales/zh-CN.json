@@ -258,7 +258,16 @@
       "files": "文件",
       "search": "搜索",
       "toc": "目录",
-      "settings": "设置"
+      "settings": "设置",
+      "tasks": "待办"
+    },
+    "tasks": {
+      "empty": "先打开一个文件夹",
+      "inbox": "收件箱",
+      "today": "今天",
+      "upcoming": "以后",
+      "overdue": "逾期",
+      "done": "已完成"
     }
   },
   "commandPalette": {

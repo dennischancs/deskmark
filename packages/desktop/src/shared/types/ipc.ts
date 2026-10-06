@@ -48,6 +48,23 @@ export type PlantumlFetchResult =
 // Invoke channels (renderer → main, returns Promise<T>)
 // =================================================================
 
+export interface DeskmarkTaskRef {
+  taskKey: string
+  notePath: string
+  line: number | null
+  text: string
+  status: 'open' | 'done'
+  due: string | null
+}
+
+export interface DeskmarkTaskGroups {
+  inbox: DeskmarkTaskRef[]
+  today: DeskmarkTaskRef[]
+  upcoming: DeskmarkTaskRef[]
+  overdue: DeskmarkTaskRef[]
+  done: DeskmarkTaskRef[]
+}
+
 export interface IpcInvokeChannels {
   'mt::ask-for-image-path': { args: []; ret: string[] }
   'mt::boot-info-async': { args: []; ret: BootInfo }
@@ -61,6 +78,7 @@ export interface IpcInvokeChannels {
   }
   'mt::dialog::show-save': { args: [request: SaveDialogRequest]; ret: string | null }
   'mt::fonts::list': { args: []; ret: string[] }
+  'mt::deskmark::tasks': { args: [root: string]; ret: DeskmarkTaskGroups | null }
   'mt::fs-trash-item': { args: [pathname: string]; ret: void }
   'mt::fs::copy': { args: [src: string, dest: string]; ret: void }
   'mt::fs::copy-with-content-hash': { args: [src: string, outputDir: string]; ret: string }

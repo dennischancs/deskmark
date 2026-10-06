@@ -258,7 +258,16 @@
       "files": "Archivos",
       "search": "Buscar",
       "toc": "Tabla de Contenidos",
-      "settings": "Configuración"
+      "settings": "Configuración",
+      "tasks": "Tareas"
+    },
+    "tasks": {
+      "empty": "Abre una carpeta para ver las tareas",
+      "inbox": "Bandeja",
+      "today": "Hoy",
+      "upcoming": "Más tarde",
+      "overdue": "Atrasadas",
+      "done": "Hechas"
     }
   },
   "commandPalette": {

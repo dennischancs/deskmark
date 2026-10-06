@@ -258,7 +258,16 @@
       "files": "Fichiers",
       "search": "Rechercher",
       "toc": "Table des matières",
-      "settings": "Paramètres"
+      "settings": "Paramètres",
+      "tasks": "Tâches"
+    },
+    "tasks": {
+      "empty": "Ouvrez un dossier pour voir les tâches",
+      "inbox": "Boîte de réception",
+      "today": "Aujourd'hui",
+      "upcoming": "Plus tard",
+      "overdue": "En retard",
+      "done": "Terminé"
     }
   },
   "commandPalette": {

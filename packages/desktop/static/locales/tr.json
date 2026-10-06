@@ -258,7 +258,16 @@
       "files": "Dosyalar",
       "search": "Ara",
       "toc": "İçindekiler",
-      "settings": "Ayarlar"
+      "settings": "Ayarlar",
+      "tasks": "Görevler"
+    },
+    "tasks": {
+      "empty": "Görevleri görmek için klasör açın",
+      "inbox": "Gelen kutusu",
+      "today": "Bugün",
+      "upcoming": "Sonra",
+      "overdue": "Gecikmiş",
+      "done": "Bitti"
     }
   },
   "commandPalette": {

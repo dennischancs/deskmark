@@ -258,7 +258,16 @@
       "files": "Bestanden",
       "search": "Zoeken",
       "toc": "Inhoudsopgave",
-      "settings": "Instellingen"
+      "settings": "Instellingen",
+      "tasks": "Taken"
+    },
+    "tasks": {
+      "empty": "Open een map om taken te zien",
+      "inbox": "Postvak",
+      "today": "Vandaag",
+      "upcoming": "Later",
+      "overdue": "Te laat",
+      "done": "Klaar"
     }
   },
   "commandPalette": {

@@ -258,7 +258,16 @@
       "files": "파일",
       "search": "검색",
       "toc": "목차",
-      "settings": "설정"
+      "settings": "설정",
+      "tasks": "할 일"
+    },
+    "tasks": {
+      "empty": "폴더를 여세요",
+      "inbox": "받은함",
+      "today": "오늘",
+      "upcoming": "나중에",
+      "overdue": "기한 지남",
+      "done": "완료"
     }
   },
   "commandPalette": {

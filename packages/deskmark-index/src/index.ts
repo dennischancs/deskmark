@@ -1,4 +1,5 @@
 export { IndexLock } from './lock.ts'
+export { collectVaultFiles, groupTasks } from './vault.ts'
 export {
   SCHEMA_VERSION,
   VaultIndex,

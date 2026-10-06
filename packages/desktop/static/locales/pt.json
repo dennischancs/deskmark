@@ -258,7 +258,16 @@
       "files": "Arquivos",
       "search": "Pesquisar",
       "toc": "Índice",
-      "settings": "Configurações"
+      "settings": "Configurações",
+      "tasks": "Tarefas"
+    },
+    "tasks": {
+      "empty": "Abra uma pasta para ver as tarefas",
+      "inbox": "Caixa de entrada",
+      "today": "Hoje",
+      "upcoming": "Mais tarde",
+      "overdue": "Atrasadas",
+      "done": "Feitas"
     }
   },
   "commandPalette": {

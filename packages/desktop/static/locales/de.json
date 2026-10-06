@@ -258,7 +258,16 @@
       "files": "Dateien",
       "search": "Suchen",
       "toc": "Inhaltsverzeichnis",
-      "settings": "Einstellungen"
+      "settings": "Einstellungen",
+      "tasks": "Aufgaben"
+    },
+    "tasks": {
+      "empty": "Ordner öffnen, um Aufgaben zu sehen",
+      "inbox": "Eingang",
+      "today": "Heute",
+      "upcoming": "Später",
+      "overdue": "Überfällig",
+      "done": "Erledigt"
     }
   },
   "commandPalette": {

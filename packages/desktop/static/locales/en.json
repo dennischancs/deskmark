@@ -258,7 +258,16 @@
       "files": "Files",
       "search": "Search",
       "toc": "Table of Contents",
-      "settings": "Settings"
+      "settings": "Settings",
+      "tasks": "Tasks"
+    },
+    "tasks": {
+      "empty": "Open a folder to see tasks",
+      "inbox": "Inbox",
+      "today": "Today",
+      "upcoming": "Later",
+      "overdue": "Overdue",
+      "done": "Done"
     }
   },
   "commandPalette": {
