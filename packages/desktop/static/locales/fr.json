@@ -794,7 +794,9 @@
       "tasks": "Afficher les tâches",
       "reminders": "Rappeler à l’heure choisie",
       "wordCount": "Afficher le nombre de mots",
-      "detail": "La date, le rappel, la priorité et la répétition se règlent sur la tâche. Ici, on ne fait que les activer."
+      "detail": "La date, le rappel, la priorité et la répétition se règlent sur la tâche. Ici, on ne fait que les activer.",
+      "reminderLimit": "Les rappels arrivent seulement pendant que Pense-bête est ouvert. Une fois fermé, l’heure ne sonne pas.",
+      "openAtLogin": "Ouvrir à la connexion"
     }
   },
   "about": {

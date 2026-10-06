@@ -794,7 +794,9 @@
       "tasks": "Görevleri göster",
       "reminders": "Belirlenen saatte anımsat",
       "wordCount": "Kelime sayısını göster",
-      "detail": "Tarih, anımsatma, öncelik ve yineleme görevin kendisinde değişir. Burada yalnızca açılır veya kapanır."
+      "detail": "Tarih, anımsatma, öncelik ve yineleme görevin kendisinde değişir. Burada yalnızca açılır veya kapanır.",
+      "reminderLimit": "Anımsatmalar yalnızca Masa notu açıkken gelir. Kapanınca saat çalmaz.",
+      "openAtLogin": "Oturum açılınca aç"
     }
   },
   "about": {

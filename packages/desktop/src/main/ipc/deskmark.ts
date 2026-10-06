@@ -117,4 +117,13 @@ export const registerDeskmarkHandlers = (): void => {
       return null
     }
   })
+
+  ipcMain.handle('mt::deskmark::login-get', () => {
+    return getStickyHost()?.loginEnabled() ?? false
+  })
+
+  ipcMain.handle('mt::deskmark::login-set', (_event, enabled: boolean) => {
+    getStickyHost()?.setLogin(enabled)
+    return getStickyHost()?.loginEnabled() ?? enabled
+  })
 }

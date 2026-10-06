@@ -794,7 +794,9 @@
       "tasks": "Taken tonen",
       "reminders": "Herinneren op het gekozen tijdstip",
       "wordCount": "Woorden tonen",
-      "detail": "Datum, herinnering, prioriteit en herhaling staan bij de taak zelf. Hier zet je de functie alleen aan of uit."
+      "detail": "Datum, herinnering, prioriteit en herhaling staan bij de taak zelf. Hier zet je de functie alleen aan of uit.",
+      "reminderLimit": "Herinneringen komen alleen zolang Bureaubriefje open is. Na afsluiten gaat er niets af.",
+      "openAtLogin": "Openen bij aanmelden"
     }
   },
   "about": {

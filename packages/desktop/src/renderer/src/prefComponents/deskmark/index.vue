@@ -21,6 +21,7 @@
         <bool
           :description="t('preferences.deskmark.reminders')"
           :bool="deskmarkReminders"
+          :notes="t('preferences.deskmark.reminderLimit')"
           :on-change="(value) => onSelectChange('deskmarkReminders', value)"
         />
         <bool
@@ -28,12 +29,18 @@
           :bool="deskmarkWordCount"
           :on-change="(value) => onSelectChange('deskmarkWordCount', value)"
         />
+        <bool
+          :description="t('preferences.deskmark.openAtLogin')"
+          :bool="openAtLogin"
+          :on-change="setLogin"
+        />
       </template>
     </compound>
   </div>
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { usePreferencesStore } from '@/store/preferences'
@@ -45,8 +52,24 @@ const { t } = useI18n()
 const preferenceStore = usePreferencesStore()
 const { deskmarkCalendar, deskmarkTasks, deskmarkReminders, deskmarkWordCount } =
   storeToRefs(preferenceStore)
+const openAtLogin = ref(false)
+
+onMounted(() => {
+  window.electron.ipcRenderer.invoke('mt::deskmark::login-get').then((enabled) => {
+    openAtLogin.value = enabled === true
+  }).catch(() => {})
+})
 
 const onSelectChange = (type: keyof PreferencesState, value: boolean): void => {
   preferenceStore.SET_SINGLE_PREFERENCE({ type, value })
+}
+
+const setLogin = (enabled: boolean): void => {
+  openAtLogin.value = enabled
+  window.electron.ipcRenderer.invoke('mt::deskmark::login-set', enabled).then((next) => {
+    openAtLogin.value = next === true
+  }).catch(() => {
+    openAtLogin.value = !enabled
+  })
 }
 </script>

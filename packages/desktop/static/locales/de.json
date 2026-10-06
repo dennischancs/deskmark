@@ -794,7 +794,9 @@
       "tasks": "Aufgaben anzeigen",
       "reminders": "Zur gewählten Zeit erinnern",
       "wordCount": "Wörter anzeigen",
-      "detail": "Datum, Erinnerung, Wichtigkeit und Wiederholung stehen an der Aufgabe selbst. Hier wird die Funktion nur ein- oder ausgeschaltet."
+      "detail": "Datum, Erinnerung, Wichtigkeit und Wiederholung stehen an der Aufgabe selbst. Hier wird die Funktion nur ein- oder ausgeschaltet.",
+      "reminderLimit": "Erinnerungen kommen nur, solange Tischzettel geöffnet ist. Nach dem Beenden klingelt nichts.",
+      "openAtLogin": "Beim Anmelden öffnen"
     }
   },
   "about": {

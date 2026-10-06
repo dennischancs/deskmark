@@ -143,11 +143,25 @@ export class StickyHost {
   }
 
   toggleLogin(): void {
-    if (!this.vaultRoot) return
-    const state = loadUiState(this.vaultRoot)
-    state.openAtLogin = !state.openAtLogin
-    saveUiState(this.vaultRoot, state)
-    this.applyLogin(state.openAtLogin)
+    this.setLogin(!this.loginEnabled())
+  }
+
+  loginEnabled(): boolean {
+    if (this.vaultRoot) return loadUiState(this.vaultRoot).openAtLogin
+    try {
+      return app.getLoginItemSettings().openAtLogin
+    } catch {
+      return false
+    }
+  }
+
+  setLogin(enabled: boolean): void {
+    if (this.vaultRoot) {
+      const state = loadUiState(this.vaultRoot)
+      state.openAtLogin = enabled
+      saveUiState(this.vaultRoot, state)
+    }
+    this.applyLogin(enabled)
     this.refreshTrayMenu()
   }
 
