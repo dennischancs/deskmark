@@ -1041,6 +1041,8 @@
   },
   "plugin": {
     "close": "Close",
-    "failed": "This add-on could not be opened"
+    "failed": "This add-on could not be opened",
+    "words": "Words",
+    "denied": "This add-on is not allowed to do that"
   }
 }

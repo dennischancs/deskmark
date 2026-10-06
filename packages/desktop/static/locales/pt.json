@@ -1041,6 +1041,8 @@
   },
   "plugin": {
     "close": "Fechar",
-    "failed": "Não foi possível abrir este complemento"
+    "failed": "Não foi possível abrir este complemento",
+    "words": "Palavras",
+    "denied": "Este complemento não tem permissão para isso"
   }
 }

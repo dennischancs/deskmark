@@ -55,7 +55,7 @@ const onMessage = (event: MessageEvent): void => {
     const permission = authorize(props.manifest, data.method)
     if (permission === 'notes.read') {
       const href = data.path || relativeNote()
-      if (!href || !noteInsideVault(href)) throw new Error('这个小功能没有得到相应允许')
+      if (!href || !noteInsideVault(href)) throw new Error(t('plugin.denied'))
       const file = currentFile.value
       const same = file?.pathname && window.path.relative(props.root, file.pathname).replaceAll('\\', '/') === href
       reply(data.id, true, { path: href, markdown: same ? file?.markdown || '' : '' })

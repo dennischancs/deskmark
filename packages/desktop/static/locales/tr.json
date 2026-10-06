@@ -1041,6 +1041,8 @@
   },
   "plugin": {
     "close": "Kapat",
-    "failed": "Bu ek açılmadı"
+    "failed": "Bu ek açılmadı",
+    "words": "Kelimeler",
+    "denied": "Bu ek bunu yapamaz"
   }
 }

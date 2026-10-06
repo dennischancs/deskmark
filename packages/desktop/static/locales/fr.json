@@ -1041,6 +1041,8 @@
   },
   "plugin": {
     "close": "Fermer",
-    "failed": "Ce complément n'a pas pu s'ouvrir"
+    "failed": "Ce complément n'a pas pu s'ouvrir",
+    "words": "Mots",
+    "denied": "Ce complément n'est pas autorisé à faire cela"
   }
 }

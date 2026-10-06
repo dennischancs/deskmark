@@ -1041,6 +1041,8 @@
   },
   "plugin": {
     "close": "Sluiten",
-    "failed": "Deze extra functie kon niet worden geopend"
+    "failed": "Deze extra functie kon niet worden geopend",
+    "words": "Woorden",
+    "denied": "Deze extra functie mag dat niet"
   }
 }

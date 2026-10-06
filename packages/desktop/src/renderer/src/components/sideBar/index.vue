@@ -74,6 +74,7 @@ import { PluginHost, readManifest, type PluginManifest } from '../../../../../..
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useCommandCenterStore } from '@/store/commandCenter'
+import bus from '@/bus'
 import type { TabDescriptor } from './types'
 
 const layoutStore = useLayoutStore()
@@ -91,9 +92,9 @@ const sideBarViewWidth = ref(280)
 const { rightColumn, showSideBar, sideBarWidth } = storeToRefs(layoutStore)
 
 const pluginHost = new PluginHost()
-pluginHost.registerBuiltin({ id: 'tasks.open', title: '待办', kind: 'command', builtin: true })
-pluginHost.registerBuiltin({ id: 'calendar.open', title: '日历', kind: 'view', builtin: true })
-pluginHost.registerBuiltin({ id: 'sticky.open', title: '便签', kind: 'command', builtin: true })
+pluginHost.registerBuiltin({ id: 'tasks.open', title: t('sideBar.icons.tasks'), kind: 'command', builtin: true })
+pluginHost.registerBuiltin({ id: 'calendar.open', title: t('calendar.title'), kind: 'view', builtin: true })
+pluginHost.registerBuiltin({ id: 'sticky.open', title: t('sticky.open'), kind: 'command', builtin: true })
 const sampleManifest: PluginManifest = {
   id: 'wordcount',
   name: 'Word count',
@@ -105,15 +106,15 @@ const pluginRoot = window.path.resolve(window.path.join(window.path.dirname(deco
 const pluginLoaded = ref(false)
 try {
   const loaded = pluginHost.load(readManifest(sampleManifest), {
-    commands: [{ id: 'count', title: '字数' }],
-    views: [{ id: 'panel', title: '字数' }]
+    commands: [{ id: 'count', title: t('plugin.words') }],
+    views: [{ id: 'panel', title: t('plugin.words') }]
   })
   const commandCenter = useCommandCenterStore()
   for (const command of loaded.commands) {
     const id = sampleManifest.id + ':' + command.id
     const entry = {
       id,
-      description: command.title,
+      description: t('plugin.words'),
       execute: () => {
         layoutStore.SET_LAYOUT({ rightColumn: sampleManifest.id + ':panel', showSideBar: true })
       }
@@ -123,6 +124,10 @@ try {
     }
   }
   pluginLoaded.value = true
+  bus.on('language-changed', () => {
+    const command = commandCenter.rootCommand.subcommands.find(item => item.id === sampleManifest.id + ':count')
+    if (command) command.description = t('plugin.words')
+  })
 } catch (error) {
   console.error(error)
 }
@@ -139,7 +144,7 @@ const sideBarIcons = computed(() => [
   ...builtinSideBarIcons,
   ...pluginHost.views().filter(view => !view.builtin).map(view => ({
     id: view.id,
-    name: () => view.title,
+    name: () => t('plugin.words'),
     icon: WordsIcon
   }))
 ])

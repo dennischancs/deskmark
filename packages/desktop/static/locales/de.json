@@ -1041,6 +1041,8 @@
   },
   "plugin": {
     "close": "Schließen",
-    "failed": "Diese Ergänzung konnte nicht geöffnet werden"
+    "failed": "Diese Ergänzung konnte nicht geöffnet werden",
+    "words": "Wörter",
+    "denied": "Diese Ergänzung darf das nicht"
   }
 }
