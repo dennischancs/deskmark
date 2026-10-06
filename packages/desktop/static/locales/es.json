@@ -794,7 +794,7 @@
       "tasks": "Mostrar tareas",
       "reminders": "Avisar a la hora elegida",
       "wordCount": "Mostrar palabras",
-      "detail": "La fecha, el aviso, la prioridad y la repetición se cambian en la propia tarea. En el calendario, una tarea sin fecha se puede poner en un día y la línea sigue en su nota. Aquí solo se enciende o se apaga.",
+      "detail": "La fecha, el aviso, la prioridad y la repetición se cambian en la propia tarea. El mes muestra las tareas abiertas. Arrastrar a otro día, o ponerla en el día elegido, solo cambia la fecha de la línea original. Aquí solo se enciende o se apaga.",
       "reminderLimit": "Los avisos solo llegan mientras Nota de mesa está abierta. Si se cierra, la hora no suena.",
       "openAtLogin": "Abrir al iniciar sesión"
     }
@@ -1081,7 +1081,8 @@
     "clearDate": "Quitar fecha",
     "showOnCalendar": "En el calendario",
     "goToDay": "Ir a este día",
-    "emptyUndated": "No hay sin fecha"
+    "emptyUndated": "No hay sin fecha",
+    "finished": "Hecho este día"
   },
   "plugin": {
     "close": "Cerrar",

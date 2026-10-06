@@ -1,4 +1,4 @@
-export { agendaCounts, agendaFromMarkdown, bridgeForDay, calendarGroup, compareAgenda, DEADLINE_WARNING_DAYS, isOverdue, markedDates, smartList, tasksForAgenda, tasksOnDate } from './query.ts'
+export { agendaCounts, agendaFromMarkdown, bridgeForDay, calendarGroup, compareAgenda, DEADLINE_WARNING_DAYS, isOverdue, markedDates, previewTasks, smartList, tasksForAgenda, tasksOnDate } from './query.ts'
 export type { DayBridge } from './agenda.ts'
 export { applyQuickAction, buildMonth, shouldOpenAtMention, slashQuery, weekdayLabels } from './calendar.ts'
 export { planReminders } from './reminders.ts'

@@ -794,7 +794,7 @@
       "tasks": "Aufgaben anzeigen",
       "reminders": "Zur gewählten Zeit erinnern",
       "wordCount": "Wörter anzeigen",
-      "detail": "Datum, Erinnerung, Wichtigkeit und Wiederholung stehen an der Aufgabe selbst. Im Kalender kann eine Aufgabe ohne Datum auf einen Tag gelegt werden. Die Zeile bleibt in ihrer Notiz. Hier wird die Funktion nur ein- oder ausgeschaltet.",
+      "detail": "Datum, Erinnerung, Wichtigkeit und Wiederholung stehen an der Aufgabe selbst. Der Monat zeigt offene Aufgaben. Ziehen auf einen anderen Tag, oder auf den gewählten Tag legen, ändert nur das Datum in der ursprünglichen Zeile. Hier wird die Funktion nur ein- oder ausgeschaltet.",
       "reminderLimit": "Erinnerungen kommen nur, solange Tischzettel geöffnet ist. Nach dem Beenden klingelt nichts.",
       "openAtLogin": "Beim Anmelden öffnen"
     }
@@ -1081,7 +1081,8 @@
     "clearDate": "Datum weg",
     "showOnCalendar": "Im Kalender",
     "goToDay": "Zu diesem Tag",
-    "emptyUndated": "Keine ohne Datum"
+    "emptyUndated": "Keine ohne Datum",
+    "finished": "An diesem Tag erledigt"
   },
   "plugin": {
     "close": "Schließen",

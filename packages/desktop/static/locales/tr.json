@@ -794,7 +794,7 @@
       "tasks": "Görevleri göster",
       "reminders": "Belirlenen saatte anımsat",
       "wordCount": "Kelime sayısını göster",
-      "detail": "Tarih, anımsatma, öncelik ve yineleme görevin kendisinde değişir. Takvimde tarihsiz bir görev bir güne konabilir, satır notunda kalır. Burada yalnızca açılır veya kapanır.",
+      "detail": "Tarih, anımsatma, öncelik ve yineleme görevin kendisinde değişir. Ay açık görevleri gösterir. Başka bir güne sürüklemek veya seçilen güne koymak yalnızca özgün satırın tarihini değiştirir. Burada yalnızca açılır veya kapanır.",
       "reminderLimit": "Anımsatmalar yalnızca Masa notu açıkken gelir. Kapanınca saat çalmaz.",
       "openAtLogin": "Oturum açılınca aç"
     }
@@ -1081,7 +1081,8 @@
     "clearDate": "Tarihi sil",
     "showOnCalendar": "Takvimde",
     "goToDay": "Bu güne git",
-    "emptyUndated": "Tarihsiz görev yok"
+    "emptyUndated": "Tarihsiz görev yok",
+    "finished": "Bu gün biten"
   },
   "plugin": {
     "close": "Kapat",

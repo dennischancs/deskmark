@@ -2,6 +2,9 @@
   <div
     class="task-row"
     :class="{ done: task.status === 'done' }"
+    :draggable="task.status !== 'done' && task.line != null"
+    @dragstart="onDrag"
+    @dragend="endTaskDrag"
   >
     <input
       type="checkbox"
@@ -23,10 +26,15 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { DeskmarkTaskRef } from '@shared/types/ipc'
+import { beginTaskDrag, endTaskDrag } from '@/util/taskDrag'
 
 const props = defineProps<{ task: DeskmarkTaskRef }>()
 const emit = defineEmits<{ open: [task: DeskmarkTaskRef], toggle: [task: DeskmarkTaskRef] }>()
 const { t } = useI18n()
+
+const onDrag = (event: DragEvent): void => {
+  beginTaskDrag(props.task.taskKey, props.task.line, props.task.status, event)
+}
 
 const meta = computed(() => {
   const note = props.task.notePath.split('/').pop() || props.task.notePath
@@ -45,6 +53,9 @@ const meta = computed(() => {
   display: flex;
   align-items: flex-start;
   gap: 6px;
+}
+.task-row[draggable='true'] {
+  cursor: grab;
 }
 input {
   margin: 6px 0 0;

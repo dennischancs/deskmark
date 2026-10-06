@@ -9,6 +9,7 @@ export {
   DEADLINE_WARNING_DAYS,
   isOverdue,
   markedDates,
+  previewTasks,
   smartList,
   tasksForAgenda,
   tasksOnDate

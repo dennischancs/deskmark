@@ -58,6 +58,7 @@ export interface DeskmarkTaskRef {
   remindAt?: string | null
   priority?: string
   repeat?: string
+  completedAt?: string | null
 }
 
 export interface DeskmarkTaskGroups {

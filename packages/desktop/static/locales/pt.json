@@ -794,7 +794,7 @@
       "tasks": "Mostrar tarefas",
       "reminders": "Lembrar à hora marcada",
       "wordCount": "Mostrar palavras",
-      "detail": "A data, o lembrete, a prioridade e a repetição mudam-se na própria tarefa. No calendário, uma tarefa sem data pode ir para um dia e a linha fica na nota. Aqui só se liga ou desliga.",
+      "detail": "A data, o lembrete, a prioridade e a repetição mudam-se na própria tarefa. O mês mostra as tarefas abertas. Arrastar para outro dia, ou pôr no dia escolhido, só muda a data da linha original. Aqui só se liga ou desliga.",
       "reminderLimit": "Os lembretes só chegam enquanto a Nota de mesa está aberta. Depois de fechar, a hora não toca.",
       "openAtLogin": "Abrir ao iniciar sessão"
     }
@@ -1081,7 +1081,8 @@
     "clearDate": "Tirar a data",
     "showOnCalendar": "No calendário",
     "goToDay": "Ir a este dia",
-    "emptyUndated": "Nenhuma sem data"
+    "emptyUndated": "Nenhuma sem data",
+    "finished": "Feito neste dia"
   },
   "plugin": {
     "close": "Fechar",

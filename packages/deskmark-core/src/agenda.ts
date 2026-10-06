@@ -11,6 +11,7 @@ type AgendaSortable = {
   due: string | null
   text: string
   priority?: string | null
+  completed?: string | null
 }
 
 export function isOverdue(item: Pick<AgendaItem, 'done' | 'due'>, now: Date, timeZone: string): boolean {
@@ -95,6 +96,7 @@ export interface DayBridge<T> {
   carried: T[]
   soon: T[]
   undated: T[]
+  finished: T[]
 }
 
 export function bridgeForDay<T extends AgendaSortable>(
@@ -106,9 +108,11 @@ export function bridgeForDay<T extends AgendaSortable>(
   const today = formatInZone(now, timeZone).slice(0, 10)
   const horizon = shiftDay(today, DEADLINE_WARNING_DAYS)
   const onDay = items.filter(item => item.due?.slice(0, 10) === day)
-  const carried = day === today
-    ? items.filter(item => !isDone(item) && Boolean(item.due) && item.due!.slice(0, 10) < day)
-    : []
+  const carriedItems = items.filter(item => {
+    if (isDone(item) || !item.due) return false
+    const dueDay = item.due.slice(0, 10)
+    return dueDay < today && dueDay !== day
+  })
   const soon = day === today
     ? items.filter(item => {
       if (isDone(item) || !item.due || !horizon) return false
@@ -117,11 +121,35 @@ export function bridgeForDay<T extends AgendaSortable>(
     })
     : []
   const undated = items.filter(item => !isDone(item) && !item.due)
+  const finished = items.filter(item => {
+    if (!isDone(item) || !item.completed) return false
+    return item.completed.slice(0, 10) === day && item.due?.slice(0, 10) !== day
+  })
   return {
     onDay: [...onDay].sort((left, right) => compareAgenda(left, right)),
-    carried: [...carried].sort((left, right) => compareAgenda(left, right)),
+    carried: [...carriedItems].sort((left, right) => compareAgenda(left, right)),
     soon: [...soon].sort((left, right) => compareAgenda(left, right)),
-    undated: [...undated].sort((left, right) => compareAgenda(left, right))
+    undated: [...undated].sort((left, right) => compareAgenda(left, right)),
+    finished: [...finished].sort((left, right) => compareFinished(left, right))
+  }
+}
+
+export interface DayPreview<T> {
+  shown: T[]
+  extra: number
+}
+
+export function previewTasks<T extends AgendaSortable>(
+  items: readonly T[],
+  day: string,
+  limit = 2
+): DayPreview<T> {
+  const open = items.filter(item => !isDone(item) && item.due?.slice(0, 10) === day)
+  const sorted = [...open].sort((left, right) => compareAgenda(left, right))
+  const cap = Math.max(0, limit)
+  return {
+    shown: sorted.slice(0, cap),
+    extra: Math.max(0, sorted.length - cap)
   }
 }
 
@@ -140,6 +168,12 @@ function dueRank(due: string | null): string {
   if (!due) return '9'
   const day = due.slice(0, 10)
   return due.includes('T') ? `0${day}${due}` : `1${day}`
+}
+
+function compareFinished(left: AgendaSortable, right: AgendaSortable): number {
+  const stamp = (left.completed || '').localeCompare(right.completed || '')
+  if (stamp) return stamp
+  return left.text.localeCompare(right.text)
 }
 
 function shiftDay(day: string, days: number): string | null {

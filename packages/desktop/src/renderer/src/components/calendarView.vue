@@ -32,24 +32,47 @@
         >{{ label }}</span>
       </div>
       <div class="grid">
-        <button
+        <div
           v-for="(cell, index) of cells"
           :key="index"
-          type="button"
-          class="deskmark-hover"
-          :class="{ marked: cell.marked, selected: mode === 'day' && cell.date === selected, today: cell.date === todayKey, pad: !cell.date }"
-          @click="pickDay(cell.date)"
+          class="cell"
+          :class="{ selected: mode === 'day' && cell.date === selected, today: cell.date === todayKey, pad: !cell.date, drop: cell.date != null && cell.date === hoverDay }"
+          @dragover="allowDrop(cell.date, $event)"
+          @drop="dropDue(cell.date, $event)"
         >
-          <span>{{ cell.day }}</span>
-          <i
-            v-if="cell.marked"
-            class="dot"
-            :class="{ late: cell.date && lateDates.has(cell.date) }"
-          />
-        </button>
+          <button
+            type="button"
+            class="daynum deskmark-hover"
+            :class="{ marked: cell.marked, late: cell.date != null && lateDates.has(cell.date) }"
+            @click="pickDay(cell.date)"
+          >
+            {{ cell.day }}
+          </button>
+          <button
+            v-for="task of dayPreview(cell.date).shown"
+            :key="`${cell.date}:${task.taskKey}`"
+            type="button"
+            class="chip deskmark-hover"
+            :class="{ late: cell.date != null && lateDates.has(cell.date) }"
+            :draggable="task.status !== 'done' && task.line != null"
+            @dragstart="dragPayload(task, $event)"
+            @dragend="endTaskDrag"
+            @click="openTask(task)"
+          >
+            {{ task.text }}
+          </button>
+          <span
+            v-if="dayPreview(cell.date).extra"
+            class="more"
+          >+{{ dayPreview(cell.date).extra }}</span>
+        </div>
       </div>
     </section>
-    <section class="agenda">
+    <section
+      class="agenda"
+      @dragover="onAgendaOver"
+      @drop="onAgendaDrop"
+    >
       <div class="chips">
         <button
           type="button"
@@ -80,7 +103,7 @@
         {{ t('calendar.journal') }}
       </button>
       <p
-        v-if="mode === 'day' ? bridge.onDay.length === 0 : visibleTasks.length === 0"
+        v-if="mode === 'day' ? bridge.onDay.length === 0 && finishedTasks.length === 0 : visibleTasks.length === 0"
         class="empty"
       >
         {{ mode === 'day' ? t('calendar.emptyDay') : t('calendar.emptyGroup') }}
@@ -105,6 +128,16 @@
             {{ t('calendar.clearDate') }}
           </button>
         </div>
+        <h4 v-if="finishedTasks.length">
+          {{ t('calendar.finished') }}
+        </h4>
+        <task-line
+          v-for="task of finishedTasks"
+          :key="`finished:${task.notePath}:${task.taskKey}`"
+          :task="task"
+          @open="openTask"
+          @toggle="toggle"
+        />
         <h4 v-if="carriedTasks.length">
           {{ t('calendar.carried') }}
         </h4>
@@ -205,16 +238,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useProjectStore } from '@/store/project'
 import { useDeskmarkStore } from '@/store/deskmark'
 import { editDeskmarkTask } from '@/util/deskmarkEdit'
 import TaskLine from '@/components/taskLine.vue'
-import { agendaCounts, bridgeForDay, calendarGroup, DEADLINE_WARNING_DAYS, tasksForAgenda, type CalendarGroup } from '../../../../../deskmark-core/src/agenda.ts'
+import { agendaCounts, bridgeForDay, calendarGroup, DEADLINE_WARNING_DAYS, previewTasks, tasksForAgenda, type CalendarGroup } from '../../../../../deskmark-core/src/agenda.ts'
 import { buildMonth, weekdayLabels } from '../../../../../deskmark-core/src/calendar.ts'
 import { formatInZone, moveDueToDay } from '../../../../../deskmark-core/src/time.ts'
+import { beginTaskDrag, endTaskDrag, readTaskDrag } from '@/util/taskDrag'
 import type { DeskmarkTaskGroups, DeskmarkTaskRef } from '@shared/types/ipc'
 
 type AgendaMode = 'day' | CalendarGroup
@@ -234,6 +268,7 @@ const month = ref(Number(initialDay.slice(5, 7)))
 const selected = ref(initialDay)
 const mode = ref<AgendaMode>('day')
 const text = ref('')
+const hoverDay = ref<string | null>(null)
 const groups = ref<DeskmarkTaskGroups | null>(null)
 const root = computed(() => projectTree.value?.pathname || '')
 const title = computed(() => new Intl.DateTimeFormat(String(locale.value || 'en'), {
@@ -246,11 +281,20 @@ const flat = computed(() => {
   if (!value) return []
   return [...value.overdue, ...value.today, ...value.upcoming, ...value.inbox, ...value.done].map(task => ({
     ...task,
-    done: task.status === 'done'
+    done: task.status === 'done',
+    completed: task.completedAt ?? null
   }))
 })
 const openDated = computed(() => flat.value.filter(task => !task.done && task.due))
 const cells = computed(() => buildMonth(year.value, month.value, openDated.value.map(task => task.due?.slice(0, 10) || '').filter(Boolean)))
+const previews = computed(() => {
+  const map = new Map<string, { shown: typeof flat.value, extra: number }>()
+  for (const cell of cells.value) {
+    if (!cell.date) continue
+    map.set(cell.date, previewTasks(flat.value, cell.date, 2))
+  }
+  return map
+})
 const lateDates = computed(() => new Set(
   openDated.value
     .filter(task => calendarGroup({ done: false, due: task.due }, new Date(), zone) === 'overdue')
@@ -276,6 +320,11 @@ const dayTasks = computed(() => withoutDone(bridge.value.onDay))
 const carriedTasks = computed(() => withoutDone(bridge.value.carried))
 const soonTasks = computed(() => withoutDone(bridge.value.soon))
 const undatedTasks = computed(() => withoutDone(bridge.value.undated))
+const finishedTasks = computed(() => withoutDone(bridge.value.finished))
+const dayPreview = (day: string | null): { shown: typeof flat.value, extra: number } => {
+  if (!day) return { shown: [], extra: 0 }
+  return previews.value.get(day) || { shown: [], extra: 0 }
+}
 const heading = computed(() => {
   if (mode.value !== 'day') return t(`calendar.${mode.value}`)
   const [y, m, d] = selected.value.split('-').map(Number)
@@ -372,6 +421,48 @@ const clearDate = (task: DeskmarkTaskRef): void => {
   writeDue(task, null)
 }
 
+const dragPayload = (task: DeskmarkTaskRef, event: DragEvent): void => {
+  beginTaskDrag(task.taskKey, task.line, task.status, event)
+}
+
+const allowDrop = (day: string | null, event: DragEvent): void => {
+  if (!day) return
+  event.preventDefault()
+  if (event.dataTransfer) event.dataTransfer.dropEffect = 'move'
+  hoverDay.value = day
+}
+
+const dropDue = (day: string | null, event: DragEvent): void => {
+  event.preventDefault()
+  const key = readTaskDrag(event)
+  endTaskDrag()
+  hoverDay.value = null
+  if (!day) return
+  const task = flat.value.find(item => item.taskKey === key)
+  if (!task || task.status === 'done' || task.line == null) return
+  if (task.due?.slice(0, 10) === day) return
+  const due = moveDueToDay(task.due, day)
+  if (!due) return
+  writeDue(task, due)
+}
+
+const onAgendaOver = (event: DragEvent): void => {
+  if (mode.value !== 'day') return
+  allowDrop(selected.value, event)
+}
+
+const onAgendaDrop = (event: DragEvent): void => {
+  if (mode.value !== 'day') return
+  dropDue(selected.value, event)
+}
+
+const clearHover = (): void => {
+  hoverDay.value = null
+}
+
+onMounted(() => window.addEventListener('dragend', clearHover))
+onBeforeUnmount(() => window.removeEventListener('dragend', clearHover))
+
 const create = async (): Promise<void> => {
   if (!root.value || mode.value !== 'day' || !selected.value || !text.value.trim()) return
   const created = await window.electron.ipcRenderer.invoke('mt::deskmark::journal-task', root.value, selected.value, text.value.trim())
@@ -429,23 +520,53 @@ header, form, .chips {
 .grid {
   margin-top: 4px;
 }
-.grid button {
+.cell {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 42px;
+  align-items: stretch;
+  gap: 2px;
+  min-width: 0;
+  min-height: 76px;
+  padding: 3px;
   border-radius: 4px;
 }
-.dot {
-  width: 4px;
-  height: 4px;
-  margin-top: 3px;
-  border-radius: 2px;
-  background: var(--themeColor);
+.daynum {
+  align-self: center;
+  min-width: 1.6em;
+  padding: 0;
+  font-size: 12px;
+  line-height: 16px;
 }
-.dot.late {
-  background: var(--deleteColor);
+.daynum.late {
+  color: var(--deleteColor);
+}
+.chip {
+  min-width: 0;
+  max-width: 100%;
+  height: 16px;
+  padding: 0 3px;
+  overflow: hidden;
+  font-size: 11px;
+  line-height: 16px;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: grab;
+  color: var(--editorColor);
+  background: color-mix(in srgb, var(--themeColor) 22%, var(--editorBgColor));
+  border-radius: 2px;
+}
+.chip.late {
+  background: color-mix(in srgb, var(--deleteColor) 24%, var(--editorBgColor));
+}
+.more {
+  padding-left: 3px;
+  font-size: 11px;
+  line-height: 14px;
+  opacity: 0.75;
+}
+.cell.drop {
+  background: var(--themeColor10, color-mix(in srgb, var(--themeColor) 12%, transparent));
 }
 .today {
   box-shadow: inset 0 0 0 1px var(--themeColor);
