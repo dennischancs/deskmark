@@ -4,7 +4,7 @@
     <div class="editor-middle">
       <div
         v-if="stickyProbe"
-        class="sticky-toolbar"
+        class="sticky-toolbar deskmark-ui"
       >
         <p
           v-if="waylandLimit"
@@ -62,12 +62,12 @@
       <rename />
       <import-modal />
     </div>
-    <task-properties />
+    <task-properties v-if="deskmarkTasks !== false" />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, watch, nextTick, onMounted, ref } from 'vue'
+import { computed, watch, nextTick, onMounted, onBeforeUnmount, ref } from 'vue'
 import { useMainStore } from '@/store'
 import { storeToRefs } from 'pinia'
 import { addStyles, addThemeStyle, addCustomStyle, type AddStylesOptions } from '@/util/theme'
@@ -95,6 +95,7 @@ import { useCommandCenterStore } from '@/store/commandCenter'
 import { useProjectStore } from '@/store/project'
 import { useAutoUpdatesStore } from '@/store/autoUpdates'
 import { useNotificationStore } from '@/store/notification'
+import { showDeskmarkTarget } from '@/util/deskmarkView'
 
 const mainStore = useMainStore()
 const editorStore = useEditorStore()
@@ -133,6 +134,7 @@ const setStickyColor = (color: string): void => {
 const { windowActive, platform, init } = storeToRefs(mainStore)
 const { showTabBar } = storeToRefs(layoutStore)
 const { sourceCode, theme, customCss, textDirection, zoom } = storeToRefs(preferencesStore)
+const { sourceCode, theme, customCss, textDirection, zoom, deskmarkTasks } = storeToRefs(preferencesStore)
 const { projectTree } = storeToRefs(projectStore)
 const { currentFile, selectionWordCount } = storeToRefs(editorStore)
 
@@ -253,6 +255,10 @@ onMounted(async () => {
   editorStore.LISTEN_FOR_RELOAD_IMAGES()
   editorStore.LISTEN_FOR_CONTEXT_MENU()
   editorStore.LISTEN_FOR_STATE_REPLACE()
+  const stopDeskmarkShow = window.electron.ipcRenderer.on('mt::deskmark-show', (_event, target) => {
+    showDeskmarkTarget(target)
+  })
+  onBeforeUnmount(stopDeskmarkShow)
 
   // module: notification
   notificationStore.listenForNotification()
@@ -313,7 +319,6 @@ onMounted(async () => {
   align-items: center;
   gap: 6px;
   padding: 6px 8px;
-  background: #fff4cc;
 }
 .sticky-limit {
   flex: 1 0 100%;
@@ -324,7 +329,7 @@ onMounted(async () => {
   width: 16px;
   height: 16px;
   padding: 0;
-  border: 1px solid rgb(0 0 0 / 20%);
+  border: 1px solid var(--floatBorderColor, color-mix(in srgb, var(--editorColor) 25%, transparent));
   border-radius: 2px;
 }
 </style>

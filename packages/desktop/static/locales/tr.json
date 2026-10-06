@@ -127,7 +127,17 @@
       "toggleTableOfContents": "İçindekileri Aç/Kapat",
       "reloadImages": "Görselleri Yeniden Yükle",
       "showDeveloperTools": "Geliştirici Araçlarını Göster",
-      "reloadWindow": "Pencereyi Yeniden Yükle"
+      "reloadWindow": "Pencereyi Yeniden Yükle",
+      "deskmark": "Masa notu",
+      "openCalendar": "Takvimi aç",
+      "openTasks": "Görevleri aç",
+      "openWordCount": "Kelime sayısını aç",
+      "stick": "Geçerli notu yapıştır",
+      "calendar": "Takvim",
+      "tasks": "Görevler",
+      "reminders": "Anımsatmalar",
+      "wordCount": "Kelimeler",
+      "deskmarkSettings": "Masa notu ayarları"
     },
     "format": {
       "format": "Biçim",
@@ -391,7 +401,8 @@
         "searcher": "Arayıcı",
         "watcher": "İzleyici",
         "spelling": "Yazım",
-        "custom css": "Özel CSS"
+        "custom css": "Özel CSS",
+        "deskmark": "Masa notu"
       },
       "items": {
         "autoSave": "Düzenlenen içeriği otomatik olarak kaydet",
@@ -458,7 +469,11 @@
         "plantumlServer": "PlantUML sunucu URL'si",
         "autoNormalizeLineEndings": "Dosyaları açarken yeni satır karakterlerini otomatik olarak normalleştir. Devre dışı bırakıldığında dosyalar olduğu gibi açılır.",
         "fileSortOrder": "Açık klasörlerdeki dosyaların sıralama düzeni: artan veya azalan.",
-        "openedFilesInSidebar": "Açık dosyaların kenar çubuğunda gösterilip gösterilmeyeceği."
+        "openedFilesInSidebar": "Açık dosyaların kenar çubuğunda gösterilip gösterilmeyeceği.",
+        "deskmarkCalendar": "Takvimi göster",
+        "deskmarkTasks": "Görevleri göster",
+        "deskmarkReminders": "Anımsatmalar",
+        "deskmarkWordCount": "Kelime sayısını göster"
       }
     },
     "categories": {
@@ -468,7 +483,8 @@
       "spelling": "Yazım",
       "theme": "Tema",
       "image": "Görsel",
-      "keybindings": "Kısayol Tuşları"
+      "keybindings": "Kısayol Tuşları",
+      "deskmark": "Masa notu"
     },
     "general": {
       "title": "Genel",
@@ -770,13 +786,22 @@
       "enableSpellChecking": "Yazım denetimini etkinleştir",
       "hideMarksForErrors": "Yazım hataları için işaretleri gizle",
       "title": "Yazım Denetleyici"
+    },
+    "deskmark": {
+      "title": "Masa notu",
+      "features": "Özellikler",
+      "calendar": "Takvimi göster",
+      "tasks": "Görevleri göster",
+      "reminders": "Belirlenen saatte anımsat",
+      "wordCount": "Kelime sayısını göster",
+      "detail": "Tarih, anımsatma, öncelik ve yineleme görevin kendisinde değişir. Burada yalnızca açılır veya kapanır."
     }
   },
   "about": {
-      "copyright": "Telif Hakkı © Luo Ran 2017-{year}",
-      "copyrightContributors": "Github Katkıda Bulunanlar tarafından <3 ile yapıldı",
-      "addon": "Bir ek, Masa notu içinde çalışır, ayrı bir program değildir."
-    },
+    "copyright": "Telif Hakkı © Luo Ran 2017-{year}",
+    "copyrightContributors": "Github Katkıda Bulunanlar tarafından <3 ile yapıldı",
+    "addon": "Bir ek, Masa notu içinde çalışır, ayrı bir program değildir."
+  },
   "commands": {
     "mt": {
       "hide": "Masa notu'i Gizle",
@@ -1035,7 +1060,7 @@
     "login": "Oturum açınca aç",
     "quit": "Çık"
   },
-"calendar": {
+  "calendar": {
     "title": "Takvim",
     "new": "Yeni",
     "placeholder": "Yeni satır"

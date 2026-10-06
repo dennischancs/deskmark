@@ -3,7 +3,19 @@ import * as actions from '../actions/view'
 import { t } from '../../i18n'
 import type Keybindings from '../../keyboard/shortcutHandler'
 
-export default function(keybindings: Keybindings): MenuItemConstructorOptions {
+interface DeskmarkPreferenceSource {
+  getItem(key: string): unknown
+}
+
+const deskmarkOn = (preferences: DeskmarkPreferenceSource | undefined, key: string): boolean => {
+  if (!preferences) return true
+  return preferences.getItem(key) !== false
+}
+
+export default function(
+  keybindings: Keybindings,
+  preferences?: DeskmarkPreferenceSource
+): MenuItemConstructorOptions {
   const submenu: MenuItemConstructorOptions[] = [
     {
       label: t('menu.view.commandPalette'),
@@ -82,6 +94,86 @@ export default function(keybindings: Keybindings): MenuItemConstructorOptions {
       click(_item, focusedWindow) {
         actions.reloadImageCache(focusedWindow as BrowserWindow | undefined)
       }
+    },
+    {
+      type: 'separator'
+    },
+    {
+      label: t('menu.view.deskmark'),
+      submenu: [
+        {
+          label: t('menu.view.openCalendar'),
+          click(_item, focusedWindow) {
+            actions.showDeskmark(focusedWindow as BrowserWindow | undefined, 'calendar')
+          }
+        },
+        {
+          label: t('menu.view.openTasks'),
+          click(_item, focusedWindow) {
+            actions.showDeskmark(focusedWindow as BrowserWindow | undefined, 'tasks')
+          }
+        },
+        {
+          label: t('menu.view.openWordCount'),
+          click(_item, focusedWindow) {
+            actions.showDeskmark(focusedWindow as BrowserWindow | undefined, 'wordcount')
+          }
+        },
+        {
+          label: t('menu.view.stick'),
+          click(_item, focusedWindow) {
+            actions.showDeskmark(focusedWindow as BrowserWindow | undefined, 'sticky')
+          }
+        },
+        {
+          type: 'separator'
+        },
+        {
+          id: 'deskmarkCalendarMenuItem',
+          label: t('menu.view.calendar'),
+          type: 'checkbox',
+          checked: deskmarkOn(preferences, 'deskmarkCalendar'),
+          click(item) {
+            actions.setDeskmarkEnabled('deskmarkCalendar', !!item.checked)
+          }
+        },
+        {
+          id: 'deskmarkTasksMenuItem',
+          label: t('menu.view.tasks'),
+          type: 'checkbox',
+          checked: deskmarkOn(preferences, 'deskmarkTasks'),
+          click(item) {
+            actions.setDeskmarkEnabled('deskmarkTasks', !!item.checked)
+          }
+        },
+        {
+          id: 'deskmarkRemindersMenuItem',
+          label: t('menu.view.reminders'),
+          type: 'checkbox',
+          checked: deskmarkOn(preferences, 'deskmarkReminders'),
+          click(item) {
+            actions.setDeskmarkEnabled('deskmarkReminders', !!item.checked)
+          }
+        },
+        {
+          id: 'deskmarkWordCountMenuItem',
+          label: t('menu.view.wordCount'),
+          type: 'checkbox',
+          checked: deskmarkOn(preferences, 'deskmarkWordCount'),
+          click(item) {
+            actions.setDeskmarkEnabled('deskmarkWordCount', !!item.checked)
+          }
+        },
+        {
+          type: 'separator'
+        },
+        {
+          label: t('menu.view.deskmarkSettings'),
+          click() {
+            actions.openDeskmarkSettings()
+          }
+        }
+      ]
     }
   ]
 

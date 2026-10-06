@@ -211,6 +211,26 @@
     "type": "boolean",
     "default": false
   },
+  "deskmarkCalendar": {
+    "description": "Deskmark--Show the calendar",
+    "type": "boolean",
+    "default": true
+  },
+  "deskmarkTasks": {
+    "description": "Deskmark--Show tasks",
+    "type": "boolean",
+    "default": true
+  },
+  "deskmarkReminders": {
+    "description": "Deskmark--Reminders",
+    "type": "boolean",
+    "default": true
+  },
+  "deskmarkWordCount": {
+    "description": "Deskmark--Word count",
+    "type": "boolean",
+    "default": true
+  },
   "hideLinkPopup": {
     "description": "Editor--Hide link popup when the cursor is hover on the link",
     "type": "boolean",

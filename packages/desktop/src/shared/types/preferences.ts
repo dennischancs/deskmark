@@ -25,6 +25,10 @@ export interface IUserPreferences {
   codeFontSize?: number
   codeFontFamily?: string
   hideQuickInsertHint?: boolean
+  deskmarkCalendar?: boolean
+  deskmarkTasks?: boolean
+  deskmarkReminders?: boolean
+  deskmarkWordCount?: boolean
   hideLinkPopup?: boolean
   autoPairBracket?: boolean
   autoPairMarkdownSyntax?: boolean

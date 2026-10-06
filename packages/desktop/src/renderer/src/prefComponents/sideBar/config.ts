@@ -5,7 +5,8 @@ import {
   Brush as ThemeIcon,
   Picture as ImageIcon,
   Reading as SpellIcon,
-  Operation as KeyBindingIcon
+  Operation as KeyBindingIcon,
+  Calendar as DeskmarkIcon
 } from '@element-plus/icons-vue'
 
 import preferences from '../../../../main/preferences/schema.json'
@@ -71,6 +72,12 @@ export const getCategory = (): PrefCategory[] => [
     label: 'general',
     icon: GeneralIcon,
     path: '/preference/general'
+  },
+  {
+    name: t('preferences.categories.deskmark'),
+    label: 'deskmark',
+    icon: DeskmarkIcon,
+    path: '/preference/deskmark'
   },
   {
     name: t('preferences.categories.editor'),
@@ -164,7 +171,8 @@ export const getTranslatedSearchContent: CachedTranslator = (() => {
         'spelling',
         'theme',
         'image',
-        'keybindings'
+        'keybindings',
+        'deskmark'
       ]
       if (!validRoutes.includes(routeCategory)) routeCategory = 'general'
 

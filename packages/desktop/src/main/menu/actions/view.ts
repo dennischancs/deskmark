@@ -77,6 +77,28 @@ export const reloadImageCache = (win: Win): void => {
   }
 }
 
+export type DeskmarkToggle =
+  | 'deskmarkCalendar'
+  | 'deskmarkTasks'
+  | 'deskmarkReminders'
+  | 'deskmarkWordCount'
+
+export type DeskmarkShowTarget = 'calendar' | 'tasks' | 'wordcount' | 'sticky'
+
+export const showDeskmark = (win: Win, target: DeskmarkShowTarget): void => {
+  if (win && win.webContents) {
+    win.webContents.send('mt::deskmark-show', target)
+  }
+}
+
+export const openDeskmarkSettings = (): void => {
+  ipcMain.emit('app-create-settings-window', 'deskmark')
+}
+
+export const setDeskmarkEnabled = (key: DeskmarkToggle, enabled: boolean): void => {
+  ipcMain.emit('set-user-preference', { [key]: enabled })
+}
+
 // --- Commands -------------------------------------------------------------
 
 export const loadViewCommands = (commandManager: CommandManager): void => {

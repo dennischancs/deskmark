@@ -349,6 +349,7 @@ export interface IpcMainEventChannels {
   'mt::set-line-ending': [lineEnding: LineEnding]
   'mt::set-pathname': [payload: { id: string; pathname: string; filename: string }]
   'mt::set-view-layout': [layout: unknown]
+  'mt::deskmark-show': [target: 'calendar' | 'tasks' | 'wordcount' | 'sticky']
   'mt::show-command-palette': []
   'mt::show-export-dialog': [type: ExportType]
   'mt::show-notification': [payload: unknown]

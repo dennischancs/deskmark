@@ -1,6 +1,6 @@
 {
   "name": "marktext",
-  "version": "7.0.2",
+  "version": "7.1.0",
   "description": "Deskmark",
   "main": "./out/main/index.js",
   "author": {

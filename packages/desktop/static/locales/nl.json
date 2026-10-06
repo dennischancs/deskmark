@@ -127,7 +127,17 @@
       "toggleTableOfContents": "Inhoudsopgave in-/uitschakelen",
       "reloadImages": "Afbeeldingen herladen",
       "showDeveloperTools": "Ontwikkelaarshulpmiddelen tonen",
-      "reloadWindow": "Venster herladen"
+      "reloadWindow": "Venster herladen",
+      "deskmark": "Bureaubriefje",
+      "openCalendar": "Kalender openen",
+      "openTasks": "Taken openen",
+      "openWordCount": "Woorden openen",
+      "stick": "Huidige notitie vastzetten",
+      "calendar": "Kalender",
+      "tasks": "Taken",
+      "reminders": "Herinneringen",
+      "wordCount": "Woorden",
+      "deskmarkSettings": "Instellingen voor Bureaubriefje"
     },
     "format": {
       "format": "Opmaak",
@@ -391,7 +401,8 @@
         "searcher": "Zoeker",
         "watcher": "Watcher",
         "spelling": "Spelling",
-        "custom css": "Aangepaste CSS"
+        "custom css": "Aangepaste CSS",
+        "deskmark": "Bureaubriefje"
       },
       "items": {
         "autoSave": "Automatisch de bewerkte inhoud opslaan",
@@ -458,7 +469,11 @@
         "imageRelativeDirectoryName": "Naam van de relatieve afbeeldingsmap",
         "autoNormalizeLineEndings": "Regeleindes automatisch normaliseren bij het openen van bestanden. Indien uitgeschakeld worden bestanden ongewijzigd geopend.",
         "fileSortOrder": "Sorteervolgorde voor bestanden in geopende mappen: oplopend of aflopend.",
-        "openedFilesInSidebar": "Geopende bestanden tonen in de zijbalk."
+        "openedFilesInSidebar": "Geopende bestanden tonen in de zijbalk.",
+        "deskmarkCalendar": "Kalender tonen",
+        "deskmarkTasks": "Taken tonen",
+        "deskmarkReminders": "Herinneringen",
+        "deskmarkWordCount": "Woorden tonen"
       }
     },
     "categories": {
@@ -468,7 +483,8 @@
       "spelling": "Spelling",
       "theme": "Thema",
       "image": "Afbeelding",
-      "keybindings": "Sneltoetsen"
+      "keybindings": "Sneltoetsen",
+      "deskmark": "Bureaubriefje"
     },
     "general": {
       "title": "Algemeen",
@@ -770,13 +786,22 @@
       "enableSpellChecking": "Spellingcontrole inschakelen",
       "hideMarksForErrors": "Markering voor spelfouten verbergen",
       "title": "Spellingcontrole"
+    },
+    "deskmark": {
+      "title": "Bureaubriefje",
+      "features": "Functies",
+      "calendar": "Kalender tonen",
+      "tasks": "Taken tonen",
+      "reminders": "Herinneren op het gekozen tijdstip",
+      "wordCount": "Woorden tonen",
+      "detail": "Datum, herinnering, prioriteit en herhaling staan bij de taak zelf. Hier zet je de functie alleen aan of uit."
     }
   },
   "about": {
-      "copyright": "Copyright © Luo Ran 2017-{year}",
-      "copyrightContributors": "Gemaakt met <3 door GitHub-bijdragers",
-      "addon": "Een extra functie draait in Bureaubriefje, niet als een apart programma."
-    },
+    "copyright": "Copyright © Luo Ran 2017-{year}",
+    "copyrightContributors": "Gemaakt met <3 door GitHub-bijdragers",
+    "addon": "Een extra functie draait in Bureaubriefje, niet als een apart programma."
+  },
   "commands": {
     "mt": {
       "hide": "Bureaubriefje verbergen",
@@ -1035,7 +1060,7 @@
     "login": "Openen bij aanmelden",
     "quit": "Afsluiten"
   },
-"calendar": {
+  "calendar": {
     "title": "Kalender",
     "new": "Nieuw",
     "placeholder": "Nieuwe regel"

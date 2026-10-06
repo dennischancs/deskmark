@@ -56,6 +56,31 @@ const getEmojiPickerPatch = (): string => {
     : ''
 }
 
+const isDarkBackground = (value: string): boolean => {
+  const context = document.createElement('canvas').getContext('2d')
+  if (!context) return document.body.classList.contains('dark')
+  context.fillStyle = '#ffffff'
+  context.fillStyle = value || '#ffffff'
+  const painted = context.fillStyle
+  if (typeof painted !== 'string' || !painted.startsWith('#')) {
+    return document.body.classList.contains('dark')
+  }
+  const hex = painted.slice(1)
+  const expanded = hex.length === 3 ? hex.split('').map((part) => part + part).join('') : hex
+  if (expanded.length < 6) return document.body.classList.contains('dark')
+  const red = parseInt(expanded.slice(0, 2), 16)
+  const green = parseInt(expanded.slice(2, 4), 16)
+  const blue = parseInt(expanded.slice(4, 6), 16)
+  return (0.2126 * red + 0.7152 * green + 0.0722 * blue) / 255 < 0.55
+}
+
+// Native fields follow the live theme background. A theme only has to set
+// --editorBgColor; there is no deskmark palette to copy into each theme file.
+const syncDeskmarkColorScheme = (): void => {
+  const background = getComputedStyle(document.documentElement).getPropertyValue('--editorBgColor')
+  document.documentElement.style.colorScheme = isDarkBackground(background) ? 'dark' : 'light'
+}
+
 export const addThemeStyle = (theme: string): void => {
   const isCmRailscasts = railscastsThemes.includes(theme)
   const isCmOneDark = oneDarkThemes.includes(theme)
@@ -195,6 +220,7 @@ export const addThemeStyle = (theme: string): void => {
       cm.classList.add('cm-s-default')
     }
   }
+  syncDeskmarkColorScheme()
 }
 
 export const setEditorWidth = (value: string): void => {

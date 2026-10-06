@@ -403,6 +403,7 @@ class App {
     stickyHost.createTray(path.join(process.cwd(), 'static', 'logo-small.png'))
     startReminderLoop({
       userDataPath: this._accessor.paths.userDataPath,
+      remindersEnabled: () => this._accessor.preferences.getItem('deskmarkReminders') !== false,
       openNote: (vault, notePath, line) => {
         this.showMainWindow()
         const editors = this._windowManager.getWindowsByType('editor')

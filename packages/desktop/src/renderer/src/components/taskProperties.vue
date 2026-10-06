@@ -1,7 +1,7 @@
 <template>
   <aside
     v-if="selected && selected.line"
-    class="task-properties"
+    class="task-properties deskmark-ui deskmark-side"
   >
     <h2>{{ selected.text }}</h2>
     <label>
@@ -37,6 +37,7 @@
     </label>
     <button
       type="button"
+      class="deskmark-primary"
       @click="save"
     >
       {{ t('sideBar.tasks.save') }}
@@ -92,7 +93,6 @@ const save = async (): Promise<void> => {
   padding: 16px 12px;
   border-left: 1px solid var(--itemBgColor);
   background: var(--sideBarBgColor);
-  color: var(--sideBarColor);
   overflow: auto;
 }
 h2 {

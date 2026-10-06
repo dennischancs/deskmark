@@ -1,0 +1,70 @@
+/* New surfaces borrow the active theme instead of keeping their own palette.
+   Tokens already set by every theme (--editorColor, --themeColor, and the
+   sidebar set) are enough. color-mix fills a step a theme forgot to declare,
+   so a new theme does not need a deskmark section. color-scheme is chosen
+   from the theme background in addThemeStyle, then inherited here. */
+
+.deskmark-ui {
+  color: var(--editorColor);
+  background: var(--editorBgColor);
+  color-scheme: inherit;
+}
+
+.deskmark-ui.deskmark-side {
+  color: var(--sideBarColor);
+  background: var(--sideBarBgColor);
+}
+
+.deskmark-ui button,
+.deskmark-ui input,
+.deskmark-ui select,
+.deskmark-ui textarea {
+  color: inherit;
+  font: inherit;
+}
+
+.deskmark-ui button,
+.deskmark-ui input:not([type='checkbox']):not([type='date']):not([type='datetime-local']),
+.deskmark-ui textarea {
+  appearance: none;
+}
+
+.deskmark-ui button {
+  background: transparent;
+  border: 0;
+}
+
+.deskmark-ui input:not([type='checkbox']),
+.deskmark-ui select,
+.deskmark-ui textarea {
+  background: var(--inputBgColor, color-mix(in srgb, var(--editorColor) 6%, var(--editorBgColor)));
+  border: 1px solid var(--floatBorderColor, color-mix(in srgb, var(--editorColor) 18%, transparent));
+  border-radius: 4px;
+}
+
+.deskmark-ui input[type='checkbox'] {
+  accent-color: var(--themeColor);
+}
+
+.deskmark-ui .deskmark-hover:hover {
+  background: var(--editorColor10, color-mix(in srgb, var(--editorColor) 10%, transparent));
+}
+
+.deskmark-ui.deskmark-side .deskmark-hover:hover {
+  background: var(--sideBarItemHoverBgColor);
+}
+
+.deskmark-ui .marked {
+  font-weight: 700;
+  color: var(--themeColor);
+}
+
+.deskmark-ui .selected {
+  background: var(--themeColor30, color-mix(in srgb, var(--themeColor) 30%, transparent));
+  color: var(--editorColor);
+}
+
+.deskmark-ui .deskmark-primary {
+  background: var(--themeColor);
+  color: var(--buttonPrimaryFontColor, var(--editorBgColor));
+}

@@ -127,7 +127,17 @@
       "toggleTableOfContents": "切換目錄",
       "reloadImages": "重新載入圖片",
       "showDeveloperTools": "顯示開發者工具",
-      "reloadWindow": "重新載入視窗"
+      "reloadWindow": "重新載入視窗",
+      "deskmark": "桌箋",
+      "openCalendar": "打開日曆",
+      "openTasks": "打開待辦",
+      "openWordCount": "打開字數",
+      "stick": "把目前筆記貼到桌面",
+      "calendar": "日曆",
+      "tasks": "待辦",
+      "reminders": "提醒",
+      "wordCount": "字數",
+      "deskmarkSettings": "桌箋設定"
     },
     "format": {
       "format": "格式",
@@ -391,7 +401,8 @@
         "searcher": "搜尋器",
         "watcher": "監聽器",
         "spelling": "拼字",
-        "custom css": "自訂 CSS"
+        "custom css": "自訂 CSS",
+        "deskmark": "桌箋"
       },
       "items": {
         "autoSave": "自動儲存正在編輯的內容",
@@ -458,7 +469,11 @@
         "imageRelativeDirectoryBase": "相對圖片的複製位置",
         "imageRelativeDirectoryName": "相對圖片資料夾名稱",
         "fileSortOrder": "開啟資料夾中檔案的排序順序：遞增或遞減",
-        "openedFilesInSidebar": "是否在側邊欄中顯示已開啟的檔案"
+        "openedFilesInSidebar": "是否在側邊欄中顯示已開啟的檔案",
+        "deskmarkCalendar": "顯示日曆",
+        "deskmarkTasks": "顯示待辦",
+        "deskmarkReminders": "到點提醒",
+        "deskmarkWordCount": "顯示字數"
       }
     },
     "categories": {
@@ -468,7 +483,8 @@
       "spelling": "拼字",
       "theme": "主題",
       "image": "圖片",
-      "keybindings": "按鍵綁定"
+      "keybindings": "按鍵綁定",
+      "deskmark": "桌箋"
     },
     "general": {
       "title": "一般",
@@ -770,13 +786,22 @@
       "enableSpellChecking": "啟用拼字檢查",
       "hideMarksForErrors": "隱藏拼字錯誤標記",
       "title": "拼字檢查"
+    },
+    "deskmark": {
+      "title": "桌箋",
+      "features": "功能",
+      "calendar": "顯示日曆",
+      "tasks": "顯示待辦",
+      "reminders": "到點提醒",
+      "wordCount": "顯示字數",
+      "detail": "每一條待辦的日期、提醒、優先順序和重複，在待辦旁邊的屬性裡改。這裡只決定功能開不開。"
     }
   },
   "about": {
-      "copyright": "Copyright © Luo Ran 2017-{year}",
-      "copyrightContributors": "版權貢獻者",
-      "addon": "加入的小功能在桌箋裡面執行，不是另一個單獨的程式。"
-    },
+    "copyright": "Copyright © Luo Ran 2017-{year}",
+    "copyrightContributors": "版權貢獻者",
+    "addon": "加入的小功能在桌箋裡面執行，不是另一個單獨的程式。"
+  },
   "commands": {
     "mt": {
       "hide": "隱藏桌箋",
@@ -1035,7 +1060,7 @@
     "login": "登入時打開",
     "quit": "結束"
   },
-"calendar": {
+  "calendar": {
     "title": "日曆",
     "new": "新增",
     "placeholder": "新的一行"

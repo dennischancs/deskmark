@@ -1,5 +1,5 @@
 <template>
-  <div class="calendar-view">
+  <div class="calendar-view deskmark-ui">
     <header>
       <button
         type="button"
@@ -21,6 +21,7 @@
         :key="index"
         type="button"
         :class="{ marked: cell.marked, selected: cell.date === selected, pad: !cell.date }"
+        class="deskmark-hover"
         @click="cell.date && (selected = cell.date)"
       >
         {{ cell.day }}
@@ -33,6 +34,7 @@
       >
         <button
           type="button"
+          class="deskmark-hover"
           @click="openTask(task)"
         >
           {{ task.text }}
@@ -44,7 +46,10 @@
         v-model="text"
         :placeholder="t('calendar.placeholder')"
       >
-      <button type="submit">
+      <button
+        type="submit"
+        class="deskmark-primary"
+      >
         {{ t('calendar.new') }}
       </button>
     </form>
@@ -118,11 +123,20 @@ const create = async (): Promise<void> => {
   flex: 1;
   overflow: auto;
   padding: 16px;
+  color: var(--editorColor);
+  background: var(--editorBgColor);
 }
-header, form {
+header, form, ul {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+ul {
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0;
+  margin: 0 0 12px;
+  list-style: none;
 }
 .grid {
   display: grid;
@@ -130,20 +144,25 @@ header, form {
   gap: 4px;
   margin: 12px 0;
 }
-.grid button, form button, li button {
+.grid button, form button, li button, form input {
   border: 0;
-  background: transparent;
   cursor: pointer;
+}
+form input {
+  flex: 1;
+  cursor: text;
+  padding: 6px 8px;
+  border-radius: 4px;
 }
 .grid button {
   height: 36px;
 }
 .marked {
   font-weight: 700;
-  text-decoration: underline;
 }
-.selected {
-  background: #d6e6ff;
+form button {
+  padding: 6px 10px;
+  border-radius: 4px;
 }
 .pad {
   visibility: hidden;

@@ -54,11 +54,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from 'vue'
+import { ref, computed, onMounted, nextTick, watch } from 'vue'
 import { useLayoutStore } from '@/store/layout'
 import { useProjectStore } from '@/store/project'
 import { useEditorStore } from '@/store/editor'
 import { useDeskmarkStore } from '@/store/deskmark'
+import { usePreferencesStore } from '@/store/preferences'
+import { showDeskmarkTarget } from '@/util/deskmarkView'
 
 import { sideBarIcons as builtinSideBarIcons, sideBarBottomIcons } from './help'
 import { Document as WordsIcon } from '@element-plus/icons-vue'
@@ -79,6 +81,8 @@ const { t } = useI18n()
 const projectStore = useProjectStore()
 const editorStore = useEditorStore()
 const deskmarkStore = useDeskmarkStore()
+const preferenceStore = usePreferencesStore()
+const { deskmarkCalendar, deskmarkTasks, deskmarkWordCount } = storeToRefs(preferenceStore)
 
 const sideBar = ref<HTMLDivElement | null>(null)
 const dragBar = ref<HTMLDivElement | null>(null)
@@ -112,7 +116,7 @@ try {
       id,
       description: t('plugin.words'),
       execute: () => {
-        layoutStore.SET_LAYOUT({ rightColumn: sampleManifest.id + ':panel', showSideBar: true })
+        showDeskmarkTarget('wordcount')
       }
     }
     if (!commandCenter.rootCommand.subcommands.some(command => command.id === id)) {
@@ -137,14 +141,41 @@ const unloadSample = (): void => {
   }
 }
 const sideBarIcons = computed(() => [
-  ...builtinSideBarIcons,
-  ...pluginHost.views().filter(view => !view.builtin).map(view => ({
+  ...builtinSideBarIcons.filter((icon) => {
+    if (icon.id === 'calendar') return deskmarkCalendar.value !== false
+    if (icon.id === 'tasks') return deskmarkTasks.value !== false
+    return true
+  }),
+  ...(deskmarkWordCount.value === false
+    ? []
+    : pluginHost.views().filter(view => !view.builtin).map(view => ({
     id: view.id,
     name: () => t('plugin.words'),
     icon: WordsIcon
-  }))
+  })))
 ])
-const pluginView = computed(() => pluginLoaded.value && rightColumn.value === 'wordcount:panel'
+
+watch(deskmarkCalendar, (enabled) => {
+  if (enabled === false) deskmarkStore.calendarOpen = false
+})
+watch(deskmarkTasks, (enabled) => {
+  if (enabled === false && rightColumn.value === 'tasks') {
+    layoutStore.SET_LAYOUT({ rightColumn: 'files' })
+  }
+})
+watch(deskmarkWordCount, (enabled) => {
+  if (enabled === false && rightColumn.value.startsWith('wordcount:')) {
+    layoutStore.SET_LAYOUT({ rightColumn: 'files' })
+  }
+})
+if (deskmarkCalendar.value === false) deskmarkStore.calendarOpen = false
+if (deskmarkTasks.value === false && rightColumn.value === 'tasks') {
+  layoutStore.SET_LAYOUT({ rightColumn: 'files' })
+}
+if (deskmarkWordCount.value === false && rightColumn.value.startsWith('wordcount:')) {
+  layoutStore.SET_LAYOUT({ rightColumn: 'files' })
+}
+const pluginView = computed(() => deskmarkWordCount.value !== false && pluginLoaded.value && rightColumn.value === 'wordcount:panel'
   ? { entry: sampleManifest.entry, manifest: sampleManifest }
   : null)
 

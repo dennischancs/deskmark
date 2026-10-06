@@ -127,7 +127,17 @@
       "toggleTableOfContents": "목차 토글",
       "reloadImages": "이미지 새로고침",
       "showDeveloperTools": "개발자 도구 보기",
-      "reloadWindow": "창 새로고침"
+      "reloadWindow": "창 새로고침",
+      "deskmark": "책상메모",
+      "openCalendar": "달력 열기",
+      "openTasks": "할 일 열기",
+      "openWordCount": "글자 수 열기",
+      "stick": "현재 노트를 바탕화면에 붙이기",
+      "calendar": "달력",
+      "tasks": "할 일",
+      "reminders": "알림",
+      "wordCount": "글자 수",
+      "deskmarkSettings": "책상메모 설정"
     },
     "format": {
       "format": "서식",
@@ -391,7 +401,8 @@
         "searcher": "검색기",
         "watcher": "감시자",
         "spelling": "맞춤법",
-        "custom css": "사용자 정의 CSS"
+        "custom css": "사용자 정의 CSS",
+        "deskmark": "책상메모"
       },
       "items": {
         "autoSave": "편집 중인 내용을 자동으로 저장",
@@ -458,7 +469,11 @@
         "imageRelativeDirectoryBase": "상대 이미지가 복사되는 위치",
         "imageRelativeDirectoryName": "상대 이미지 폴더 이름",
         "fileSortOrder": "열린 폴더의 파일 정렬 순서: 오름차순 또는 내림차순",
-        "openedFilesInSidebar": "사이드바에 열린 파일을 표시할지 여부"
+        "openedFilesInSidebar": "사이드바에 열린 파일을 표시할지 여부",
+        "deskmarkCalendar": "달력 표시",
+        "deskmarkTasks": "할 일 표시",
+        "deskmarkReminders": "정한 시간에 알림",
+        "deskmarkWordCount": "글자 수 표시"
       }
     },
     "categories": {
@@ -468,7 +483,8 @@
       "spelling": "맞춤법",
       "theme": "테마",
       "image": "이미지",
-      "keybindings": "키 바인딩"
+      "keybindings": "키 바인딩",
+      "deskmark": "책상메모"
     },
     "general": {
       "title": "일반",
@@ -770,13 +786,22 @@
       "enableSpellChecking": "맞춤법 검사 활성화",
       "hideMarksForErrors": "맞춤법 오류 표시 숨기기",
       "title": "맞춤법 검사기"
+    },
+    "deskmark": {
+      "title": "책상메모",
+      "features": "기능",
+      "calendar": "달력 표시",
+      "tasks": "할 일 표시",
+      "reminders": "정한 시간에 알림",
+      "wordCount": "글자 수 표시",
+      "detail": "날짜, 알림, 우선순위, 반복은 각 할 일에서 바꿉니다. 여기서는 기능만 켜고 끕니다."
     }
   },
   "about": {
-      "copyright": "Copyright © Luo Ran 2017-{year}",
-      "copyrightContributors": "저작권 기여자",
-      "addon": "추가 기능은 책상메모 안에서 실행되며, 다른 프로그램이 아닙니다."
-    },
+    "copyright": "Copyright © Luo Ran 2017-{year}",
+    "copyrightContributors": "저작권 기여자",
+    "addon": "추가 기능은 책상메모 안에서 실행되며, 다른 프로그램이 아닙니다."
+  },
   "commands": {
     "mt": {
       "hide": "책상메모 숨기기",
@@ -1035,7 +1060,7 @@
     "login": "로그인할 때 열기",
     "quit": "종료"
   },
-"calendar": {
+  "calendar": {
     "title": "달력",
     "new": "추가",
     "placeholder": "새 줄"

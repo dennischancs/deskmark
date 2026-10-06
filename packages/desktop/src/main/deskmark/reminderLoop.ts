@@ -18,6 +18,7 @@ interface ReminderFile {
 export function startReminderLoop(options: {
   userDataPath: string
   getVault?: () => string | null
+  remindersEnabled?: () => boolean
   openNote: (vault: string, notePath: string, line: number | null) => void
 }): void {
   const file = join(options.userDataPath, 'reminder-state.json')
@@ -36,6 +37,7 @@ export function startReminderLoop(options: {
     renameSync(temporary, file)
   }
   const tick = (): void => {
+    if (options.remindersEnabled && !options.remindersEnabled()) return
     const vault = options.getVault ? options.getVault() : currentVault
     if (!vault) return
     try {

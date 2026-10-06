@@ -1,5 +1,5 @@
 <template>
-  <div class="plugin-panel">
+  <div class="plugin-panel deskmark-ui deskmark-side">
     <button
       type="button"
       class="close"
@@ -24,6 +24,7 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useEditorStore } from '@/store/editor'
 import { useProjectStore } from '@/store/project'
+import { usePreferencesStore } from '@/store/preferences'
 import { noteInsideVault } from '../../../../../../deskmark-plugin/src/index.ts'
 
 defineProps<{ closeLabel: string }>()
@@ -31,10 +32,28 @@ const emit = defineEmits<{ close: [] }>()
 const { t } = useI18n()
 const editorStore = useEditorStore()
 const projectStore = useProjectStore()
+const preferencesStore = usePreferencesStore()
 const { currentFile } = storeToRefs(editorStore)
 const { projectTree } = storeToRefs(projectStore)
+const { theme } = storeToRefs(preferencesStore)
 const host = ref<HTMLDivElement | null>(null)
 const error = ref('')
+let guestView: (HTMLElement & { insertCSS?: (css: string) => Promise<string> }) | null = null
+
+const safeColor = (value: string): string => {
+  const trimmed = value.trim()
+  return /^(#[0-9a-fA-F]{3,8}|rgba?\([^)]+\)|hsla?\([^)]+\))$/.test(trimmed) ? trimmed : ''
+}
+
+const paintGuest = (): void => {
+  if (!guestView?.insertCSS) return
+  const style = getComputedStyle(document.documentElement)
+  const foreground = safeColor(style.getPropertyValue('--sideBarColor'))
+    || safeColor(style.getPropertyValue('--editorColor'))
+  const scheme = document.documentElement.style.colorScheme === 'dark' ? 'dark' : 'light'
+  const color = foreground ? `--deskmark-fg:${foreground};color:${foreground} !important;` : ''
+  guestView.insertCSS(`:root{color-scheme:${scheme};${color}}html,body{background:transparent !important;${color}}`).catch(() => {})
+}
 
 const publish = (): void => {
   const root = projectTree.value?.pathname || ''
@@ -63,9 +82,11 @@ onMounted(async () => {
       return
     }
     const guest = document.createElement('webview')
+    guestView = guest as HTMLElement & { insertCSS?: (css: string) => Promise<string> }
     guest.setAttribute('src', info.src)
     guest.setAttribute('preload', info.preload)
     guest.setAttribute('partition', 'persist:deskmark-plugin')
+    guest.addEventListener('dom-ready', paintGuest)
     host.value.appendChild(guest)
     publish()
   } catch (caught) {
@@ -78,6 +99,9 @@ onBeforeUnmount(() => {
 })
 
 watch([currentFile, projectTree], publish)
+watch(theme, () => {
+  paintGuest()
+})
 </script>
 
 <style scoped>

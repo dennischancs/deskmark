@@ -1,5 +1,5 @@
 <template>
-  <div class="deskmark-tasks">
+  <div class="deskmark-tasks deskmark-ui deskmark-side">
     <p
       v-if="!root"
       class="empty"
@@ -7,6 +7,7 @@
       {{ t('sideBar.tasks.empty') }}
     </p>
     <button
+        class="deskmark-hover"
       v-if="currentPath"
       type="button"
       @click="stickCurrent"
@@ -30,6 +31,7 @@
         >
         <button
           type="button"
+          class="deskmark-hover"
           @click="openTask(task)"
         >
           {{ task.text }}
@@ -125,7 +127,6 @@ const stickCurrent = (): void => {
 <style scoped>
 .deskmark-tasks {
   padding: 12px;
-  color: var(--sideBarColor);
 }
 .empty {
   margin: 0;
@@ -141,10 +142,7 @@ button {
   flex: 1;
   margin: 0 0 4px;
   padding: 4px 6px;
-  border: 0;
   border-radius: 4px;
-  background: transparent;
-  color: inherit;
   text-align: left;
   cursor: pointer;
 }
@@ -154,8 +152,5 @@ input {
 .task-row {
   display: flex;
   align-items: center;
-}
-button:hover {
-  background: var(--sideBarItemHoverBgColor);
 }
 </style>

@@ -127,7 +127,17 @@
       "toggleTableOfContents": "Показать/скрыть оглавление",
       "reloadImages": "Обновить изображения",
       "showDeveloperTools": "Инструменты разработчика",
-      "reloadWindow": "Перезагрузить окно"
+      "reloadWindow": "Перезагрузить окно",
+      "deskmark": "Листок",
+      "openCalendar": "Открыть календарь",
+      "openTasks": "Открыть задачи",
+      "openWordCount": "Открыть число слов",
+      "stick": "Прикрепить текущую заметку",
+      "calendar": "Календарь",
+      "tasks": "Задачи",
+      "reminders": "Напоминания",
+      "wordCount": "Слова",
+      "deskmarkSettings": "Настройки листка"
     },
     "format": {
       "format": "Формат",
@@ -391,7 +401,8 @@
         "searcher": "Поиск",
         "watcher": "Наблюдение",
         "spelling": "Орфография",
-        "custom css": "Пользовательский CSS"
+        "custom css": "Пользовательский CSS",
+        "deskmark": "Листок"
       },
       "items": {
         "autoSave": "Автоматически сохранять редактируемое содержимое",
@@ -458,7 +469,11 @@
         "imageRelativeDirectoryName": "Имя относительной папки изображений",
         "autoNormalizeLineEndings": "Автоматически нормализовать концы строк при открытии файлов. Если отключено, файлы открываются как есть.",
         "fileSortOrder": "Порядок сортировки файлов в открытых папках: по возрастанию или убыванию.",
-        "openedFilesInSidebar": "Показывать открытые файлы на боковой панели."
+        "openedFilesInSidebar": "Показывать открытые файлы на боковой панели.",
+        "deskmarkCalendar": "Показывать календарь",
+        "deskmarkTasks": "Показывать задачи",
+        "deskmarkReminders": "Напоминания",
+        "deskmarkWordCount": "Показывать число слов"
       }
     },
     "categories": {
@@ -468,7 +483,8 @@
       "spelling": "Орфография",
       "theme": "Тема",
       "image": "Изображения",
-      "keybindings": "Горячие клавиши"
+      "keybindings": "Горячие клавиши",
+      "deskmark": "Листок"
     },
     "general": {
       "title": "Общие",
@@ -770,13 +786,22 @@
       "enableSpellChecking": "Включить проверку орфографии",
       "hideMarksForErrors": "Скрывать пометки орфографических ошибок",
       "title": "Проверка орфографии"
+    },
+    "deskmark": {
+      "title": "Листок",
+      "features": "Функции",
+      "calendar": "Показывать календарь",
+      "tasks": "Показывать задачи",
+      "reminders": "Напоминать в заданное время",
+      "wordCount": "Показывать число слов",
+      "detail": "Дата, напоминание, важность и повтор задаются у самой задачи. Здесь функция только включается и выключается."
     }
   },
   "about": {
-      "copyright": "Copyright © Luo Ran 2017-{year}",
-      "copyrightContributors": "Сделано с <3 участниками GitHub",
-      "addon": "Дополнение работает внутри Листок, а не как отдельная программа."
-    },
+    "copyright": "Copyright © Luo Ran 2017-{year}",
+    "copyrightContributors": "Сделано с <3 участниками GitHub",
+    "addon": "Дополнение работает внутри Листок, а не как отдельная программа."
+  },
   "commands": {
     "mt": {
       "hide": "Скрыть Листок",
@@ -1035,7 +1060,7 @@
     "login": "Открывать при входе",
     "quit": "Выйти"
   },
-"calendar": {
+  "calendar": {
     "title": "Календарь",
     "new": "Добавить",
     "placeholder": "Новая строка"

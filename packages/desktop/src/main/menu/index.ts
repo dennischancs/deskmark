@@ -15,6 +15,13 @@ import type Preference from '../preferences'
 import type Keybindings from '../keyboard/shortcutHandler'
 import type { IUserPreferences } from '@shared/types/preferences'
 
+const DESKMARK_MENU_IDS: Record<string, string> = {
+  deskmarkCalendar: 'deskmarkCalendarMenuItem',
+  deskmarkTasks: 'deskmarkTasksMenuItem',
+  deskmarkReminders: 'deskmarkRemindersMenuItem',
+  deskmarkWordCount: 'deskmarkWordCountMenuItem'
+}
+
 const RECENTLY_USED_DOCUMENTS_FILE_NAME = 'recently-used-documents.json'
 const MAX_RECENTLY_USED_DOCUMENTS = 12
 
@@ -586,6 +593,19 @@ class AppMenu {
         // Update main process language and rebuild menu
         setLanguage(prefs.language)
         this.updateAppMenu()
+      }
+      const deskmarkChanged = Object.keys(DESKMARK_MENU_IDS).some(
+        (key) => prefs[key as keyof IUserPreferences] !== undefined
+      )
+      if (deskmarkChanged) {
+        this.windowMenus.forEach((value) => {
+          if (value.type !== MenuType.EDITOR || !value.menu) return
+          for (const [key, id] of Object.entries(DESKMARK_MENU_IDS)) {
+            if (prefs[key as keyof IUserPreferences] === undefined) continue
+            const item = value.menu.getMenuItemById(id)
+            if (item) item.checked = prefs[key as keyof IUserPreferences] !== false
+          }
+        })
       }
     })
   }

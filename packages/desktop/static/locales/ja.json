@@ -127,7 +127,17 @@
       "toggleTableOfContents": "目次の切り替え",
       "reloadImages": "画像の再読み込み",
       "showDeveloperTools": "開発者ツールの表示",
-      "reloadWindow": "ウィンドウの再読み込み"
+      "reloadWindow": "ウィンドウの再読み込み",
+      "deskmark": "デスクメモ",
+      "openCalendar": "カレンダーを開く",
+      "openTasks": "やることを開く",
+      "openWordCount": "文字数を開く",
+      "stick": "このノートをデスクトップに貼る",
+      "calendar": "カレンダー",
+      "tasks": "やること",
+      "reminders": "通知",
+      "wordCount": "文字数",
+      "deskmarkSettings": "デスクメモの設定"
     },
     "format": {
       "format": "フォーマット",
@@ -391,7 +401,8 @@
         "searcher": "検索",
         "watcher": "ウォッチャー",
         "spelling": "スペリング",
-        "custom css": "カスタム CSS"
+        "custom css": "カスタム CSS",
+        "deskmark": "デスクメモ"
       },
       "items": {
         "autoSave": "編集中のコンテンツを自動保存",
@@ -458,7 +469,11 @@
         "imageRelativeDirectoryBase": "相対画像のコピー先",
         "imageRelativeDirectoryName": "相対画像フォルダー名",
         "fileSortOrder": "開いたフォルダー内のファイルの並べ替え順、昇順または降順",
-        "openedFilesInSidebar": "開いているファイルをサイドバーに表示するかどうか"
+        "openedFilesInSidebar": "開いているファイルをサイドバーに表示するかどうか",
+        "deskmarkCalendar": "カレンダーを表示",
+        "deskmarkTasks": "やることを表示",
+        "deskmarkReminders": "時間になったら通知",
+        "deskmarkWordCount": "文字数を表示"
       }
     },
     "categories": {
@@ -468,7 +483,8 @@
       "spelling": "スペルチェック",
       "theme": "テーマ",
       "image": "画像",
-      "keybindings": "キーバインド"
+      "keybindings": "キーバインド",
+      "deskmark": "デスクメモ"
     },
     "general": {
       "title": "全般",
@@ -770,13 +786,22 @@
       "enableSpellChecking": "スペルチェックを有効",
       "hideMarksForErrors": "スペルエラーのマークを隠す",
       "title": "スペルチェック"
+    },
+    "deskmark": {
+      "title": "デスクメモ",
+      "features": "機能",
+      "calendar": "カレンダーを表示",
+      "tasks": "やることを表示",
+      "reminders": "時間になったら通知",
+      "wordCount": "文字数を表示",
+      "detail": "日付、通知、優先度、繰り返しは各やることで変えます。ここでは機能のオンとオフだけです。"
     }
   },
   "about": {
-      "copyright": "Copyright © Luo Ran 2017-{year}",
-      "copyrightContributors": "著作権貢献者",
-      "addon": "追加機能はデスクメモの中で動きます。別のプログラムではありません。"
-    },
+    "copyright": "Copyright © Luo Ran 2017-{year}",
+    "copyrightContributors": "著作権貢献者",
+    "addon": "追加機能はデスクメモの中で動きます。別のプログラムではありません。"
+  },
   "commands": {
     "mt": {
       "hide": "デスクメモ を隠す",
@@ -1035,7 +1060,7 @@
     "login": "ログイン時に開く",
     "quit": "終了"
   },
-"calendar": {
+  "calendar": {
     "title": "カレンダー",
     "new": "追加",
     "placeholder": "新しい一行"

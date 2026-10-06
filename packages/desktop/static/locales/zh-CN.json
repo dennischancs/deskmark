@@ -127,7 +127,17 @@
       "toggleTableOfContents": "切换目录",
       "reloadImages": "重新加载图片",
       "showDeveloperTools": "显示开发者工具",
-      "reloadWindow": "重新加载窗口"
+      "reloadWindow": "重新加载窗口",
+      "deskmark": "桌笺",
+      "openCalendar": "打开日历",
+      "openTasks": "打开待办",
+      "openWordCount": "打开字数",
+      "stick": "把当前笔记贴到桌面",
+      "calendar": "日历",
+      "tasks": "待办",
+      "reminders": "提醒",
+      "wordCount": "字数",
+      "deskmarkSettings": "桌笺设置"
     },
     "format": {
       "format": "格式",
@@ -391,7 +401,8 @@
         "searcher": "搜索器",
         "watcher": "监听器",
         "spelling": "拼写",
-        "custom css": "自定义 CSS"
+        "custom css": "自定义 CSS",
+        "deskmark": "桌笺"
       },
       "items": {
         "autoSave": "自动保存正在编辑的内容",
@@ -458,7 +469,11 @@
         "imageRelativeDirectoryBase": "相对图片的复制位置",
         "imageRelativeDirectoryName": "相对图片文件夹名称",
         "fileSortOrder": "打开文件夹中文件的排序顺序：升序或降序",
-        "openedFilesInSidebar": "是否在侧边栏中显示已打开文件"
+        "openedFilesInSidebar": "是否在侧边栏中显示已打开文件",
+        "deskmarkCalendar": "显示日历",
+        "deskmarkTasks": "显示待办",
+        "deskmarkReminders": "到点提醒",
+        "deskmarkWordCount": "显示字数"
       }
     },
     "categories": {
@@ -468,7 +483,8 @@
       "spelling": "拼写",
       "theme": "主题",
       "image": "图片",
-      "keybindings": "快捷键"
+      "keybindings": "快捷键",
+      "deskmark": "桌笺"
     },
     "general": {
       "title": "通用",
@@ -770,13 +786,22 @@
       "enableSpellChecking": "启用拼写检查",
       "hideMarksForErrors": "隐藏拼写错误标记",
       "title": "拼写检查器"
+    },
+    "deskmark": {
+      "title": "桌笺",
+      "features": "功能",
+      "calendar": "显示日历",
+      "tasks": "显示待办",
+      "reminders": "到点提醒",
+      "wordCount": "显示字数",
+      "detail": "每条待办的日期、提醒、优先级和重复，在待办旁边的属性里改。这里只决定这些功能开不开。"
     }
   },
   "about": {
-      "copyright": "Copyright © Luo Ran 2017-{year}",
-      "copyrightContributors": "版权贡献者",
-      "addon": "添加的小功能在桌笺里面运行，不是另一个单独的程序。"
-    },
+    "copyright": "Copyright © Luo Ran 2017-{year}",
+    "copyrightContributors": "版权贡献者",
+    "addon": "添加的小功能在桌笺里面运行，不是另一个单独的程序。"
+  },
   "commands": {
     "mt": {
       "hide": "隐藏桌笺",
@@ -1035,7 +1060,7 @@
     "login": "登录时打开",
     "quit": "退出"
   },
-"calendar": {
+  "calendar": {
     "title": "日历",
     "new": "新建",
     "placeholder": "新的一行"

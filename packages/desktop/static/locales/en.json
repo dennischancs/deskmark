@@ -127,7 +127,17 @@
       "toggleTableOfContents": "Toggle Table of Contents",
       "reloadImages": "Reload Images",
       "showDeveloperTools": "Show Developer Tools",
-      "reloadWindow": "Reload Window"
+      "reloadWindow": "Reload Window",
+      "deskmark": "Deskmark",
+      "openCalendar": "Open calendar",
+      "openTasks": "Open tasks",
+      "openWordCount": "Open word count",
+      "stick": "Stick current note",
+      "calendar": "Calendar",
+      "tasks": "Tasks",
+      "reminders": "Reminders",
+      "wordCount": "Word count",
+      "deskmarkSettings": "Deskmark settings"
     },
     "format": {
       "format": "Format",
@@ -391,7 +401,8 @@
         "searcher": "Searcher",
         "watcher": "Watcher",
         "spelling": "Spelling",
-        "custom css": "Custom CSS"
+        "custom css": "Custom CSS",
+        "deskmark": "Deskmark"
       },
       "items": {
         "autoSave": "Automatically save the content being edited",
@@ -458,7 +469,11 @@
         "imageRelativeDirectoryName": "The relative image folder name",
         "autoNormalizeLineEndings": "Automatically normalize line endings when opening files. When disabled, files are opened as-is.",
         "fileSortOrder": "Sort order for files in opened folders: ascending or descending.",
-        "openedFilesInSidebar": "Whether to show opened files in the sidebar."
+        "openedFilesInSidebar": "Whether to show opened files in the sidebar.",
+        "deskmarkCalendar": "Show calendar",
+        "deskmarkTasks": "Show tasks",
+        "deskmarkReminders": "Reminders",
+        "deskmarkWordCount": "Word count"
       }
     },
     "categories": {
@@ -468,7 +483,8 @@
       "spelling": "Spelling",
       "theme": "Theme",
       "image": "Image",
-      "keybindings": "Keybindings"
+      "keybindings": "Keybindings",
+      "deskmark": "Deskmark"
     },
     "general": {
       "title": "General",
@@ -770,13 +786,22 @@
       "enableSpellChecking": "Enable spell checking",
       "hideMarksForErrors": "Hide marks for spelling errors",
       "title": "Spell Checker"
+    },
+    "deskmark": {
+      "title": "Deskmark",
+      "features": "Features",
+      "calendar": "Show calendar",
+      "tasks": "Show tasks",
+      "reminders": "Remind at the chosen time",
+      "wordCount": "Show word count",
+      "detail": "Each task keeps its own date, reminder, priority, and repeat. Change those beside the task. These switches only turn the features on or off."
     }
   },
   "about": {
-      "copyright": "Copyright © Luo Ran 2017-{year}",
-      "copyrightContributors": "Made with <3 by Github Contributors",
-      "addon": "An added feature runs inside Deskmark, not as its own program."
-    },
+    "copyright": "Copyright © Luo Ran 2017-{year}",
+    "copyrightContributors": "Made with <3 by Github Contributors",
+    "addon": "An added feature runs inside Deskmark, not as its own program."
+  },
   "commands": {
     "mt": {
       "hide": "Hide Deskmark",
@@ -1035,7 +1060,7 @@
     "login": "Open at login",
     "quit": "Quit"
   },
-"calendar": {
+  "calendar": {
     "title": "Calendar",
     "new": "New",
     "placeholder": "New line"

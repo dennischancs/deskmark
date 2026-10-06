@@ -127,7 +127,17 @@
       "toggleTableOfContents": "Basculer la table des matières",
       "reloadImages": "Recharger les images",
       "showDeveloperTools": "Afficher les outils de développement",
-      "reloadWindow": "Recharger la fenêtre"
+      "reloadWindow": "Recharger la fenêtre",
+      "deskmark": "Pense-bête",
+      "openCalendar": "Ouvrir le calendrier",
+      "openTasks": "Ouvrir les tâches",
+      "openWordCount": "Ouvrir le nombre de mots",
+      "stick": "Épingler la note actuelle",
+      "calendar": "Calendrier",
+      "tasks": "Tâches",
+      "reminders": "Rappels",
+      "wordCount": "Mots",
+      "deskmarkSettings": "Réglages du pense-bête"
     },
     "format": {
       "format": "Format",
@@ -391,7 +401,8 @@
         "searcher": "Recherche",
         "watcher": "Surveillant",
         "spelling": "Orthographe",
-        "custom css": "CSS personnalisé"
+        "custom css": "CSS personnalisé",
+        "deskmark": "Pense-bête"
       },
       "items": {
         "autoSave": "Sauvegarder automatiquement le contenu en cours d'édition",
@@ -458,7 +469,11 @@
         "imageRelativeDirectoryBase": "Où les images relatives sont copiées",
         "imageRelativeDirectoryName": "Le nom du dossier d'image relatif",
         "fileSortOrder": "Ordre de tri des fichiers dans les dossiers ouverts : croissant ou décroissant.",
-        "openedFilesInSidebar": "Afficher ou non les fichiers ouverts dans la barre latérale."
+        "openedFilesInSidebar": "Afficher ou non les fichiers ouverts dans la barre latérale.",
+        "deskmarkCalendar": "Afficher le calendrier",
+        "deskmarkTasks": "Afficher les tâches",
+        "deskmarkReminders": "Rappels",
+        "deskmarkWordCount": "Afficher le nombre de mots"
       }
     },
     "categories": {
@@ -468,7 +483,8 @@
       "spelling": "Orthographe",
       "theme": "Thème",
       "image": "Image",
-      "keybindings": "Raccourcis clavier"
+      "keybindings": "Raccourcis clavier",
+      "deskmark": "Pense-bête"
     },
     "general": {
       "title": "Général",
@@ -770,13 +786,22 @@
       "enableSpellChecking": "Activer la vérification orthographique",
       "hideMarksForErrors": "Masquer les marques d'erreurs orthographiques",
       "title": "Vérification orthographique"
+    },
+    "deskmark": {
+      "title": "Pense-bête",
+      "features": "Fonctions",
+      "calendar": "Afficher le calendrier",
+      "tasks": "Afficher les tâches",
+      "reminders": "Rappeler à l’heure choisie",
+      "wordCount": "Afficher le nombre de mots",
+      "detail": "La date, le rappel, la priorité et la répétition se règlent sur la tâche. Ici, on ne fait que les activer."
     }
   },
   "about": {
-      "copyright": "Copyright © Luo Ran 2017-{year}",
-      "copyrightContributors": "Contributeurs aux droits d'auteur",
-      "addon": "Un complément tourne dans Pense-bête, pas comme un programme à part."
-    },
+    "copyright": "Copyright © Luo Ran 2017-{year}",
+    "copyrightContributors": "Contributeurs aux droits d'auteur",
+    "addon": "Un complément tourne dans Pense-bête, pas comme un programme à part."
+  },
   "commands": {
     "mt": {
       "hide": "Masquer Pense-bête",
@@ -1035,7 +1060,7 @@
     "login": "Ouvrir à la connexion",
     "quit": "Quitter"
   },
-"calendar": {
+  "calendar": {
     "title": "Calendrier",
     "new": "Nouveau",
     "placeholder": "Nouvelle ligne"

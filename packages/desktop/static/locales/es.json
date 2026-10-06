@@ -127,7 +127,17 @@
       "toggleTableOfContents": "Alternar Tabla de Contenidos",
       "reloadImages": "Recargar Imágenes",
       "showDeveloperTools": "Mostrar Herramientas de Desarrollador",
-      "reloadWindow": "Recargar Ventana"
+      "reloadWindow": "Recargar Ventana",
+      "deskmark": "Nota de mesa",
+      "openCalendar": "Abrir calendario",
+      "openTasks": "Abrir tareas",
+      "openWordCount": "Abrir recuento de palabras",
+      "stick": "Fijar la nota actual",
+      "calendar": "Calendario",
+      "tasks": "Tareas",
+      "reminders": "Recordatorios",
+      "wordCount": "Palabras",
+      "deskmarkSettings": "Ajustes de Nota de mesa"
     },
     "format": {
       "format": "Formato",
@@ -391,7 +401,8 @@
         "searcher": "Buscador",
         "watcher": "Observador",
         "spelling": "Ortografía",
-        "custom css": "CSS personalizado"
+        "custom css": "CSS personalizado",
+        "deskmark": "Nota de mesa"
       },
       "items": {
         "autoSave": "Guardar automáticamente el contenido que se está editando",
@@ -458,7 +469,11 @@
         "imageRelativeDirectoryBase": "Dónde se copian las imágenes relativas",
         "imageRelativeDirectoryName": "El nombre de la carpeta de imagen relativa",
         "fileSortOrder": "El orden de clasificación de los archivos en las carpetas abiertas: ascendente o descendente",
-        "openedFilesInSidebar": "Si mostrar los archivos abiertos en la barra lateral"
+        "openedFilesInSidebar": "Si mostrar los archivos abiertos en la barra lateral",
+        "deskmarkCalendar": "Mostrar calendario",
+        "deskmarkTasks": "Mostrar tareas",
+        "deskmarkReminders": "Recordatorios",
+        "deskmarkWordCount": "Mostrar palabras"
       }
     },
     "categories": {
@@ -468,7 +483,8 @@
       "spelling": "Ortografía",
       "theme": "Tema",
       "image": "Imagen",
-      "keybindings": "Atajos de Teclado"
+      "keybindings": "Atajos de Teclado",
+      "deskmark": "Nota de mesa"
     },
     "general": {
       "title": "General",
@@ -770,13 +786,22 @@
       "enableSpellChecking": "Habilitar corrección ortográfica",
       "hideMarksForErrors": "Ocultar marcas para errores ortográficos",
       "title": "Corrector Ortográfico"
+    },
+    "deskmark": {
+      "title": "Nota de mesa",
+      "features": "Funciones",
+      "calendar": "Mostrar calendario",
+      "tasks": "Mostrar tareas",
+      "reminders": "Avisar a la hora elegida",
+      "wordCount": "Mostrar palabras",
+      "detail": "La fecha, el aviso, la prioridad y la repetición se cambian en la propia tarea. Aquí solo se enciende o se apaga."
     }
   },
   "about": {
-      "copyright": "Derechos de autor © Luo Ran 2017-{year}",
-      "copyrightContributors": "Derechos de Autor Contribuidores",
-      "addon": "Un complemento funciona dentro de Nota de mesa, no como otro programa."
-    },
+    "copyright": "Derechos de autor © Luo Ran 2017-{year}",
+    "copyrightContributors": "Derechos de Autor Contribuidores",
+    "addon": "Un complemento funciona dentro de Nota de mesa, no como otro programa."
+  },
   "commands": {
     "mt": {
       "hide": "Ocultar Nota de mesa",
@@ -1035,7 +1060,7 @@
     "login": "Abrir al iniciar sesión",
     "quit": "Salir"
   },
-"calendar": {
+  "calendar": {
     "title": "Calendario",
     "new": "Nuevo",
     "placeholder": "Nueva línea"

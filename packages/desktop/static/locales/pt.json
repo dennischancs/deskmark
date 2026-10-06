@@ -127,7 +127,17 @@
       "toggleTableOfContents": "Alternar Índice",
       "reloadImages": "Recarregar Imagens",
       "showDeveloperTools": "Mostrar Ferramentas de Desenvolvedor",
-      "reloadWindow": "Recarregar Janela"
+      "reloadWindow": "Recarregar Janela",
+      "deskmark": "Nota de mesa",
+      "openCalendar": "Abrir calendário",
+      "openTasks": "Abrir tarefas",
+      "openWordCount": "Abrir contagem de palavras",
+      "stick": "Fixar a nota atual",
+      "calendar": "Calendário",
+      "tasks": "Tarefas",
+      "reminders": "Lembretes",
+      "wordCount": "Palavras",
+      "deskmarkSettings": "Definições da Nota de mesa"
     },
     "format": {
       "format": "Formato",
@@ -391,7 +401,8 @@
         "searcher": "Pesquisador",
         "watcher": "Observador",
         "spelling": "Ortografia",
-        "custom css": "CSS personalizado"
+        "custom css": "CSS personalizado",
+        "deskmark": "Nota de mesa"
       },
       "items": {
         "autoSave": "Salvar automaticamente o conteúdo sendo editado",
@@ -458,7 +469,11 @@
         "imageRelativeDirectoryBase": "Onde as imagens relativas são copiadas",
         "imageRelativeDirectoryName": "O nome da pasta de imagem relativa",
         "fileSortOrder": "Ordem de classificação dos arquivos nas pastas abertas: ascendente ou descendente.",
-        "openedFilesInSidebar": "Se os arquivos abertos são mostrados na barra lateral."
+        "openedFilesInSidebar": "Se os arquivos abertos são mostrados na barra lateral.",
+        "deskmarkCalendar": "Mostrar calendário",
+        "deskmarkTasks": "Mostrar tarefas",
+        "deskmarkReminders": "Lembretes",
+        "deskmarkWordCount": "Mostrar palavras"
       }
     },
     "categories": {
@@ -468,7 +483,8 @@
       "spelling": "Ortografia",
       "theme": "Tema",
       "image": "Imagem",
-      "keybindings": "Atalhos de Teclado"
+      "keybindings": "Atalhos de Teclado",
+      "deskmark": "Nota de mesa"
     },
     "general": {
       "title": "Geral",
@@ -770,13 +786,22 @@
       "enableSpellChecking": "Habilitar verificação ortográfica",
       "hideMarksForErrors": "Ocultar marcas para erros ortográficos",
       "title": "Corretor Ortográfico"
+    },
+    "deskmark": {
+      "title": "Nota de mesa",
+      "features": "Funções",
+      "calendar": "Mostrar calendário",
+      "tasks": "Mostrar tarefas",
+      "reminders": "Lembrar à hora marcada",
+      "wordCount": "Mostrar palavras",
+      "detail": "A data, o lembrete, a prioridade e a repetição mudam-se na própria tarefa. Aqui só se liga ou desliga."
     }
   },
   "about": {
-      "copyright": "Copyright © Luo Ran 2017-{year}",
-      "copyrightContributors": "Copyright Contribuidores",
-      "addon": "Um complemento funciona dentro de Nota de mesa, não como outro programa."
-    },
+    "copyright": "Copyright © Luo Ran 2017-{year}",
+    "copyrightContributors": "Copyright Contribuidores",
+    "addon": "Um complemento funciona dentro de Nota de mesa, não como outro programa."
+  },
   "commands": {
     "mt": {
       "hide": "Ocultar Nota de mesa",
@@ -1035,7 +1060,7 @@
     "login": "Abrir ao iniciar sessão",
     "quit": "Sair"
   },
-"calendar": {
+  "calendar": {
     "title": "Calendário",
     "new": "Novo",
     "placeholder": "Nova linha"

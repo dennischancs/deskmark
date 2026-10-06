@@ -62,6 +62,10 @@ export interface PreferencesState {
   trimTrailingNewline: number
   textDirection: TextDirection | string
   hideQuickInsertHint: boolean
+  deskmarkCalendar: boolean
+  deskmarkTasks: boolean
+  deskmarkReminders: boolean
+  deskmarkWordCount: boolean
   imageInsertAction: ImageInsertAction | string
   imagePreferRelativeDirectory: boolean
   imageRelativeDirectoryBase: ImageRelativeDirectoryBase | string
@@ -183,6 +187,10 @@ export const usePreferencesStore = defineStore('preferences', {
     trimTrailingNewline: 2,
     textDirection: 'ltr',
     hideQuickInsertHint: false,
+    deskmarkCalendar: true,
+    deskmarkTasks: true,
+    deskmarkReminders: true,
+    deskmarkWordCount: true,
     imageInsertAction: 'folder',
     imagePreferRelativeDirectory: false,
     imageRelativeDirectoryBase: 'file',

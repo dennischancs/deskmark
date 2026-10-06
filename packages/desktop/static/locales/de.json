@@ -127,7 +127,17 @@
       "toggleTableOfContents": "Inhaltsverzeichnis umschalten",
       "reloadImages": "Bilder neu laden",
       "showDeveloperTools": "Entwicklertools anzeigen",
-      "reloadWindow": "Fenster neu laden"
+      "reloadWindow": "Fenster neu laden",
+      "deskmark": "Tischzettel",
+      "openCalendar": "Kalender öffnen",
+      "openTasks": "Aufgaben öffnen",
+      "openWordCount": "Wörter öffnen",
+      "stick": "Aktuelle Notiz anheften",
+      "calendar": "Kalender",
+      "tasks": "Aufgaben",
+      "reminders": "Erinnerungen",
+      "wordCount": "Wörter",
+      "deskmarkSettings": "Einstellungen für Tischzettel"
     },
     "format": {
       "format": "Format",
@@ -391,7 +401,8 @@
         "searcher": "Suche",
         "watcher": "Watcher",
         "spelling": "Rechtschreibung",
-        "custom css": "Benutzerdefiniertes CSS"
+        "custom css": "Benutzerdefiniertes CSS",
+        "deskmark": "Tischzettel"
       },
       "items": {
         "autoSave": "Den bearbeiteten Inhalt automatisch speichern",
@@ -458,7 +469,11 @@
         "imageRelativeDirectoryBase": "Wohin relative Bilder kopiert werden",
         "imageRelativeDirectoryName": "Der relative Bildordner-Name",
         "fileSortOrder": "Sortierreihenfolge für Dateien in geöffneten Ordnern: aufsteigend oder absteigend.",
-        "openedFilesInSidebar": "Ob geöffnete Dateien in der Seitenleiste angezeigt werden sollen."
+        "openedFilesInSidebar": "Ob geöffnete Dateien in der Seitenleiste angezeigt werden sollen.",
+        "deskmarkCalendar": "Kalender anzeigen",
+        "deskmarkTasks": "Aufgaben anzeigen",
+        "deskmarkReminders": "Erinnerungen",
+        "deskmarkWordCount": "Wörter anzeigen"
       }
     },
     "categories": {
@@ -468,7 +483,8 @@
       "spelling": "Rechtschreibung",
       "theme": "Design",
       "image": "Bild",
-      "keybindings": "Tastenkürzel"
+      "keybindings": "Tastenkürzel",
+      "deskmark": "Tischzettel"
     },
     "general": {
       "title": "Allgemein",
@@ -770,13 +786,22 @@
       "enableSpellChecking": "Rechtschreibprüfung aktivieren",
       "hideMarksForErrors": "Markierungen für Rechtschreibfehler ausblenden",
       "title": "Rechtschreibprüfung"
+    },
+    "deskmark": {
+      "title": "Tischzettel",
+      "features": "Funktionen",
+      "calendar": "Kalender anzeigen",
+      "tasks": "Aufgaben anzeigen",
+      "reminders": "Zur gewählten Zeit erinnern",
+      "wordCount": "Wörter anzeigen",
+      "detail": "Datum, Erinnerung, Wichtigkeit und Wiederholung stehen an der Aufgabe selbst. Hier wird die Funktion nur ein- oder ausgeschaltet."
     }
   },
   "about": {
-      "copyright": "Copyright © Luo Ran 2017-{year}",
-      "copyrightContributors": "Urheberrecht Mitwirkende",
-      "addon": "Eine Ergänzung läuft in Tischzettel, nicht als eigenes Programm."
-    },
+    "copyright": "Copyright © Luo Ran 2017-{year}",
+    "copyrightContributors": "Urheberrecht Mitwirkende",
+    "addon": "Eine Ergänzung läuft in Tischzettel, nicht als eigenes Programm."
+  },
   "commands": {
     "mt": {
       "hide": "Tischzettel ausblenden",
@@ -1035,7 +1060,7 @@
     "login": "Beim Anmelden öffnen",
     "quit": "Beenden"
   },
-"calendar": {
+  "calendar": {
     "title": "Kalender",
     "new": "Neu",
     "placeholder": "Neue Zeile"
