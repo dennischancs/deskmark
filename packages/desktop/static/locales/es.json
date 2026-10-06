@@ -1038,5 +1038,9 @@
     "title": "Calendario",
     "new": "Nuevo",
     "placeholder": "Nueva línea"
+  },
+  "plugin": {
+    "close": "Cerrar",
+    "failed": "No se pudo abrir este complemento"
   }
 }

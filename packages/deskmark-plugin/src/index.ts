@@ -1,0 +1,176 @@
+export const API_MAJOR = 1
+
+export const PERMISSIONS = [
+  'notes.read',
+  'notes.write',
+  'tasks.read',
+  'tasks.write',
+  'ui.panel',
+  'ui.command',
+  'settings'
+] as const
+
+export type Permission = (typeof PERMISSIONS)[number]
+
+export interface PluginManifest {
+  id: string
+  name: string
+  api: number
+  entry: string
+  permissions: string[]
+}
+
+export interface PluginCommand {
+  id: string
+  title: string
+}
+
+export interface PluginView {
+  id: string
+  title: string
+}
+
+export interface HostContribution {
+  id: string
+  title: string
+  kind: 'command' | 'view'
+  builtin: boolean
+}
+
+export class PluginError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'PluginError'
+  }
+}
+
+export function readManifest(raw: unknown): PluginManifest {
+  if (!raw || typeof raw !== 'object') throw new PluginError('清单不是对象')
+  const value = raw as Record<string, unknown>
+  if (typeof value.id !== 'string' || !/^[a-z0-9-]+$/.test(value.id)) {
+    throw new PluginError('插件编号无效')
+  }
+  if (typeof value.name !== 'string' || !value.name.trim()) throw new PluginError('插件没有名称')
+  if (value.api !== API_MAJOR) throw new PluginError(`这个插件需要第 ${String(value.api)} 版接口，当前是第 ${API_MAJOR} 版`)
+  if (typeof value.entry !== 'string' || !value.entry.endsWith('.html') || value.entry.includes('..') || value.entry.startsWith('/') || value.entry.includes('\\')) {
+    throw new PluginError('入口必须是插件目录里的页面')
+  }
+  if (!Array.isArray(value.permissions) || value.permissions.some(item => typeof item !== 'string' || !PERMISSIONS.includes(item as Permission))) {
+    throw new PluginError('权限无效')
+  }
+  return {
+    id: value.id,
+    name: value.name,
+    api: value.api,
+    entry: value.entry,
+    permissions: [...value.permissions]
+  }
+}
+
+export function assertPermission(manifest: PluginManifest, permission: Permission): void {
+  if (!manifest.permissions.includes(permission)) {
+    throw new PluginError('这个小功能没有得到相应允许')
+  }
+}
+
+export interface BridgeRequest {
+  id: string
+  method: string
+  path?: string
+  markdown?: string
+}
+
+export interface BridgeResponse {
+  id: string
+  ok: boolean
+  result?: unknown
+  error?: string
+}
+
+const METHODS: Record<string, Permission> = {
+  'notes.read': 'notes.read',
+  'notes.write': 'notes.write',
+  'tasks.read': 'tasks.read',
+  'tasks.write': 'tasks.write',
+  'ui.command': 'ui.command',
+  'ui.panel': 'ui.panel',
+  'settings.read': 'settings'
+}
+
+export function authorize(manifest: PluginManifest, method: string): Permission {
+  const permission = METHODS[method]
+  if (!permission) throw new PluginError('没有这个操作')
+  assertPermission(manifest, permission)
+  return permission
+}
+
+export function noteInsideVault(notePath: string): boolean {
+  const normalized = notePath.split('\\').join('/').replace(/^\.\//, '')
+  if (!normalized || normalized.startsWith('/') || /^[A-Za-z]:/.test(normalized)) return false
+  return !normalized.split('/').includes('..')
+}
+
+export interface LoadedPlugin {
+  manifest: PluginManifest
+  commands: PluginCommand[]
+  views: PluginView[]
+}
+
+export class PluginHost {
+  readonly builtins: HostContribution[] = []
+  readonly plugins = new Map<string, LoadedPlugin>()
+
+  registerBuiltin(contribution: HostContribution): void {
+    if (!contribution.builtin) throw new PluginError('内置功能必须标明来源')
+    this.builtins.push(contribution)
+  }
+
+  load(manifest: PluginManifest, contributions: { commands?: PluginCommand[], views?: PluginView[] } = {}): LoadedPlugin {
+    if (this.plugins.has(manifest.id)) throw new PluginError('这个小功能已经打开')
+    const commands = contributions.commands ?? []
+    const views = contributions.views ?? []
+    if (commands.length && !manifest.permissions.includes('ui.command')) {
+      throw new PluginError('这个小功能没有得到相应允许')
+    }
+    if (views.length && !manifest.permissions.includes('ui.panel')) {
+      throw new PluginError('这个小功能没有得到相应允许')
+    }
+    const loaded = { manifest, commands, views }
+    this.plugins.set(manifest.id, loaded)
+    return loaded
+  }
+
+  unload(id: string): void {
+    this.plugins.delete(id)
+  }
+
+  commands(): HostContribution[] {
+    const extra: HostContribution[] = []
+    for (const plugin of this.plugins.values()) {
+      for (const command of plugin.commands) {
+        extra.push({ id: `${plugin.manifest.id}:${command.id}`, title: command.title, kind: 'command', builtin: false })
+      }
+    }
+    return [...this.builtins.filter(item => item.kind === 'command'), ...extra]
+  }
+
+  views(): HostContribution[] {
+    const extra: HostContribution[] = []
+    for (const plugin of this.plugins.values()) {
+      for (const view of plugin.views) {
+        extra.push({ id: `${plugin.manifest.id}:${view.id}`, title: view.title, kind: 'view', builtin: false })
+      }
+    }
+    return [...this.builtins.filter(item => item.kind === 'view'), ...extra]
+  }
+}
+
+export function createDeadline(timeoutMs: number, now = Date.now()): { expired: () => boolean, assert: () => void } {
+  const end = now + timeoutMs
+  return {
+    expired: () => Date.now() > end,
+    assert: () => {
+      if (Date.now() > end) throw new PluginError('这个小功能没有及时完成')
+    }
+  }
+}

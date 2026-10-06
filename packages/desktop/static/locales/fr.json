@@ -1038,5 +1038,9 @@
     "title": "Calendrier",
     "new": "Nouveau",
     "placeholder": "Nouvelle ligne"
+  },
+  "plugin": {
+    "close": "Fermer",
+    "failed": "Ce complément n'a pas pu s'ouvrir"
   }
 }

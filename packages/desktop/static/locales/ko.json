@@ -1038,5 +1038,9 @@
     "title": "달력",
     "new": "추가",
     "placeholder": "새 줄"
+  },
+  "plugin": {
+    "close": "닫기",
+    "failed": "이 추가 기능을 열지 못했습니다"
   }
 }

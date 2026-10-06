@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Word count</title>
+  <style>
+    body { margin: 12px; font: 13px/1.4 sans-serif; color: #243024; background: transparent; }
+    strong { font-size: 28px; }
+  </style>
+</head>
+<body>
+  <div id="count">0</div>
+  <script>
+    const count = document.querySelector("#count")
+    const request = (method, extra) => new Promise((resolve, reject) => {
+      const id = String(Date.now()) + Math.random().toString(16).slice(2)
+      const onMessage = (event) => {
+        const data = event.data || {}
+        if (data.id !== id) return
+        window.removeEventListener("message", onMessage)
+        if (data.ok) resolve(data.result)
+        else reject(new Error(data.error || "failed"))
+      }
+      window.addEventListener("message", onMessage)
+      parent.postMessage({ id, method, ...extra }, "*")
+    })
+    const show = async () => {
+      const note = await request("notes.read", {})
+      const text = String(note && note.markdown || "")
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0
+      count.textContent = String(words)
+    }
+    window.addEventListener("message", (event) => {
+      if (event.data && event.data.type === "note-changed") show().catch(() => { count.textContent = "-" })
+    })
+    parent.postMessage({ id: "ready", method: "ui.panel", title: "Words" }, "*")
+    show().catch(() => { count.textContent = "-" })
+  </script>
+</body>
+</html>

@@ -1038,5 +1038,9 @@
     "title": "Kalender",
     "new": "Nieuw",
     "placeholder": "Nieuwe regel"
+  },
+  "plugin": {
+    "close": "Sluiten",
+    "failed": "Deze extra functie kon niet worden geopend"
   }
 }

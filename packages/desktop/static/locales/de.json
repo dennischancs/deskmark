@@ -1038,5 +1038,9 @@
     "title": "Kalender",
     "new": "Neu",
     "placeholder": "Neue Zeile"
+  },
+  "plugin": {
+    "close": "Schließen",
+    "failed": "Diese Ergänzung konnte nicht geöffnet werden"
   }
 }

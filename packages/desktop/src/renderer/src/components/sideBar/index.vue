@@ -39,6 +39,14 @@
       <side-bar-search v-else-if="rightColumn === 'search'" />
       <toc v-else-if="rightColumn === 'toc'" />
       <task-lists v-else-if="rightColumn === 'tasks'" />
+      <plugin-panel
+        v-else-if="pluginView"
+        :root="pluginRoot"
+        :entry="pluginView.entry"
+        :manifest="pluginView.manifest"
+        :close-label="t('plugin.close')"
+        @close="unloadSample"
+      />
     </div>
     <div
       v-show="rightColumn"
@@ -55,15 +63,21 @@ import { useProjectStore } from '@/store/project'
 import { useEditorStore } from '@/store/editor'
 import { useDeskmarkStore } from '@/store/deskmark'
 
-import { sideBarIcons, sideBarBottomIcons } from './help'
+import { sideBarIcons as builtinSideBarIcons, sideBarBottomIcons } from './help'
+import { Document as WordsIcon } from '@element-plus/icons-vue'
 import Tree from './tree.vue'
 import SideBarSearch from './search.vue'
 import Toc from './toc.vue'
 import TaskLists from './tasks.vue'
+import PluginPanel from '../pluginPanel/index.vue'
+import { PluginHost, readManifest, type PluginManifest } from '../../../../../../deskmark-plugin/src/index.ts'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
+import { useCommandCenterStore } from '@/store/commandCenter'
 import type { TabDescriptor } from './types'
 
 const layoutStore = useLayoutStore()
+const { t } = useI18n()
 const projectStore = useProjectStore()
 const editorStore = useEditorStore()
 const deskmarkStore = useDeskmarkStore()
@@ -75,6 +89,63 @@ const openedFiles = ref<TabDescriptor[]>([])
 const sideBarViewWidth = ref(280)
 
 const { rightColumn, showSideBar, sideBarWidth } = storeToRefs(layoutStore)
+
+const pluginHost = new PluginHost()
+pluginHost.registerBuiltin({ id: 'tasks.open', title: '待办', kind: 'command', builtin: true })
+pluginHost.registerBuiltin({ id: 'calendar.open', title: '日历', kind: 'view', builtin: true })
+pluginHost.registerBuiltin({ id: 'sticky.open', title: '便签', kind: 'command', builtin: true })
+const sampleManifest: PluginManifest = {
+  id: 'wordcount',
+  name: 'Word count',
+  api: 1,
+  entry: 'index.html',
+  permissions: ['notes.read', 'ui.command', 'ui.panel']
+}
+const pluginRoot = window.path.resolve(window.path.join(window.path.dirname(decodeURIComponent(window.location.pathname.replace(/^\//, ''))), '../../../../../../plugins/sample-wordcount'))
+const pluginLoaded = ref(false)
+try {
+  const loaded = pluginHost.load(readManifest(sampleManifest), {
+    commands: [{ id: 'count', title: '字数' }],
+    views: [{ id: 'panel', title: '字数' }]
+  })
+  const commandCenter = useCommandCenterStore()
+  for (const command of loaded.commands) {
+    const id = sampleManifest.id + ':' + command.id
+    const entry = {
+      id,
+      description: command.title,
+      execute: () => {
+        layoutStore.SET_LAYOUT({ rightColumn: sampleManifest.id + ':panel', showSideBar: true })
+      }
+    }
+    if (!commandCenter.rootCommand.subcommands.some(command => command.id === id)) {
+      commandCenter.REGISTER_COMMAND(entry)
+    }
+  }
+  pluginLoaded.value = true
+} catch (error) {
+  console.error(error)
+}
+const unloadSample = (): void => {
+  pluginHost.unload(sampleManifest.id)
+  pluginLoaded.value = false
+  const commandCenter = useCommandCenterStore()
+  commandCenter.rootCommand.subcommands = commandCenter.rootCommand.subcommands.filter(command => !String(command.id).startsWith(sampleManifest.id + ':'))
+  if (rightColumn.value.startsWith(sampleManifest.id + ':')) {
+    layoutStore.SET_LAYOUT({ rightColumn: 'files' })
+  }
+}
+const sideBarIcons = computed(() => [
+  ...builtinSideBarIcons,
+  ...pluginHost.views().filter(view => !view.builtin).map(view => ({
+    id: view.id,
+    name: () => view.title,
+    icon: WordsIcon
+  }))
+])
+const pluginView = computed(() => pluginLoaded.value && rightColumn.value === 'wordcount:panel'
+  ? { entry: sampleManifest.entry, manifest: sampleManifest }
+  : null)
 
 const { projectTree } = storeToRefs(projectStore)
 const { tabs } = storeToRefs(editorStore)

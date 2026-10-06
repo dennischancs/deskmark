@@ -1038,5 +1038,9 @@
     "title": "日历",
     "new": "新建",
     "placeholder": "新的一行"
+  },
+  "plugin": {
+    "close": "关闭",
+    "failed": "这个小功能没能打开"
   }
 }

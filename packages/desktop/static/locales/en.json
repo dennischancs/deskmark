@@ -1038,5 +1038,9 @@
     "title": "Calendar",
     "new": "New",
     "placeholder": "New line"
+  },
+  "plugin": {
+    "close": "Close",
+    "failed": "This add-on could not be opened"
   }
 }

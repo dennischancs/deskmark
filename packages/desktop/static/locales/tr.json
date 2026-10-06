@@ -1038,5 +1038,9 @@
     "title": "Takvim",
     "new": "Yeni",
     "placeholder": "Yeni satır"
+  },
+  "plugin": {
+    "close": "Kapat",
+    "failed": "Bu ek açılmadı"
   }
 }
