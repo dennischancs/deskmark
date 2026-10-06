@@ -1,7 +1,7 @@
 {
   "name": "marktext-monorepo",
-  "version": "0.20.0",
-  "description": "MarkText monorepo root",
+  "version": "0.1.0",
+  "description": "Deskmark monorepo root",
   "private": true,
   "homepage": "https://github.com/marktext/marktext",
   "packageManager": "pnpm@10.33.4",

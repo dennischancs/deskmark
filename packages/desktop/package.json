@@ -1,7 +1,7 @@
 {
   "name": "marktext",
-  "version": "0.20.0",
-  "description": "MarkText",
+  "version": "0.1.0",
+  "description": "Deskmark",
   "main": "./out/main/index.js",
   "author": {
     "name": "Jocs",
