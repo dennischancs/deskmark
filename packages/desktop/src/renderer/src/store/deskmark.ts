@@ -11,6 +11,7 @@ export const useDeskmarkStore = defineStore('deskmark', () => {
   const selected = ref<DeskmarkTaskRef | null>(null)
   const revision = ref(0)
   const calendarOpen = ref(false)
+  const focusDay = ref<string | null>(null)
   const notes = ref<DeskmarkNoteLink[]>([])
 
   const select = (task: DeskmarkTaskRef | null): void => {
@@ -21,5 +22,5 @@ export const useDeskmarkStore = defineStore('deskmark', () => {
     revision.value += 1
   }
 
-  return { selected, select, revision, touch, calendarOpen, notes }
+  return { selected, select, revision, touch, calendarOpen, focusDay, notes }
 })

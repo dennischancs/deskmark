@@ -7,8 +7,8 @@
       {{ t('sideBar.tasks.empty') }}
     </p>
     <button
-        class="deskmark-hover stick"
       v-if="currentPath"
+      class="deskmark-hover stick"
       type="button"
       @click="stickCurrent"
     >
@@ -19,13 +19,25 @@
       :key="group.id"
     >
       <h3>{{ t(group.label) }}</h3>
-      <task-line
+      <div
         v-for="task of group.items"
         :key="`${task.notePath}:${task.taskKey}`"
-        :task="task"
-        @open="openTask"
-        @toggle="toggle"
-      />
+        class="task-block"
+      >
+        <task-line
+          :task="task"
+          @open="openTask"
+          @toggle="toggle"
+        />
+        <button
+          v-if="task.due"
+          type="button"
+          class="deskmark-hover calendar-link"
+          @click="showOnCalendar(task)"
+        >
+          {{ t('calendar.showOnCalendar') }}
+        </button>
+      </div>
     </section>
   </div>
 </template>
@@ -38,6 +50,7 @@ import { useProjectStore } from '@/store/project'
 import { useEditorStore } from '@/store/editor'
 import { useDeskmarkStore } from '@/store/deskmark'
 import { editDeskmarkTask } from '@/util/deskmarkEdit'
+import { showDeskmarkTarget } from '@/util/deskmarkView'
 import TaskLine from '@/components/taskLine.vue'
 import { calendarGroup } from '../../../../../../deskmark-core/src/agenda.ts'
 import type { DeskmarkTaskGroups, DeskmarkTaskRef } from '@shared/types/ipc'
@@ -101,6 +114,13 @@ const openTask = (task: DeskmarkTaskRef): void => {
   window.electron.ipcRenderer.send('mt::open-file', fullPath, task.line ? { deskmarkLine: task.line } : {})
 }
 
+const showOnCalendar = (task: DeskmarkTaskRef): void => {
+  const day = task.due?.slice(0, 10)
+  if (!day) return
+  deskmarkStore.focusDay = day
+  showDeskmarkTarget('calendar')
+}
+
 const toggle = (task: DeskmarkTaskRef): void => {
   if (!root.value || !task.line) return
   editDeskmarkTask(root.value, task.notePath, task.line, {
@@ -134,5 +154,12 @@ h3 {
 }
 .stick {
   margin-bottom: 8px;
+}
+.calendar-link {
+  margin: 0 0 8px 22px;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--themeColor);
 }
 </style>

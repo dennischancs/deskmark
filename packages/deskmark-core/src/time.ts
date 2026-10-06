@@ -51,6 +51,14 @@ export function shiftDue(due: string, repeat: 'daily' | 'weekly' | 'monthly'): s
   return `${date}T${parsed.time}${parsed.offset}`
 }
 
+export function moveDueToDay(due: string | null, day: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return null
+  if (!due) return day
+  const parsed = parseDue(due)
+  if (!parsed?.time || !parsed.offset) return day
+  return `${day}T${parsed.time}${parsed.offset}`
+}
+
 export function shiftRemind(due: string, remind: string, advancedDue: string): string | null {
   const dueParts = parseDue(due)
   const remindParts = parseDue(remind)

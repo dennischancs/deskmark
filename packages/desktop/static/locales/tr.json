@@ -794,7 +794,7 @@
       "tasks": "Görevleri göster",
       "reminders": "Belirlenen saatte anımsat",
       "wordCount": "Kelime sayısını göster",
-      "detail": "Tarih, anımsatma, öncelik ve yineleme görevin kendisinde değişir. Burada yalnızca açılır veya kapanır.",
+      "detail": "Tarih, anımsatma, öncelik ve yineleme görevin kendisinde değişir. Takvimde tarihsiz bir görev bir güne konabilir, satır notunda kalır. Burada yalnızca açılır veya kapanır.",
       "reminderLimit": "Anımsatmalar yalnızca Masa notu açıkken gelir. Kapanınca saat çalmaz.",
       "openAtLogin": "Oturum açılınca aç"
     }
@@ -1074,7 +1074,14 @@
     "thisDay": "Bu gün",
     "journal": "Bu günün notunu aç",
     "emptyDay": "Bu günde bir şey yok",
-    "emptyGroup": "Burada bir şey yok"
+    "emptyGroup": "Burada bir şey yok",
+    "carried": "Hâlâ açık",
+    "soon": "Sonraki {days} gün",
+    "place": "Bu güne",
+    "clearDate": "Tarihi sil",
+    "showOnCalendar": "Takvimde",
+    "goToDay": "Bu güne git",
+    "emptyUndated": "Tarihsiz görev yok"
   },
   "plugin": {
     "close": "Kapat",

@@ -1,5 +1,17 @@
-import { dayNumber, formatInZone, parseDue, toInstant, type DateParts } from './time.ts'
+import { addDays, dayNumber, formatDate, formatInZone, parseDue, toInstant, type DateParts } from './time.ts'
 import type { AgendaItem, CalendarGroup, SmartList } from './types.ts'
+
+export type { CalendarGroup }
+
+export const DEADLINE_WARNING_DAYS = 3
+
+type AgendaSortable = {
+  done?: boolean
+  status?: string
+  due: string | null
+  text: string
+  priority?: string | null
+}
 
 export function isOverdue(item: Pick<AgendaItem, 'done' | 'due'>, now: Date, timeZone: string): boolean {
   if (item.done || !item.due) return false
@@ -44,7 +56,7 @@ export function tasksForAgenda<T extends { done: boolean, due: string | null, te
     if (item.done) return false
     return calendarGroup(item, now, timeZone) === mode.group
   })
-  return [...matched].sort((left, right) => Number(left.done) - Number(right.done) || left.text.localeCompare(right.text))
+  return [...matched].sort((left, right) => compareAgenda(left, right))
 }
 
 export function agendaCounts<T extends { done: boolean, due: string | null }>(
@@ -66,6 +78,74 @@ export function markedDates(items: AgendaItem[]): string[] {
     return [item.due.slice(0, 10)]
   })
   return [...new Set(dates)].sort()
+}
+
+export function compareAgenda(left: AgendaSortable, right: AgendaSortable): number {
+  const doneDelta = Number(isDone(left)) - Number(isDone(right))
+  if (doneDelta) return doneDelta
+  const priorityDelta = priorityRank(left.priority) - priorityRank(right.priority)
+  if (priorityDelta) return priorityDelta
+  const dueDelta = dueRank(left.due).localeCompare(dueRank(right.due))
+  if (dueDelta) return dueDelta
+  return left.text.localeCompare(right.text)
+}
+
+export interface DayBridge<T> {
+  onDay: T[]
+  carried: T[]
+  soon: T[]
+  undated: T[]
+}
+
+export function bridgeForDay<T extends AgendaSortable>(
+  items: readonly T[],
+  day: string,
+  now: Date,
+  timeZone: string
+): DayBridge<T> {
+  const today = formatInZone(now, timeZone).slice(0, 10)
+  const horizon = shiftDay(today, DEADLINE_WARNING_DAYS)
+  const onDay = items.filter(item => item.due?.slice(0, 10) === day)
+  const carried = day === today
+    ? items.filter(item => !isDone(item) && Boolean(item.due) && item.due!.slice(0, 10) < day)
+    : []
+  const soon = day === today
+    ? items.filter(item => {
+      if (isDone(item) || !item.due || !horizon) return false
+      const dueDay = item.due.slice(0, 10)
+      return dueDay > day && dueDay <= horizon
+    })
+    : []
+  const undated = items.filter(item => !isDone(item) && !item.due)
+  return {
+    onDay: [...onDay].sort((left, right) => compareAgenda(left, right)),
+    carried: [...carried].sort((left, right) => compareAgenda(left, right)),
+    soon: [...soon].sort((left, right) => compareAgenda(left, right)),
+    undated: [...undated].sort((left, right) => compareAgenda(left, right))
+  }
+}
+
+function isDone(item: { done?: boolean, status?: string }): boolean {
+  if (typeof item.done === 'boolean') return item.done
+  return item.status === 'done'
+}
+
+function priorityRank(priority: string | null | undefined): number {
+  if (priority === 'high') return 0
+  if (priority === 'low') return 2
+  return 1
+}
+
+function dueRank(due: string | null): string {
+  if (!due) return '9'
+  const day = due.slice(0, 10)
+  return due.includes('T') ? `0${day}${due}` : `1${day}`
+}
+
+function shiftDay(day: string, days: number): string | null {
+  const parsed = parseDue(day)
+  if (!parsed) return null
+  return formatDate(addDays(parsed, days))
 }
 
 function localDate(now: Date, timeZone: string): DateParts {

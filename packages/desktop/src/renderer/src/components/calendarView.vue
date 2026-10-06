@@ -80,18 +80,111 @@
         {{ t('calendar.journal') }}
       </button>
       <p
-        v-if="visibleTasks.length === 0"
+        v-if="mode === 'day' ? bridge.onDay.length === 0 : visibleTasks.length === 0"
         class="empty"
       >
         {{ mode === 'day' ? t('calendar.emptyDay') : t('calendar.emptyGroup') }}
       </p>
-      <task-line
-        v-for="task of visibleTasks"
-        :key="`${task.notePath}:${task.taskKey}`"
-        :task="task"
-        @open="openTask"
-        @toggle="toggle"
-      />
+      <template v-if="mode === 'day'">
+        <div
+          v-for="task of dayTasks"
+          :key="`day:${task.notePath}:${task.taskKey}`"
+          class="bridge-row"
+        >
+          <task-line
+            :task="task"
+            @open="openTask"
+            @toggle="toggle"
+          />
+          <button
+            v-if="task.line && task.due"
+            type="button"
+            class="deskmark-hover action"
+            @click="clearDate(task)"
+          >
+            {{ t('calendar.clearDate') }}
+          </button>
+        </div>
+        <h4 v-if="carriedTasks.length">
+          {{ t('calendar.carried') }}
+        </h4>
+        <div
+          v-for="task of carriedTasks"
+          :key="`carried:${task.notePath}:${task.taskKey}`"
+          class="bridge-row"
+        >
+          <task-line
+            :task="task"
+            @open="openTask"
+            @toggle="toggle"
+          />
+          <button
+            v-if="task.line"
+            type="button"
+            class="deskmark-hover action"
+            @click="place(task)"
+          >
+            {{ t('calendar.place') }}
+          </button>
+        </div>
+        <h4 v-if="soonTasks.length">
+          {{ t('calendar.soon', { days: warningDays }) }}
+        </h4>
+        <div
+          v-for="task of soonTasks"
+          :key="`soon:${task.notePath}:${task.taskKey}`"
+          class="bridge-row"
+        >
+          <task-line
+            :task="task"
+            @open="openTask"
+            @toggle="toggle"
+          />
+          <button
+            v-if="task.due"
+            type="button"
+            class="deskmark-hover action"
+            @click="showDay(task.due.slice(0, 10))"
+          >
+            {{ t('calendar.goToDay') }}
+          </button>
+        </div>
+        <h4>{{ t('calendar.undated') }}</h4>
+        <p
+          v-if="undatedTasks.length === 0"
+          class="empty"
+        >
+          {{ t('calendar.emptyUndated') }}
+        </p>
+        <div
+          v-for="task of undatedTasks"
+          :key="`undated:${task.notePath}:${task.taskKey}`"
+          class="bridge-row"
+        >
+          <task-line
+            :task="task"
+            @open="openTask"
+            @toggle="toggle"
+          />
+          <button
+            v-if="task.line"
+            type="button"
+            class="deskmark-hover action"
+            @click="place(task)"
+          >
+            {{ t('calendar.place') }}
+          </button>
+        </div>
+      </template>
+      <template v-else>
+        <task-line
+          v-for="task of visibleTasks"
+          :key="`${task.notePath}:${task.taskKey}`"
+          :task="task"
+          @open="openTask"
+          @toggle="toggle"
+        />
+      </template>
       <form
         v-if="mode === 'day'"
         @submit.prevent="create"
@@ -119,9 +212,9 @@ import { useProjectStore } from '@/store/project'
 import { useDeskmarkStore } from '@/store/deskmark'
 import { editDeskmarkTask } from '@/util/deskmarkEdit'
 import TaskLine from '@/components/taskLine.vue'
-import { agendaCounts, calendarGroup, tasksForAgenda, type CalendarGroup } from '../../../../../deskmark-core/src/agenda.ts'
+import { agendaCounts, bridgeForDay, calendarGroup, DEADLINE_WARNING_DAYS, tasksForAgenda, type CalendarGroup } from '../../../../../deskmark-core/src/agenda.ts'
 import { buildMonth, weekdayLabels } from '../../../../../deskmark-core/src/calendar.ts'
-import { formatInZone } from '../../../../../deskmark-core/src/time.ts'
+import { formatInZone, moveDueToDay } from '../../../../../deskmark-core/src/time.ts'
 import type { DeskmarkTaskGroups, DeskmarkTaskRef } from '@shared/types/ipc'
 
 type AgendaMode = 'day' | CalendarGroup
@@ -132,6 +225,7 @@ const deskmarkStore = useDeskmarkStore()
 const { projectTree } = storeToRefs(projectStore)
 const { revision } = storeToRefs(deskmarkStore)
 const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+const warningDays = DEADLINE_WARNING_DAYS
 const localDay = (): string => formatInZone(new Date(), zone).slice(0, 10)
 const todayKey = computed(() => localDay())
 const initialDay = localDay()
@@ -176,6 +270,12 @@ const visibleTasks = computed(() => {
     : tasksForAgenda(flat.value, { kind: 'group', group: mode.value }, new Date(), zone)
   return rows.map(({ done: _done, ...task }) => task)
 })
+const bridge = computed(() => bridgeForDay(flat.value, selected.value, new Date(), zone))
+const withoutDone = (rows: typeof flat.value): DeskmarkTaskRef[] => rows.map(({ done: _done, ...task }) => task)
+const dayTasks = computed(() => withoutDone(bridge.value.onDay))
+const carriedTasks = computed(() => withoutDone(bridge.value.carried))
+const soonTasks = computed(() => withoutDone(bridge.value.soon))
+const undatedTasks = computed(() => withoutDone(bridge.value.undated))
 const heading = computed(() => {
   if (mode.value !== 'day') return t(`calendar.${mode.value}`)
   const [y, m, d] = selected.value.split('-').map(Number)
@@ -219,6 +319,19 @@ const pickDay = (day: string | null): void => {
   mode.value = 'day'
 }
 
+const showDay = (day: string): void => {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return
+  year.value = Number(day.slice(0, 4))
+  month.value = Number(day.slice(5, 7))
+  pickDay(day)
+}
+
+watch(() => deskmarkStore.focusDay, (day) => {
+  if (!day) return
+  showDay(day)
+  deskmarkStore.focusDay = null
+}, { immediate: true })
+
 const reveal = (path: string, line?: number | null): void => {
   deskmarkStore.calendarOpen = false
   window.electron.ipcRenderer.send('mt::open-file', path, line ? { deskmarkLine: line } : {})
@@ -238,6 +351,25 @@ const toggle = (task: DeskmarkTaskRef): void => {
     if (next) groups.value = next
     deskmarkStore.touch()
   }).catch((error) => console.error(error))
+}
+
+const writeDue = (task: DeskmarkTaskRef, due: string | null): void => {
+  if (!root.value || !task.line) return
+  editDeskmarkTask(root.value, task.notePath, task.line, { due }).then((next) => {
+    if (next) groups.value = next
+    deskmarkStore.touch()
+  }).catch((error) => console.error(error))
+}
+
+const place = (task: DeskmarkTaskRef): void => {
+  if (mode.value !== 'day') return
+  const due = moveDueToDay(task.due, selected.value)
+  if (!due) return
+  writeDue(task, due)
+}
+
+const clearDate = (task: DeskmarkTaskRef): void => {
+  writeDue(task, null)
 }
 
 const create = async (): Promise<void> => {
@@ -338,6 +470,28 @@ form input {
 }
 .empty {
   margin: 8px 0;
+}
+.agenda h4 {
+  margin: 14px 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.bridge-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+.bridge-row > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+.action {
+  flex: 0 0 auto;
+  margin-top: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  color: var(--themeColor);
 }
 .pad {
   visibility: hidden;

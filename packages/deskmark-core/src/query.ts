@@ -3,7 +3,10 @@ import type { AgendaItem } from './types.ts'
 
 export {
   agendaCounts,
+  bridgeForDay,
   calendarGroup,
+  compareAgenda,
+  DEADLINE_WARNING_DAYS,
   isOverdue,
   markedDates,
   smartList,

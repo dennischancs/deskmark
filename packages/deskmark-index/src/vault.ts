@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
 import { join, relative } from 'node:path'
-import { smartList, type SmartList } from '../../deskmark-core/src/index.ts'
+import { compareAgenda, smartList, type SmartList } from '../../deskmark-core/src/index.ts'
 import type { TaskRow, VaultFile } from './database.ts'
 
 const SKIP = new Set(['.deskmark', '.git', 'node_modules'])
@@ -45,6 +45,9 @@ export function groupTasks(tasks: TaskRow[], now: Date, timeZone: string): Recor
   for (const task of tasks) {
     const list = smartList({ done: task.status === 'done', due: task.due }, now, timeZone)
     groups[list].push(task)
+  }
+  for (const list of Object.values(groups)) {
+    list.sort((left, right) => compareAgenda(left, right))
   }
   return groups
 }

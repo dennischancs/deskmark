@@ -794,7 +794,7 @@
       "tasks": "Taken tonen",
       "reminders": "Herinneren op het gekozen tijdstip",
       "wordCount": "Woorden tonen",
-      "detail": "Datum, herinnering, prioriteit en herhaling staan bij de taak zelf. Hier zet je de functie alleen aan of uit.",
+      "detail": "Datum, herinnering, prioriteit en herhaling staan bij de taak zelf. In de kalender zet je een taak zonder datum op een dag. De regel blijft in de notitie. Hier zet je de functie alleen aan of uit.",
       "reminderLimit": "Herinneringen komen alleen zolang Bureaubriefje open is. Na afsluiten gaat er niets af.",
       "openAtLogin": "Openen bij aanmelden"
     }
@@ -1074,7 +1074,14 @@
     "thisDay": "Deze dag",
     "journal": "Notitie van deze dag openen",
     "emptyDay": "Niets op deze dag",
-    "emptyGroup": "Hier is niets"
+    "emptyGroup": "Hier is niets",
+    "carried": "Nog open",
+    "soon": "Komende {days} dagen",
+    "place": "Hierheen",
+    "clearDate": "Datum weg",
+    "showOnCalendar": "In de kalender",
+    "goToDay": "Naar deze dag",
+    "emptyUndated": "Geen zonder datum"
   },
   "plugin": {
     "close": "Sluiten",

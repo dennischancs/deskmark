@@ -794,7 +794,7 @@
       "tasks": "Mostrar tarefas",
       "reminders": "Lembrar à hora marcada",
       "wordCount": "Mostrar palavras",
-      "detail": "A data, o lembrete, a prioridade e a repetição mudam-se na própria tarefa. Aqui só se liga ou desliga.",
+      "detail": "A data, o lembrete, a prioridade e a repetição mudam-se na própria tarefa. No calendário, uma tarefa sem data pode ir para um dia e a linha fica na nota. Aqui só se liga ou desliga.",
       "reminderLimit": "Os lembretes só chegam enquanto a Nota de mesa está aberta. Depois de fechar, a hora não toca.",
       "openAtLogin": "Abrir ao iniciar sessão"
     }
@@ -1074,7 +1074,14 @@
     "thisDay": "Este dia",
     "journal": "Abrir a nota deste dia",
     "emptyDay": "Nada neste dia",
-    "emptyGroup": "Nada aqui"
+    "emptyGroup": "Nada aqui",
+    "carried": "Ainda abertas",
+    "soon": "Próximos {days} dias",
+    "place": "Pôr aqui",
+    "clearDate": "Tirar a data",
+    "showOnCalendar": "No calendário",
+    "goToDay": "Ir a este dia",
+    "emptyUndated": "Nenhuma sem data"
   },
   "plugin": {
     "close": "Fechar",

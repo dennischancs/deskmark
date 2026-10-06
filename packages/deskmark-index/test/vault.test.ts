@@ -45,3 +45,27 @@ test('待办按分组放好', () => {
   assert.deepEqual(groups.inbox.map(task => task.text), ['没有日期'])
   assert.deepEqual(groups.done.map(task => task.text), ['完成'])
 })
+
+test('同一组里高优先级排在前面', () => {
+  const now = new Date('2026-10-06T01:00:00.000Z')
+  const row = (text: string, priority: string): TaskRow => ({
+    taskKey: text,
+    notePath: 'a.md',
+    line: 1,
+    text,
+    status: 'open',
+    due: null,
+    remindAt: null,
+    priority,
+    repeat: 'none',
+    completedAt: null,
+    raw: text,
+    source: 'inline'
+  })
+  const groups = groupTasks([
+    row('低', 'low'),
+    row('高', 'high'),
+    row('普通', 'normal')
+  ], now, 'Asia/Shanghai')
+  assert.deepEqual(groups.inbox.map(task => task.text), ['高', '普通', '低'])
+})

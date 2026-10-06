@@ -794,7 +794,7 @@
       "tasks": "Mostrar tareas",
       "reminders": "Avisar a la hora elegida",
       "wordCount": "Mostrar palabras",
-      "detail": "La fecha, el aviso, la prioridad y la repetición se cambian en la propia tarea. Aquí solo se enciende o se apaga.",
+      "detail": "La fecha, el aviso, la prioridad y la repetición se cambian en la propia tarea. En el calendario, una tarea sin fecha se puede poner en un día y la línea sigue en su nota. Aquí solo se enciende o se apaga.",
       "reminderLimit": "Los avisos solo llegan mientras Nota de mesa está abierta. Si se cierra, la hora no suena.",
       "openAtLogin": "Abrir al iniciar sesión"
     }
@@ -1074,7 +1074,14 @@
     "thisDay": "Este día",
     "journal": "Abrir la nota de este día",
     "emptyDay": "Nada en este día",
-    "emptyGroup": "Aquí no hay nada"
+    "emptyGroup": "Aquí no hay nada",
+    "carried": "Aún abiertas",
+    "soon": "Próximos {days} días",
+    "place": "Poner aquí",
+    "clearDate": "Quitar fecha",
+    "showOnCalendar": "En el calendario",
+    "goToDay": "Ir a este día",
+    "emptyUndated": "No hay sin fecha"
   },
   "plugin": {
     "close": "Cerrar",

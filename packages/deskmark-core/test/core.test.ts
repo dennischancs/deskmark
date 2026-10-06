@@ -6,7 +6,9 @@ import {
   applyTaskEdit,
   appendJournalTask,
   agendaCounts,
+  bridgeForDay,
   calendarGroup,
+  DEADLINE_WARNING_DAYS,
   tasksForAgenda,
   completeInlineTask,
   completeNote,
@@ -14,6 +16,7 @@ import {
   journalPath,
   localDateTimeToIso,
   markedDates,
+  moveDueToDay,
   parseNote,
   smartList,
   tasksOnDate,
@@ -148,6 +151,50 @@ test('日历分组按本地时区，同一天带时间的过点算逾期', () =>
   assert.deepEqual(agendaCounts(named, now, zone), { overdue: 2, today: 2, next7: 1, later: 1, undated: 1 })
   assert.deepEqual(tasksForAgenda(named, { kind: 'group', group: 'next7' }, now, zone).map(item => item.due), ['2026-10-08'])
   assert.deepEqual(tasksForAgenda(named, { kind: 'day', day: '2026-10-05' }, now, zone).map(item => item.text), ['0', '7'])
+})
+
+test('今天的日历把逾期、近几天和未定日期接在同一天，别的日子不带上', () => {
+  const now = new Date('2026-10-06T01:00:00.000Z')
+  const zone = 'Asia/Shanghai'
+  const items = [
+    { done: false, due: '2026-10-05', text: '逾期低', priority: 'low' },
+    { done: false, due: '2026-10-04', text: '逾期高', priority: 'high' },
+    { done: false, due: '2026-10-06', text: '今天', priority: 'normal' },
+    { done: false, due: '2026-10-06T18:00:00+08:00', text: '今晚', priority: 'normal' },
+    { done: false, due: '2026-10-08', text: '快到了', priority: 'normal' },
+    { done: false, due: '2026-10-20', text: '更晚', priority: 'normal' },
+    { done: false, due: null, text: '没收拾', priority: 'normal' },
+    { done: true, due: '2026-10-05', text: '做过了', priority: 'high' },
+    { done: true, due: null, text: '完成且无日期', priority: 'normal' }
+  ]
+  const today = bridgeForDay(items, '2026-10-06', now, zone)
+  assert.equal(DEADLINE_WARNING_DAYS, 3)
+  assert.deepEqual(today.onDay.map(item => item.text), ['今晚', '今天'])
+  assert.deepEqual(today.carried.map(item => item.text), ['逾期高', '逾期低'])
+  assert.deepEqual(today.soon.map(item => item.text), ['快到了'])
+  assert.deepEqual(today.undated.map(item => item.text), ['没收拾'])
+  const past = bridgeForDay(items, '2026-10-05', now, zone)
+  assert.deepEqual(past.onDay.map(item => item.text), ['逾期低', '做过了'])
+  assert.deepEqual(past.carried, [])
+  assert.deepEqual(past.soon, [])
+  assert.deepEqual(past.undated.map(item => item.text), ['没收拾'])
+})
+
+test('把待办放到某一天只改原来的日期，不另起一行', () => {
+  assert.equal(moveDueToDay(null, '2026-10-08'), '2026-10-08')
+  assert.equal(moveDueToDay('2026-10-01', '2026-10-08'), '2026-10-08')
+  assert.equal(moveDueToDay('2026-10-01T09:00:00+08:00', '2026-10-08'), '2026-10-08T09:00:00+08:00')
+  assert.equal(moveDueToDay('2026-10-01', '明天'), null)
+  const source = '- [ ] 买牛奶 <!-- deskmark: id=A; due=2026-10-01; priority=high -->\n'
+  const moved = applyTaskEdit(source, 1, { due: moveDueToDay('2026-10-01', '2026-10-08') }, new Date('2026-10-06T01:00:00.000Z'), 'Asia/Shanghai')
+  assert.equal(moved.changed, true)
+  assert.match(moved.markdown, /买牛奶/)
+  assert.match(moved.markdown, /due=2026-10-08/)
+  assert.match(moved.markdown, /priority=high/)
+  assert.equal(moved.markdown.match(/^- \[ \]/gm)?.length, 1)
+  const cleared = applyTaskEdit(moved.markdown, 1, { due: null }, new Date('2026-10-06T01:00:00.000Z'), 'Asia/Shanghai')
+  assert.doesNotMatch(cleared.markdown, /due=/)
+  assert.match(cleared.markdown, /priority=high/)
 })
 
 test('全库待办按日期出现，完成的不在月历标记里', () => {

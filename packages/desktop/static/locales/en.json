@@ -794,7 +794,7 @@
       "tasks": "Show tasks",
       "reminders": "Remind at the chosen time",
       "wordCount": "Show word count",
-      "detail": "Each task keeps its own date, reminder, priority, and repeat. Change those beside the task. These switches only turn the features on or off.",
+      "detail": "Each task keeps its own date, reminder, priority, and repeat. Change those beside the task. On the calendar, an undated task can be placed on a day without leaving its note. These switches only turn the features on or off.",
       "reminderLimit": "Reminders only arrive while Deskmark is open. After you quit, a due time does not ring.",
       "openAtLogin": "Open at login"
     }
@@ -1074,7 +1074,14 @@
     "thisDay": "This day",
     "journal": "Open this day's note",
     "emptyDay": "Nothing on this day",
-    "emptyGroup": "Nothing here"
+    "emptyGroup": "Nothing here",
+    "carried": "Still open",
+    "soon": "Next {days} days",
+    "place": "Place here",
+    "clearDate": "Clear date",
+    "showOnCalendar": "On calendar",
+    "goToDay": "Go to day",
+    "emptyUndated": "No undated tasks"
   },
   "plugin": {
     "close": "Close",
