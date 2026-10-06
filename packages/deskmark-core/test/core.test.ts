@@ -1,0 +1,165 @@
+import assert from 'node:assert/strict'
+import test from 'node:test'
+import { addMonths } from '../src/time.ts'
+import {
+  agendaFromMarkdown,
+  appendJournalTask,
+  calendarGroup,
+  completeInlineTask,
+  completeNote,
+  idQueue,
+  journalPath,
+  markedDates,
+  parseNote,
+  smartList,
+  tasksOnDate,
+  updateInlineTask
+} from '../src/index.ts'
+
+const weekly = [
+  '---',
+  'title: 买东西',
+  'custom: keep-me',
+  'deskmark:',
+  '  id: NOTE',
+  '  kind: note',
+  '---',
+  '',
+  '- [ ] 买牛奶 <!-- deskmark: id=OLD; due=2026-10-08; remind=2026-10-08T09:00:00+08:00; priority=high; repeat=weekly; vendor=keep -->',
+  '- [x] 已做的事 <!-- deskmark: id=DONE; completed=2026-10-06T18:02:00+08:00 -->',
+  ''
+].join('\n')
+
+test('打开文件不会改写，未知键还在', () => {
+  const parsed = parseNote(weekly, 'notes/a.md')
+  assert.equal(parsed.title, '买东西')
+  assert.equal(parsed.fields.kind, 'note')
+  assert.equal(parsed.tasks[0].text, '买牛奶')
+  assert.equal(parsed.tasks[0].unknown[0].key, 'vendor')
+  assert.equal(parsed.tasks[0].id, 'OLD')
+  assert.equal(parsed.tasks[1].checked, true)
+  assert.match(parsed.tasks[0].temporaryKey, /^notes\/a.md#/)
+})
+
+test('只改截止日期时，其他字节里的未知键还在', () => {
+  const result = updateInlineTask(weekly, 9, { due: '2026-10-09' }, idQueue(['UNUSED']))
+  assert.equal(result.changed, true)
+  assert.match(result.markdown, /custom: keep-me/)
+  assert.match(result.markdown, /due=2026-10-09/)
+  assert.match(result.markdown, /vendor=keep/)
+  assert.match(result.markdown, /id=OLD/)
+  assert.doesNotMatch(result.markdown, /UNUSED/)
+})
+
+test('完成每周任务会留下原行，并插入下一次', () => {
+  const now = new Date('2026-10-06T10:00:00.000Z')
+  const result = completeInlineTask(weekly, 9, now, 'Asia/Shanghai', idQueue(['NEXT']))
+  assert.equal(result.advanced, true)
+  const lines = result.markdown.split('\n')
+  assert.match(lines[8], /^- \[x\] 买牛奶 <!-- deskmark: id=OLD; due=2026-10-08; remind=2026-10-08T09:00:00\+08:00; priority=high; repeat=weekly; completed=2026-10-06T18:00:00\+08:00; vendor=keep -->$/)
+  assert.match(lines[9], /^- \[ \] 买牛奶 <!-- deskmark: id=NEXT; due=2026-10-15; remind=2026-10-15T09:00:00\+08:00; priority=high; repeat=weekly; vendor=keep -->$/)
+})
+
+test('不认识的重复规则原样留下，完成时不往后推', () => {
+  const markdown = '- [ ] 春季整理 <!-- deskmark: id=OLD; due=2026-10-08; repeat=every-spring -->\n'
+  const result = completeInlineTask(markdown, 1, new Date('2026-10-06T10:00:00.000Z'), 'Asia/Shanghai', idQueue(['NO']))
+  assert.equal(result.advanced, false)
+  assert.equal(result.unsupportedRepeat, true)
+  assert.match(result.markdown, /repeat=every-spring/)
+  assert.doesNotMatch(result.markdown, /id=NO/)
+  assert.equal(result.markdown.split('\n').filter(line => line.startsWith('- [')).length, 1)
+})
+
+test('坏掉的 front matter 不挡住正文里的待办', () => {
+  const markdown = '---\ntitle: 没有结尾\n- [ ] 仍然是待办\n'
+  const parsed = parseNote(markdown, 'bad.md')
+  assert.equal(parsed.frontMatterError, 'unclosed')
+  assert.equal(parsed.tasks.length, 1)
+  assert.equal(parsed.tasks[0].text, '仍然是待办')
+})
+
+test('代码块里的勾选框不是待办', () => {
+  const markdown = '```\n- [ ] 不是\n```\n\n- [ ] 是\n'
+  assert.deepEqual(parseNote(markdown).tasks.map(task => task.text), ['是'])
+})
+
+test('每月跨月截到当月最后一天', () => {
+  assert.deepEqual(addMonths({ y: 2026, m: 1, d: 31 }, 1), { y: 2026, m: 2, d: 28 })
+  assert.deepEqual(addMonths({ y: 2024, m: 1, d: 31 }, 1), { y: 2024, m: 2, d: 29 })
+  const note = [
+    '---',
+    'title: 交房租',
+    'deskmark:',
+    '  id: NOTE',
+    '  kind: todo',
+    '  due: 2026-01-31',
+    '  remind: 2026-01-31T09:00:00+08:00',
+    '  repeat: monthly',
+    '  extra: stay',
+    '---',
+    '',
+    '说明',
+    ''
+  ].join('\n')
+  const result = completeNote(note, new Date('2026-01-31T01:00:00.000Z'), 'Asia/Shanghai', idQueue(['NO']))
+  assert.equal(result.advanced, true)
+  assert.match(result.markdown, /due: 2026-02-28/)
+  assert.match(result.markdown, /remind: 2026-02-28T09:00:00\+08:00/)
+  assert.match(result.markdown, /extra: stay/)
+  assert.doesNotMatch(result.markdown, /status: done/)
+  assert.match(result.markdown, /## 完成记录/)
+  assert.match(result.markdown, /- 2026-01-31T09:00:00\+08:00/)
+})
+
+test('整篇待办遇到不认识的重复规则时不推进', () => {
+  const note = '---\ndeskmark:\n  kind: todo\n  due: 2026-10-08\n  repeat: FREQ=WEEKLY;INTERVAL=2\n---\n\n正文\n'
+  const result = completeNote(note, new Date('2026-10-06T10:00:00.000Z'), 'Asia/Shanghai', idQueue(['ID1']))
+  assert.equal(result.unsupportedRepeat, true)
+  assert.equal(result.advanced, false)
+  assert.match(result.markdown, /repeat: FREQ=WEEKLY;INTERVAL=2/)
+  assert.match(result.markdown, /due: 2026-10-08/)
+  assert.match(result.markdown, /status: done/)
+})
+
+test('日历分组按本地时区，同一天带时间的过点算逾期', () => {
+  const now = new Date('2026-10-06T01:00:00.000Z')
+  const zone = 'Asia/Shanghai'
+  const samples = [
+    { done: false, due: '2026-10-05' },
+    { done: false, due: '2026-10-06' },
+    { done: false, due: '2026-10-06T08:00:00+08:00' },
+    { done: false, due: '2026-10-06T18:00:00+08:00' },
+    { done: false, due: '2026-10-08' },
+    { done: false, due: '2026-10-20' },
+    { done: false, due: null },
+    { done: true, due: '2026-10-05' }
+  ]
+  assert.deepEqual(samples.map(item => calendarGroup(item, now, zone)), [
+    'overdue', 'today', 'overdue', 'today', 'next7', 'later', 'undated', 'today'
+  ])
+  assert.deepEqual(samples.map(item => smartList(item, now, zone)), [
+    'overdue', 'today', 'overdue', 'today', 'upcoming', 'upcoming', 'inbox', 'done'
+  ])
+})
+
+test('全库待办按日期出现，完成的不在月历标记里', () => {
+  const markdown = [
+    '- [ ] 牛奶 <!-- deskmark: due=2026-10-08 -->',
+    '- [x] 面包 <!-- deskmark: due=2026-10-08 -->',
+    '- [ ] 以后 <!-- deskmark: due=2026-10-20 -->',
+    ''
+  ].join('\n')
+  const items = agendaFromMarkdown('notes/a.md', markdown)
+  assert.deepEqual(tasksOnDate(items, '2026-10-08').map(item => item.text), ['牛奶', '面包'])
+  assert.deepEqual(markedDates(items), ['2026-10-08', '2026-10-20'])
+})
+
+test('从日历新建落在日记的一行', () => {
+  assert.equal(journalPath('2026-10-08'), 'journal/2026-10-08.md')
+  const created = appendJournalTask(null, '交表', '2026-10-08', 'NEW')
+  assert.match(created, /kind: note/)
+  assert.match(created, /^- \[ \] 交表 <!-- deskmark: id=NEW; due=2026-10-08 -->$/m)
+  const again = appendJournalTask(created, '再补一条', '2026-10-08', 'NEW2')
+  assert.equal(again.match(/^- \[ \]/gm)?.length, 2)
+  assert.equal(again.match(/deskmark:/g)?.length, 3)
+})
