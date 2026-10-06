@@ -48,6 +48,7 @@
       </div>
       <div
         v-show="showOpenedFiles"
+        ref="openedList"
         class="opened-files-list"
       >
         <transition-group name="list">
@@ -162,6 +163,7 @@ import { showContextMenu } from '../../contextMenu/sideBar'
 import { useI18n } from 'vue-i18n'
 import { ArrowRight } from '@element-plus/icons-vue'
 import type { TreeNode, TabDescriptor } from './types'
+import dragula from 'dragula'
 
 const { t } = useI18n()
 
@@ -187,6 +189,7 @@ const showDirectories = ref(readSectionExpanded(SHOW_DIRECTORIES_KEY))
 const showOpenedFiles = ref(readSectionExpanded(SHOW_OPENED_FILES_KEY))
 const createName = ref('')
 const input = ref<HTMLInputElement | null>(null)
+const openedList = ref<HTMLDivElement | null>(null)
 
 const projectStore = useProjectStore()
 const editorStore = useEditorStore()
@@ -250,6 +253,18 @@ const handleInputEnter = (): void => {
 
 onMounted(() => {
   bus.on('SIDEBAR::show-new-input', handleInputFocus)
+  if (openedList.value) {
+    dragula([openedList.value], {
+      direction: 'vertical',
+      revertOnSpill: true,
+      mirrorContainer: openedList.value
+    }).on('drop', (el, _target, _source, sibling) => {
+      const fromId = el?.getAttribute('data-id')
+      const nextId = sibling && !sibling.classList.contains('gu-mirror') ? sibling.getAttribute('data-id') : null
+      if (!fromId) return
+      editorStore.EXCHANGE_TABS_BY_ID({ fromId, toId: nextId })
+    })
+  }
 
   // Hide rename / create inputs on outside clicks. Buttons that open these
   // inputs must use @click.stop so their click never reaches this listener.

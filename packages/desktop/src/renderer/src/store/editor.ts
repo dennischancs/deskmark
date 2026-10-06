@@ -22,6 +22,7 @@ import { useLayoutStore } from './layout'
 import { useMainStore } from '.'
 import { t } from '../i18n'
 import { debouncedSendBufferedState, sendBufferedState } from './bufferedState'
+import { prefersSourceMode } from 'common/sessionRules'
 import type {
   IFileState,
   FileNotification,
@@ -680,35 +681,13 @@ export const useEditorStore = defineStore('editor', {
     },
 
     LISTEN_FOR_CLOSE(): void {
-      const projectStore = useProjectStore()
-      const preferencesStore = usePreferencesStore()
       window.electron.ipcRenderer.on('mt::ask-for-close', () => {
         sendBufferedState()
           .catch((err) => {
             console.error('Failed to update buffered state before closing', err)
           })
           .then(() => {
-            const unsavedFiles = this.tabs
-              .filter((file) => !file.isSaved)
-              .map((file) => {
-                const { id, filename, pathname, markdown } = file
-                const options = getOptionsFromState(file)
-                return {
-                  id,
-                  filename,
-                  pathname,
-                  markdown,
-                  options,
-                  defaultPath: getRootFolderFromState(projectStore)
-                }
-              })
-
-            if (unsavedFiles.length && preferencesStore.startUpAction !== 'restoreAll') {
-              // Ignore unsaved files when user has chosen to restore all on startup, as they will be restored anyway.
-              window.electron.ipcRenderer.send('mt::close-window-confirm', deepClone(unsavedFiles))
-            } else {
-              window.electron.ipcRenderer.send('mt::close-window')
-            }
+            window.electron.ipcRenderer.send('mt::close-window')
           })
       })
     },
@@ -886,6 +865,12 @@ export const useEditorStore = defineStore('editor', {
           scrollTop,
           blocks
         })
+        const preferencesStore = usePreferencesStore()
+        const sourceMode = prefersSourceMode(currentFile.filename || pathname || '')
+        if (preferencesStore.sourceCode !== sourceMode) {
+          preferencesStore.sourceCode = sourceMode
+          preferencesStore.DISPATCH_EDITOR_VIEW_STATE({ sourceCode: sourceMode })
+        }
       }
 
       this.UPDATE_LINE_ENDING_MENU()
@@ -998,12 +983,7 @@ export const useEditorStore = defineStore('editor', {
     CLOSE_TAB(file: IFileState | null = null): void {
       const target = file ?? this.currentFile
       if (target === null) return
-
-      if (target.isSaved) {
-        this.FORCE_CLOSE_TAB(target)
-      } else {
-        this.CLOSE_UNSAVED_TAB(target)
-      }
+      this.FORCE_CLOSE_TAB(target)
     },
 
     LISTEN_FOR_CLOSE_TAB(): void {

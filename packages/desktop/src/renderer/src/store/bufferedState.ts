@@ -2,6 +2,7 @@ import debounce from 'lodash/debounce'
 import { useEditorStore } from './editor'
 import { useProjectStore } from './project'
 import { useLayoutStore } from './layout'
+import { SNAPSHOT_INTERVAL_MS } from 'common/sessionRules'
 
 const BUFFERED_STATE_DEBOUNCE_MS = 1000
 const BUFFERED_STATE_VERSION = 1
@@ -54,3 +55,9 @@ export const debouncedSendBufferedState = debounce(() => {
     console.error('Failed to update buffered state', err)
   })
 }, BUFFERED_STATE_DEBOUNCE_MS)
+
+setInterval(() => {
+  sendBufferedState().catch((err) => {
+    console.error('Failed to snapshot the open-file session', err)
+  })
+}, SNAPSHOT_INTERVAL_MS)

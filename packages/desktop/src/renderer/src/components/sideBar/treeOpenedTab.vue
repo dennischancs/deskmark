@@ -1,6 +1,7 @@
 <template>
   <div
     class="opened-file"
+    :data-id="file.id"
     :title="file.pathname"
     :class="[{ active: currentFile?.id === file.id, unsaved: !file.isSaved }]"
     @click="selectFile(file)"
@@ -37,12 +38,7 @@ const selectFile = (file: TabDescriptor): void => {
 }
 
 const removeFileInTab = (file: TabDescriptor): void => {
-  const { isSaved } = file
-  if (isSaved) {
-    editorStore.FORCE_CLOSE_TAB(file)
-  } else {
-    editorStore.CLOSE_UNSAVED_TAB(file)
-  }
+  editorStore.FORCE_CLOSE_TAB(file)
 }
 </script>
 

@@ -4,6 +4,7 @@ import writeFileAtomic from 'write-file-atomic'
 import { BrowserWindow, ipcMain, type IpcMainInvokeEvent } from 'electron'
 import { TypedEmitter } from '@shared/types/typedEmitter'
 import type BaseWindow from '../windows/base'
+import { OpenSession, tabsFromBufferState } from 'common/openSession'
 
 interface EditorBufferStorePaths {
   editorBufferStorePath: string
@@ -33,6 +34,7 @@ class EditorBufferStore extends TypedEmitter<EditorBufferStoreEvents> {
   bufferStores: Record<string, BufferStoreEntry> | null
   serviceName: string
   encryptKeys: string[]
+  private readonly openSession: OpenSession
 
   constructor(paths: EditorBufferStorePaths) {
     super()
@@ -45,6 +47,7 @@ class EditorBufferStore extends TypedEmitter<EditorBufferStoreEvents> {
     this.bufferStores = null
     this.serviceName = 'marktext'
     this.encryptKeys = []
+    this.openSession = new OpenSession(path.join(editorBufferStorePath, '..', 'open-session'))
 
     this.init()
   }
@@ -195,6 +198,14 @@ class EditorBufferStore extends TypedEmitter<EditorBufferStoreEvents> {
 
     const bufferStore = this.getBufferStoreInfo(restoreBufferId)
     this.writeBufferStoreFile(bufferStore.filePath, newState)
+    const session = tabsFromBufferState(newState)
+    if (session) {
+      try {
+        this.openSession.save(session.currentId, session.tabs)
+      } catch (error) {
+        console.error('Failed to write the open-file session', error)
+      }
+    }
     return true
   }
 
