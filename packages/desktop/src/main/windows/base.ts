@@ -66,6 +66,7 @@ class BaseWindow extends TypedEmitter<BaseWindowEvents> {
   public browserWindow: BrowserWindow | null
   public lifecycle: WindowLifecycleValue
   public type: WindowTypeValue
+  protected extraQuery: Record<string, string> = {}
 
   /**
    * @param accessor The application accessor for application instances.
@@ -136,6 +137,10 @@ class BaseWindow extends TypedEmitter<BaseWindowEvents> {
     url.searchParams.set('hsb', hideScrollbar ? '1' : '0')
     url.searchParams.set('theme', theme ?? '')
     url.searchParams.set('tbs', titleBarStyle ?? '')
+
+    for (const [key, value] of Object.entries(this.extraQuery)) {
+      url.searchParams.set(key, value)
+    }
 
     return url
   }

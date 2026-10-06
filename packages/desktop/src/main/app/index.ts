@@ -376,6 +376,7 @@ class App {
         if (windowCreated) return
         windowCreated = true
         createWindow()
+        this._openProbeWindow()
       }
 
       // Wait for theme to settle (Linux-specific issue?)
@@ -385,6 +386,7 @@ class App {
     } else {
       // Create immediately on Windows/macOS
       createWindow()
+      this._openProbeWindow()
     }
 
     // this.shortcutCapture = new ShortcutCapture()
@@ -451,6 +453,19 @@ class App {
       this._accessor.menu.setActiveWindow(editor.id!)
     }
     return editor
+  }
+
+  private _openProbeWindow(): void {
+    if (process.env.DESKMARK_PROBE_B !== '1') return
+    const editor = new EditorWindow(this._accessor)
+    editor.stickyProbe = true
+    editor.createWindow(null, [], ['- [ ] 探针\n'], {
+      alwaysOnTop: true,
+      frame: false,
+      transparent: false,
+      backgroundColor: '#fff4cc'
+    })
+    this._windowManager.add(editor)
   }
 
   /**

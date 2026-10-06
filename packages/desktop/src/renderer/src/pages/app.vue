@@ -1,6 +1,6 @@
 <template>
   <div class="editor-container">
-    <side-bar v-if="init" />
+    <side-bar v-if="init && !stickyProbe" />
 
     <div class="editor-middle">
       <title-bar
@@ -74,6 +74,7 @@ const commandCenterStore = useCommandCenterStore()
 const notificationStore = useNotificationStore()
 
 const timer = ref<ReturnType<typeof setTimeout> | null>(null)
+const stickyProbe = new URLSearchParams(window.location.search).get('sticky') === '1'
 
 const { windowActive, platform, init } = storeToRefs(mainStore)
 const { showTabBar } = storeToRefs(layoutStore)

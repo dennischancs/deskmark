@@ -1,5 +1,5 @@
 import path from 'path'
-import { BrowserWindow, dialog, ipcMain } from 'electron'
+import { BrowserWindow, dialog, ipcMain, screen } from 'electron'
 import type { BrowserWindowConstructorOptions } from 'electron'
 import log from 'electron-log'
 import windowStateKeeper from 'electron-window-state'
@@ -13,6 +13,8 @@ import { loadMarkdownFile } from '../filesystem/markdown'
 import { switchLanguage } from '../spellchecker'
 import fs from 'fs'
 import { t } from '../i18n'
+import { restoreWindowRect } from 'common/windowRect'
+import { readProbeBounds, writeProbeBounds } from './probeBounds'
 
 type RawMarkdownDocument = Awaited<ReturnType<typeof loadMarkdownFile>>
 
@@ -59,6 +61,7 @@ class EditorWindow extends BaseWindow {
   private _openedFiles: string[] | null
 
   public bufferStoreInfo: BufferStoreInfo | null
+  public stickyProbe = false
 
   /**
    * @param accessor The application accessor for application instances.
@@ -94,12 +97,41 @@ class EditorWindow extends BaseWindow {
     const addBlankTab =
       !bufferStoreInfo && !rootDirectory && fileList.length === 0 && markdownList.length === 0
 
-    const mainWindowState = windowStateKeeper({
-      defaultWidth: 1200,
-      defaultHeight: 800
-    })
-
-    const { x, y, width, height } = ensureWindowPosition(mainWindowState)
+    let managedWindowState: { manage: (target: BrowserWindow) => void } | null = null
+    let x: number
+    let y: number
+    let width: number
+    let height: number
+    if (this.stickyProbe) {
+      this.extraQuery = { sticky: '1' }
+      const displays = screen.getAllDisplays().map((display) => ({
+        x: display.workArea.x,
+        y: display.workArea.y,
+        width: display.workArea.width,
+        height: display.workArea.height
+      }))
+      const rect = restoreWindowRect(readProbeBounds(env.paths.userDataPath), displays, {
+        x: 80,
+        y: 80,
+        width: 360,
+        height: 320
+      })
+      x = rect.x
+      y = rect.y
+      width = rect.width
+      height = rect.height
+    } else {
+      const mainWindowState = windowStateKeeper({
+        defaultWidth: 1200,
+        defaultHeight: 800
+      })
+      const position = ensureWindowPosition(mainWindowState)
+      x = position.x
+      y = position.y
+      width = position.width
+      height = position.height
+      managedWindowState = mainWindowState
+    }
     const winOptions: BrowserWindowConstructorOptions = Object.assign(
       { x, y, width, height },
       editorWinOptions,
@@ -130,6 +162,12 @@ class EditorWindow extends BaseWindow {
     }
 
     winOptions.backgroundColor = this._getPreferredBackgroundColor(theme)
+    if (this.stickyProbe) {
+      winOptions.frame = false
+      winOptions.transparent = false
+      winOptions.alwaysOnTop = true
+      winOptions.backgroundColor = '#fff4cc'
+    }
     if (env.disableSpellcheck) {
       // winOptions.webPreferences is set by editorWinOptions spread above
       ;(winOptions.webPreferences as { spellcheck: boolean }).spellcheck = false
@@ -157,7 +195,9 @@ class EditorWindow extends BaseWindow {
     }
 
     // Create a menu for the current window
-    appMenu.addEditorMenu(win, { sourceCodeModeEnabled: sourceCodeModeEnabled as boolean })
+    if (!this.stickyProbe) {
+      appMenu.addEditorMenu(win, { sourceCodeModeEnabled: sourceCodeModeEnabled as boolean })
+    }
 
     win.webContents.on('context-menu', (event, params) => {
       showEditorContextMenu(win!, event, params, preferences.getItem('spellcheckerEnabled'))
@@ -277,7 +317,19 @@ class EditorWindow extends BaseWindow {
     win.loadURL(this._buildUrlString(this.id, env, preferences))
     win.setSheetOffset(TITLE_BAR_HEIGHT)
 
-    mainWindowState.manage(win)
+    if (managedWindowState) {
+      managedWindowState.manage(win)
+    } else {
+      const userDataPath = env.paths.userDataPath
+      const persistBounds = (): void => {
+        if (!win || win.isDestroyed()) return
+        writeProbeBounds(userDataPath, win.getBounds())
+      }
+      win.setAlwaysOnTop(true, 'floating')
+      win.on('move', persistBounds)
+      win.on('resize', persistBounds)
+      persistBounds()
+    }
 
     // Disable application menu shortcuts because we want to handle key bindings ourself.
     win.webContents.setIgnoreMenuShortcuts(true)
