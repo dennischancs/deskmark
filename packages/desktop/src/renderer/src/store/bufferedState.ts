@@ -1,4 +1,5 @@
 import debounce from 'lodash/debounce'
+import bus from '@/bus'
 import { useEditorStore } from './editor'
 import { useProjectStore } from './project'
 import { useLayoutStore } from './layout'
@@ -52,6 +53,9 @@ export const enableSessionCapture = (): void => {
 
 export const sendBufferedState = (): Promise<unknown> => {
   if (!sessionReady) return Promise.resolve(false)
+  // The engine keeps the latest keystrokes until flush. Quit and the periodic
+  // snapshot both read the store, so flush first or a new file is saved empty.
+  bus.emit('flush-active-editor')
   const snapshot = createBufferedState()
   if (snapshot) {
     return window.electron.ipcRenderer.invoke('update-buffer-state', snapshot)
