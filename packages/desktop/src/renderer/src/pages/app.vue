@@ -44,7 +44,7 @@
         v-if="!init"
         class="editor-placeholder"
       />
-      <recent v-if="!hasCurrentFile && init" />
+      <recent v-if="!hasCurrentFile && init && !calendarOpen" />
       <calendar-view v-if="calendarOpen && !stickyProbe" />
       <editor-with-tabs
         v-if="hasCurrentFile && init && !calendarOpen"
