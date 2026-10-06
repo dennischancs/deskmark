@@ -1,0 +1,51 @@
+{
+  "engine": "@muyajs/core",
+  "changedEngine": false,
+  "steps": [
+    {
+      "step": "load",
+      "frontMatter": "kept",
+      "inlineComment": "kept",
+      "customKey": "kept",
+      "sawEdit": false,
+      "firstBox": "open",
+      "markdown": "---\ntitle: 交房租\ncustom: keep-me\ndeskmark:\n  id: 01J00000000000000000000000\n  kind: todo\n  status: open\n  due: 2026-10-08\n  remind: 2026-10-08T09:00:00+08:00\n  priority: high\n  repeat: monthly\n---\n\n- [ ] 买牛奶 <!-- deskmark: id=01J00000000000000000000001; due=2026-10-08; remind=2026-10-08T09:00:00+08:00; priority=high; repeat=weekly -->\n- [x] 已做的事 <!-- deskmark: id=01J00000000000000000000002; completed=2026-10-06T18:02:00+08:00; vendor=keep -->\n"
+    },
+    {
+      "step": "check",
+      "frontMatter": "kept",
+      "inlineComment": "kept",
+      "customKey": "kept",
+      "sawEdit": false,
+      "firstBox": "done",
+      "markdown": "---\ntitle: 交房租\ncustom: keep-me\ndeskmark:\n  id: 01J00000000000000000000000\n  kind: todo\n  status: open\n  due: 2026-10-08\n  remind: 2026-10-08T09:00:00+08:00\n  priority: high\n  repeat: monthly\n---\n\n- [x] 买牛奶 <!-- deskmark: id=01J00000000000000000000001; due=2026-10-08; remind=2026-10-08T09:00:00+08:00; priority=high; repeat=weekly -->\n- [x] 已做的事 <!-- deskmark: id=01J00000000000000000000002; completed=2026-10-06T18:02:00+08:00; vendor=keep -->\n"
+    },
+    {
+      "step": "edit-line",
+      "frontMatter": "kept",
+      "inlineComment": "kept",
+      "customKey": "kept",
+      "sawEdit": true,
+      "firstBox": "done",
+      "markdown": "---\ntitle: 交房租\ncustom: keep-me\ndeskmark:\n  id: 01J00000000000000000000000\n  kind: todo\n  status: open\n  due: 2026-10-08\n  remind: 2026-10-08T09:00:00+08:00\n  priority: high\n  repeat: monthly\n---\n\n- [x] 买牛奶 改 <!-- deskmark: id=01J00000000000000000000001; due=2026-10-08; remind=2026-10-08T09:00:00+08:00; priority=high; repeat=weekly -->\n- [x] 已做的事 <!-- deskmark: id=01J00000000000000000000002; completed=2026-10-06T18:02:00+08:00; vendor=keep -->\n"
+    },
+    {
+      "step": "source-mode",
+      "frontMatter": "kept",
+      "inlineComment": "kept",
+      "customKey": "kept",
+      "sawEdit": true,
+      "firstBox": "done",
+      "markdown": "---\ntitle: 交房租\ncustom: keep-me\ndeskmark:\n  id: 01J00000000000000000000000\n  kind: todo\n  status: open\n  due: 2026-10-08\n  remind: 2026-10-08T09:00:00+08:00\n  priority: high\n  repeat: monthly\n---\n\n- [x] 买牛奶 改 <!-- deskmark: id=01J00000000000000000000001; due=2026-10-08; remind=2026-10-08T09:00:00+08:00; priority=high; repeat=weekly -->\n- [x] 已做的事 <!-- deskmark: id=01J00000000000000000000002; completed=2026-10-06T18:02:00+08:00; vendor=keep -->\n"
+    },
+    {
+      "step": "undo",
+      "frontMatter": "kept",
+      "inlineComment": "kept",
+      "customKey": "kept",
+      "sawEdit": true,
+      "firstBox": "done",
+      "markdown": "---\ntitle: 交房租\ncustom: keep-me\ndeskmark:\n  id: 01J00000000000000000000000\n  kind: todo\n  status: open\n  due: 2026-10-08\n  remind: 2026-10-08T09:00:00+08:00\n  priority: high\n  repeat: monthly\n---\n\n- [x] 买牛奶 改 <!-- deskmark: id=01J00000000000000000000001; due=2026-10-08; remind=2026-10-08T09:00:00+08:00; priority=high; repeat=weekly -->\n- [x] 已做的事 <!-- deskmark: id=01J00000000000000000000002; completed=2026-10-06T18:02:00+08:00; vendor=keep -->\n"
+    }
+  ]
+}
