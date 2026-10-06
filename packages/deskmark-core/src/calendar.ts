@@ -19,6 +19,14 @@ export function buildMonth(year: number, month: number, marked: readonly string[
   return cells
 }
 
+export function weekdayLabels(locale: string): string[] {
+  const monday = new Date(Date.UTC(2026, 0, 5))
+  const format = new Intl.DateTimeFormat(locale || 'en', { weekday: 'narrow', timeZone: 'UTC' })
+  return Array.from({ length: 7 }, (_value, index) => {
+    return format.format(new Date(monday.getTime() + index * 86_400_000))
+  })
+}
+
 export function shouldOpenAtMention(text: string): boolean {
   return /(?:^|\s)@\S*$/.test(text) && !/\w@\S*$/.test(text)
 }

@@ -73,6 +73,33 @@ export function tasksOnDate(items: AgendaItem[], day: string): AgendaItem[] {
   return items.filter(item => item.due?.slice(0, 10) === day)
 }
 
+export function tasksForAgenda<T extends { done: boolean, due: string | null, text: string }>(
+  items: readonly T[],
+  mode: { kind: 'day', day: string } | { kind: 'group', group: CalendarGroup },
+  now: Date,
+  timeZone: string
+): T[] {
+  const matched = items.filter(item => {
+    if (mode.kind === 'day') return item.due?.slice(0, 10) === mode.day
+    if (item.done) return false
+    return calendarGroup(item, now, timeZone) === mode.group
+  })
+  return [...matched].sort((left, right) => Number(left.done) - Number(right.done) || left.text.localeCompare(right.text))
+}
+
+export function agendaCounts<T extends { done: boolean, due: string | null }>(
+  items: readonly T[],
+  now: Date,
+  timeZone: string
+): Record<CalendarGroup, number> {
+  const counts: Record<CalendarGroup, number> = { overdue: 0, today: 0, next7: 0, later: 0, undated: 0 }
+  for (const item of items) {
+    if (item.done) continue
+    counts[calendarGroup(item, now, timeZone)] += 1
+  }
+  return counts
+}
+
 export function markedDates(items: AgendaItem[]): string[] {
   const dates = items.flatMap(item => {
     if (item.done || !item.due) return []

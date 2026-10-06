@@ -129,6 +129,10 @@ export function journalPath(day: string): string {
   return `journal/${day}.md`
 }
 
+export function blankJournal(day: string): string {
+  return `---\ntitle: ${day}\ndeskmark:\n  kind: note\n---\n\n`
+}
+
 export function appendJournalTask(existing: string | null, text: string, due: string, id: string): string {
   const line = `- [ ] ${text} <!-- deskmark: id=${id}; due=${due} -->`
   if (existing == null || existing.length === 0) {

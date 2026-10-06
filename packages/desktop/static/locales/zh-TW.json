@@ -1063,7 +1063,16 @@
   "calendar": {
     "title": "日曆",
     "new": "新增",
-    "placeholder": "新的一行"
+    "placeholder": "新的一行",
+    "today": "今天",
+    "overdue": "逾期",
+    "next7": "未來 7 天",
+    "later": "更晚",
+    "undated": "無日期",
+    "thisDay": "這一天",
+    "journal": "打開這一天的筆記",
+    "emptyDay": "這一天還沒有待辦",
+    "emptyGroup": "這裡還沒有待辦"
   },
   "plugin": {
     "close": "關閉",

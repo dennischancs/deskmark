@@ -115,6 +115,10 @@ export interface IpcInvokeChannels {
     args: [root: string, day: string, text: string]
     ret: { path: string, relative: string, line: number } | null
   }
+  'mt::deskmark::journal-open': {
+    args: [root: string, day: string]
+    ret: { path: string, relative: string, created: boolean } | null
+  }
   'mt::deskmark::plugin-info': {
     args: []
     ret: { src: string, preload: string, manifest: { id: string, name: string, api: number, entry: string, permissions: string[] } } | null

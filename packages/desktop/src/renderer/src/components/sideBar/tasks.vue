@@ -7,7 +7,7 @@
       {{ t('sideBar.tasks.empty') }}
     </p>
     <button
-        class="deskmark-hover"
+        class="deskmark-hover stick"
       v-if="currentPath"
       type="button"
       @click="stickCurrent"
@@ -19,24 +19,13 @@
       :key="group.id"
     >
       <h3>{{ t(group.label) }}</h3>
-      <div
+      <task-line
         v-for="task of group.items"
         :key="`${task.notePath}:${task.taskKey}`"
-        class="task-row"
-      >
-        <input
-          type="checkbox"
-          :checked="task.status === 'done'"
-          @change="toggle(task)"
-        >
-        <button
-          type="button"
-          class="deskmark-hover"
-          @click="openTask(task)"
-        >
-          {{ task.text }}
-        </button>
-      </div>
+        :task="task"
+        @open="openTask"
+        @toggle="toggle"
+      />
     </section>
   </div>
 </template>
@@ -49,6 +38,8 @@ import { useProjectStore } from '@/store/project'
 import { useEditorStore } from '@/store/editor'
 import { useDeskmarkStore } from '@/store/deskmark'
 import { editDeskmarkTask } from '@/util/deskmarkEdit'
+import TaskLine from '@/components/taskLine.vue'
+import { calendarGroup } from '../../../../../deskmark-core/src/query.ts'
 import type { DeskmarkTaskGroups, DeskmarkTaskRef } from '@shared/types/ipc'
 
 const { t } = useI18n()
@@ -65,10 +56,15 @@ const root = computed(() => projectTree.value?.pathname || '')
 const visibleGroups = computed(() => {
   const value = groups.value
   if (!value) return []
+  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+  const now = new Date()
+  const next7 = value.upcoming.filter(task => calendarGroup({ done: false, due: task.due }, now, zone) === 'next7')
+  const later = value.upcoming.filter(task => calendarGroup({ done: false, due: task.due }, now, zone) !== 'next7')
   return [
     { id: 'overdue', label: 'sideBar.tasks.overdue', items: value.overdue },
     { id: 'today', label: 'sideBar.tasks.today', items: value.today },
-    { id: 'upcoming', label: 'sideBar.tasks.upcoming', items: value.upcoming },
+    { id: 'next7', label: 'calendar.next7', items: next7 },
+    { id: 'later', label: 'calendar.later', items: later },
     { id: 'inbox', label: 'sideBar.tasks.inbox', items: value.inbox },
     { id: 'done', label: 'sideBar.tasks.done', items: value.done }
   ].filter(group => group.items.length > 0)
@@ -136,21 +132,7 @@ h3 {
   font-size: 13px;
   font-weight: 600;
 }
-button {
-  display: block;
-  width: auto;
-  flex: 1;
-  margin: 0 0 4px;
-  padding: 4px 6px;
-  border-radius: 4px;
-  text-align: left;
-  cursor: pointer;
-}
-input {
-  margin: 0 6px 0 0;
-}
-.task-row {
-  display: flex;
-  align-items: center;
+.stick {
+  margin-bottom: 8px;
 }
 </style>

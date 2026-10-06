@@ -1063,7 +1063,16 @@
   "calendar": {
     "title": "Kalender",
     "new": "Nieuw",
-    "placeholder": "Nieuwe regel"
+    "placeholder": "Nieuwe regel",
+    "today": "Vandaag",
+    "overdue": "Te laat",
+    "next7": "Komende 7 dagen",
+    "later": "Later",
+    "undated": "Zonder datum",
+    "thisDay": "Deze dag",
+    "journal": "Notitie van deze dag openen",
+    "emptyDay": "Niets op deze dag",
+    "emptyGroup": "Hier is niets"
   },
   "plugin": {
     "close": "Sluiten",

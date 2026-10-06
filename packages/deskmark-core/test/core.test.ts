@@ -5,7 +5,9 @@ import {
   agendaFromMarkdown,
   applyTaskEdit,
   appendJournalTask,
+  agendaCounts,
   calendarGroup,
+  tasksForAgenda,
   completeInlineTask,
   completeNote,
   idQueue,
@@ -142,6 +144,10 @@ test('日历分组按本地时区，同一天带时间的过点算逾期', () =>
   assert.deepEqual(samples.map(item => smartList(item, now, zone)), [
     'overdue', 'today', 'overdue', 'today', 'upcoming', 'upcoming', 'inbox', 'done'
   ])
+  const named = samples.map((item, index) => ({ ...item, text: String(index) }))
+  assert.deepEqual(agendaCounts(named, now, zone), { overdue: 2, today: 2, next7: 1, later: 1, undated: 1 })
+  assert.deepEqual(tasksForAgenda(named, { kind: 'group', group: 'next7' }, now, zone).map(item => item.due), ['2026-10-08'])
+  assert.deepEqual(tasksForAgenda(named, { kind: 'day', day: '2026-10-05' }, now, zone).map(item => item.text), ['0', '7'])
 })
 
 test('全库待办按日期出现，完成的不在月历标记里', () => {

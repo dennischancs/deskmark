@@ -1063,7 +1063,16 @@
   "calendar": {
     "title": "Calendar",
     "new": "New",
-    "placeholder": "New line"
+    "placeholder": "New line",
+    "today": "Today",
+    "overdue": "Overdue",
+    "next7": "Next 7 days",
+    "later": "Later",
+    "undated": "No date",
+    "thisDay": "This day",
+    "journal": "Open this day's note",
+    "emptyDay": "Nothing on this day",
+    "emptyGroup": "Nothing here"
   },
   "plugin": {
     "close": "Close",

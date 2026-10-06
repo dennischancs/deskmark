@@ -5,7 +5,7 @@ import type { InlinePatch } from '../../../../deskmark-core/src/index.ts'
 import { getStickyHost } from '../deskmark/stickies'
 import { setReminderVault } from '../deskmark/reminderLoop'
 import { handlePluginCall, loadSamplePlugin, registerPluginGuestGuard, rememberPluginNote } from '../deskmark/pluginGuest'
-import { appendJournalTask, createUlid, journalPath } from '../../../../deskmark-core/src/index.ts'
+import { appendJournalTask, blankJournal, createUlid, journalPath } from '../../../../deskmark-core/src/index.ts'
 import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 
@@ -94,6 +94,26 @@ export const registerDeskmarkHandlers = (): void => {
       return { path: absolute, relative, line }
     } catch (error) {
       log.error('Failed to create journal task', error)
+      return null
+    }
+  })
+
+  ipcMain.handle('mt::deskmark::journal-open', async(_event, root: string, day: string) => {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day)) return null
+    try {
+      const relative = journalPath(day)
+      const absolute = join(root, relative)
+      mkdirSync(dirname(absolute), { recursive: true })
+      const created = !existsSync(absolute)
+      if (created) {
+        const temporary = `${absolute}.deskmark-tmp`
+        const { writeFileSync, renameSync } = await import('node:fs')
+        writeFileSync(temporary, blankJournal(day))
+        renameSync(temporary, absolute)
+      }
+      return { path: absolute, relative, created }
+    } catch (error) {
+      log.error('Failed to open journal', error)
       return null
     }
   })

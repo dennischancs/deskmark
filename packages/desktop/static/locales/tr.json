@@ -1063,7 +1063,16 @@
   "calendar": {
     "title": "Takvim",
     "new": "Yeni",
-    "placeholder": "Yeni satır"
+    "placeholder": "Yeni satır",
+    "today": "Bugün",
+    "overdue": "Gecikmiş",
+    "next7": "Sonraki 7 gün",
+    "later": "Daha sonra",
+    "undated": "Tarihsiz",
+    "thisDay": "Bu gün",
+    "journal": "Bu günün notunu aç",
+    "emptyDay": "Bu günde bir şey yok",
+    "emptyGroup": "Burada bir şey yok"
   },
   "plugin": {
     "close": "Kapat",

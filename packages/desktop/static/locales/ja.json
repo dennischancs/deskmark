@@ -1063,7 +1063,16 @@
   "calendar": {
     "title": "カレンダー",
     "new": "追加",
-    "placeholder": "新しい一行"
+    "placeholder": "新しい一行",
+    "today": "今日",
+    "overdue": "期限超過",
+    "next7": "今後7日",
+    "later": "その先",
+    "undated": "日付なし",
+    "thisDay": "この日",
+    "journal": "この日のノートを開く",
+    "emptyDay": "この日のやることはありません",
+    "emptyGroup": "ここにはまだありません"
   },
   "plugin": {
     "close": "閉じる",

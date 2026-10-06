@@ -1063,7 +1063,16 @@
   "calendar": {
     "title": "달력",
     "new": "추가",
-    "placeholder": "새 줄"
+    "placeholder": "새 줄",
+    "today": "오늘",
+    "overdue": "기한 지남",
+    "next7": "앞으로 7일",
+    "later": "더 나중",
+    "undated": "날짜 없음",
+    "thisDay": "이 날",
+    "journal": "이 날의 노트를 열기",
+    "emptyDay": "이 날에는 할 일이 없습니다",
+    "emptyGroup": "여기에는 아직 없습니다"
   },
   "plugin": {
     "close": "닫기",

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { applyQuickAction, buildMonth, planReminders, shouldOpenAtMention } from '../src/index.ts'
+import { applyQuickAction, blankJournal, buildMonth, planReminders, shouldOpenAtMention, weekdayLabels } from '../src/index.ts'
 
 test('月历标出有事的日期，周一开头', () => {
   const cells = buildMonth(2026, 10, ['2026-10-08'])
@@ -9,6 +9,16 @@ test('月历标出有事的日期，周一开头', () => {
   assert.equal(cells.find(cell => cell.date === '2026-10-08')?.marked, true)
   assert.equal(cells.find(cell => cell.date === '2026-10-07')?.marked, false)
   assert.equal(cells.length % 7, 0)
+})
+
+test('星期从周一开始，空日记只有标题没有待办', () => {
+  const labels = weekdayLabels('en-US')
+  const sunday = new Intl.DateTimeFormat('en-US', { weekday: 'narrow', timeZone: 'UTC' }).format(new Date(Date.UTC(2026, 0, 4)))
+  assert.equal(labels.length, 7)
+  assert.notEqual(labels[0], sunday)
+  const journal = blankJournal('2026-10-08')
+  assert.match(journal, /title: 2026-10-08/)
+  assert.doesNotMatch(journal, /- \[ \]/)
 })
 
 test('邮箱中间的 @ 不打开，行首和空格后的 @ 打开', () => {
