@@ -227,7 +227,8 @@ class EditorWindow extends BaseWindow {
         lineEnding,
         sideBarVisibility: resolvedSideBarVisibility,
         tabBarVisibility,
-        sourceCodeModeEnabled
+        sourceCodeModeEnabled,
+        willRestore: Boolean(this.bufferStoreInfo!.filePath)
       })
 
       if (this.bufferStoreInfo!.filePath) {

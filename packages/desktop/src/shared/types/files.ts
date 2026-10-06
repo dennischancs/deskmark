@@ -154,6 +154,7 @@ export interface BootstrapEditorConfig {
   sideBarVisibility: boolean
   tabBarVisibility: boolean
   sourceCodeModeEnabled: boolean
+  willRestore?: boolean
   preferences?: unknown
   userKeybindings?: unknown
   recentlyUsedFiles?: string[]

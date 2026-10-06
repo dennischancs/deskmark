@@ -21,7 +21,7 @@ import { useProjectStore } from './project'
 import { useLayoutStore } from './layout'
 import { useMainStore } from '.'
 import { t } from '../i18n'
-import { debouncedSendBufferedState, sendBufferedState } from './bufferedState'
+import { debouncedSendBufferedState, enableSessionCapture, sendBufferedState } from './bufferedState'
 import { prefersSourceMode } from 'common/sessionRules'
 import type {
   IFileState,
@@ -235,6 +235,7 @@ export const useEditorStore = defineStore('editor', {
       this.updateTabIdToIndex()
       window.DIRNAME = currentFile?.pathname ? window.path.dirname(currentFile.pathname) : ''
       this.UPDATE_LINE_ENDING_MENU()
+      enableSessionCapture()
 
       for (const warning of bufferedEditorState.restoreWarnings) {
         const restoredTabId = warning.tabId ? oldIdToNewId[warning.tabId] : null
@@ -948,6 +949,7 @@ export const useEditorStore = defineStore('editor', {
             isFirst = false
           }
         }
+        if (!config.willRestore) enableSessionCapture()
       })
     },
 

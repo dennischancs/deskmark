@@ -2,7 +2,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { OpenSession } from '../../../src/common/openSession'
+import { OpenSession, shouldPreserveOpenSession } from '../../../src/common/openSession'
 import { prefersSourceMode } from '../../../src/common/sessionRules'
 
 describe('open file session', () => {
@@ -43,5 +43,12 @@ describe('open file session', () => {
   it('treats txt as source mode and markdown as the formatted mode', () => {
     expect(prefersSourceMode('notes.txt')).toBe(true)
     expect(prefersSourceMode('Notes.MD')).toBe(false)
+  })
+
+  it('does not let a startup snapshot erase tabs that have not been restored', () => {
+    expect(shouldPreserveOpenSession(2, 0, false)).toBe(true)
+    expect(shouldPreserveOpenSession(2, 0, true)).toBe(false)
+    expect(shouldPreserveOpenSession(0, 0, false)).toBe(false)
+    expect(shouldPreserveOpenSession(2, 1, false)).toBe(false)
   })
 })

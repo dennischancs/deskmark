@@ -4,7 +4,7 @@ import writeFileAtomic from 'write-file-atomic'
 import { BrowserWindow, ipcMain, type IpcMainInvokeEvent } from 'electron'
 import { TypedEmitter } from '@shared/types/typedEmitter'
 import type BaseWindow from '../windows/base'
-import { OpenSession, tabsFromBufferState } from 'common/openSession'
+import { OpenSession, shouldPreserveOpenSession, tabsFromBufferState } from 'common/openSession'
 
 interface EditorBufferStorePaths {
   editorBufferStorePath: string
@@ -196,9 +196,16 @@ class EditorBufferStore extends TypedEmitter<EditorBufferStoreEvents> {
       return false
     }
 
+    const session = tabsFromBufferState(newState)
+    const sessionReady = Boolean(
+      newState && typeof newState === 'object' && (newState as { sessionReady?: unknown }).sessionReady
+    )
+    if (session && shouldPreserveOpenSession(this.previousFileCount(), session.tabs.length, sessionReady)) {
+      return false
+    }
+
     const bufferStore = this.getBufferStoreInfo(restoreBufferId)
     this.writeBufferStoreFile(bufferStore.filePath, newState)
-    const session = tabsFromBufferState(newState)
     if (session) {
       try {
         this.openSession.save(session.currentId, session.tabs)
@@ -207,6 +214,15 @@ class EditorBufferStore extends TypedEmitter<EditorBufferStoreEvents> {
       }
     }
     return true
+  }
+
+  private previousFileCount(): number {
+    try {
+      return this.openSession.load().document.files.length
+    } catch (error) {
+      console.error('Failed to read the open-file session', error)
+      return 0
+    }
   }
 
   getUnUsedBufferUUID(): string {
