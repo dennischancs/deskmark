@@ -359,6 +359,7 @@ class AppMenu {
    */
   updateLineEndingMenu(windowId: number, lineEnding: string): void {
     const menus = this.getWindowMenuById(windowId)
+    if (!menus) return
     const crlfMenu = menus.getMenuItemById('crlfLineEndingMenuEntry')
     const lfMenu = menus.getMenuItemById('lfLineEndingMenuEntry')
     if (lineEnding === 'crlf') {
@@ -376,6 +377,7 @@ class AppMenu {
    */
   updateAlwaysOnTopMenu(windowId: number, flag: boolean): void {
     const menus = this.getWindowMenuById(windowId)
+    if (!menus) return
     const menu = menus.getMenuItemById('alwaysOnTopMenuItem')
     if (menu) menu.checked = flag
   }
