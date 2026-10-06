@@ -531,7 +531,9 @@ class AppMenu {
           log.error(`UpdateApplicationMenu: Cannot find window menu for window id ${windowId}.`)
           return
         }
-        updateFormatMenu(this.getWindowMenuById(windowId), formats)
+        const menu = this.getWindowMenuById(windowId)
+        if (!menu) return
+        updateFormatMenu(menu, formats)
       }
     )
     ipcMain.on('mt::update-sidebar-menu', (_e, windowId: number, value: unknown) => {
@@ -539,7 +541,9 @@ class AppMenu {
         log.error(`UpdateApplicationMenu: Cannot find window menu for window id ${windowId}.`)
         return
       }
-      updateSidebarMenu(this.getWindowMenuById(windowId), value)
+      const menu = this.getWindowMenuById(windowId)
+      if (!menu) return
+      updateSidebarMenu(menu, value)
     })
     ipcMain.on(
       'mt::view-layout-changed',
@@ -548,7 +552,9 @@ class AppMenu {
           log.error(`UpdateApplicationMenu: Cannot find window menu for window id ${windowId}.`)
           return
         }
-        viewLayoutChanged(this.getWindowMenuById(windowId), viewSettings)
+        const menu = this.getWindowMenuById(windowId)
+        if (!menu) return
+        viewLayoutChanged(menu, viewSettings)
       }
     )
     ipcMain.on('mt::editor-selection-changed', (_e, windowId: number, changes: SelectionState) => {
@@ -556,7 +562,9 @@ class AppMenu {
         log.error(`UpdateApplicationMenu: Cannot find window menu for window id ${windowId}.`)
         return
       }
-      updateSelectionMenus(this.getWindowMenuById(windowId), changes)
+      const menu = this.getWindowMenuById(windowId)
+      if (!menu) return
+      updateSelectionMenus(menu, changes)
     })
 
     // In source-code mode the Paragraph and Format commands act on the hidden

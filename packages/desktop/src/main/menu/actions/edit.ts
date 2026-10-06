@@ -187,7 +187,8 @@ export const loadEditCommands = (commandManager: CommandManager): void => {
 // NOTE: Don't use static `getMenuItemById` here, instead request the menu by
 //       window id from `AppMenu` manager.
 
-export const updateSidebarMenu = (applicationMenu: Menu, value: unknown): void => {
-  const sideBarMenuItem: MenuItem = applicationMenu.getMenuItemById('sideBarMenuItem')!
+export const updateSidebarMenu = (applicationMenu: Menu | null, value: unknown): void => {
+  const sideBarMenuItem = applicationMenu?.getMenuItemById('sideBarMenuItem')
+  if (!sideBarMenuItem) return
   sideBarMenuItem.checked = !!value
 }
