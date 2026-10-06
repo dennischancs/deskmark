@@ -322,7 +322,11 @@ const handleLeftBottomClick = (name: string): void => {
 .right-column {
   flex: 1;
   width: calc(100% - 50px);
-  overflow: hidden;
+  height: 100%;
+  box-sizing: border-box;
+  padding-top: var(--titleBarHeight);
+  overflow: auto;
+  -webkit-app-region: no-drag;
 }
 
 .drag-bar {
