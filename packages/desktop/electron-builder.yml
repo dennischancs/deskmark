@@ -1,5 +1,6 @@
-appId: com.github.marktext.marktext
-productName: MarkText
+appId: app.deskmark.desktop
+productName: Deskmark
+executableName: deskmark
 directories:
   buildResources: build
   output: ../../dist

@@ -1,4 +1,7 @@
 {
+  "app": {
+    "displayName": "Masa notu"
+  },
   "menu": {
     "counter": {
       "words": "Sözcükler",
@@ -97,21 +100,21 @@
       "reportBug": "Hata Bildir",
       "viewSource": "Kaynağı Görüntüle",
       "followUs": "Bizi Takip Edin",
-      "support": "MarkText'e Destek Ol",
+      "support": "Masa notu'e Destek Ol",
       "license": "Lisans",
       "about": "Hakkında",
       "checkUpdates": "Güncellemeleri Denetle"
     },
     "marktext": {
-      "title": "MarkText",
-      "about": "MarkText Hakkında",
+      "title": "Masa notu",
+      "about": "Masa notu Hakkında",
       "checkUpdates": "Güncellemeleri Denetle...",
       "preferences": "Tercihler",
       "services": "Hizmetler",
-      "hide": "MarkText'i Gizle",
+      "hide": "Masa notu'i Gizle",
       "hideOthers": "Diğerlerini Gizle",
       "showAll": "Tümünü Göster",
-      "quit": "MarkText'ten Çık"
+      "quit": "Masa notu'ten Çık"
     },
     "view": {
       "view": "Görünüm",
@@ -351,7 +354,7 @@
   },
   "import": {
     "title": "İçe Aktar veya Aç",
-    "description": "İçeriklerinizi MarkText'e almak için buraya bırakın"
+    "description": "İçeriklerinizi Masa notu'e almak için buraya bırakın"
   },
   "preferences": {
     "title": "Tercihler",
@@ -379,10 +382,10 @@
         "hideScrollbar": "Kaydırma çubuklarının gizlenip gizlenmeyeceği",
         "wordWrapInToc": "İçindekilerde sözcük kaydırmanın etkinleştirilip etkinleştirilmeyeceği",
         "fileSortBy": "Açık klasördeki dosyaları oluşturulma zamanı, değiştirilme zamanı ve başlığa göre sırala",
-        "startUpAction": "MarkText başladıktan sonraki eylem: son düzenlenen içeriği aç, belirtilen klasörü aç veya boş sayfa",
+        "startUpAction": "Masa notu başladıktan sonraki eylem: son düzenlenen içeriği aç, belirtilen klasörü aç veya boş sayfa",
         "restoreLayoutState": "Başlangıçta önceki düzenleyici durumunu geri yükle",
         "defaultDirectoryToOpen": "startUp=folder olduğunda başlangıçta açılması gereken varsayılan klasör",
-        "language": "MarkText'in kullandığı dil",
+        "language": "Masa notu'in kullandığı dil",
         "editorFontFamily": "Düzenleyici yazı tipi ailesi",
         "fontSize": "Piksel cinsinden yazı tipi boyutu",
         "lineHeight": "Satır Yüksekliği",
@@ -407,7 +410,7 @@
         "preferLooseListItem": "Tercih edilen liste türü",
         "bulletListMarker": "Sırasız listede kullanılan işaret",
         "orderListDelimiter": "Sıralı listede kullanılan ayraç",
-        "preferHeadingStyle": "MarkText'te tercih edilen başlık stili",
+        "preferHeadingStyle": "Masa notu'te tercih edilen başlık stili",
         "tabSize": "Sekmeyi x boşlukla değiştir",
         "listIndentation": "Liste girintisini seçin",
         "frontmatterType": "Ön bilgi türü",
@@ -420,7 +423,7 @@
         "isHtmlEnabled": "HTML işlemeyi etkinleştir",
         "softNewlineAsSpace": "Yumuşak satır sonlarını boşluk olarak değerlendir",
         "sequenceTheme": "Dizi diyagramı teması",
-        "theme": "MarkText'te kullanılan temayı seçin",
+        "theme": "Masa notu'te kullanılan temayı seçin",
         "followSystemTheme": "Sistem Temasını Takip Et",
         "lightModeTheme": "Sistem açık moddayken kullanılacak tema",
         "darkModeTheme": "Sistem koyu moddayken kullanılacak tema",
@@ -633,7 +636,7 @@
         "pleaseInstall": "Lütfen yükleyin",
         "scriptPath": "Betik yolu"
       },
-      "defaultBehavior": "Görseli MarkText'e yapıştırdıktan veya sürükledikten sonraki varsayılan davranış"
+      "defaultBehavior": "Görseli Masa notu'e yapıştırdıktan veya sürükledikten sonraki varsayılan davranış"
     },
     "markdown": {
       "title": "Markdown",
@@ -754,7 +757,7 @@
   },
   "commands": {
     "mt": {
-      "hide": "MarkText'i Gizle",
+      "hide": "Masa notu'i Gizle",
       "hideOthers": "Diğerlerini Gizle"
     },
     "file": {
@@ -905,7 +908,7 @@
     "fileExists": "Dosya zaten var: {filename}",
     "files": "Dosyalar",
     "importWarning": "İçe aktarma uyarısı",
-    "installPandoc": "Pandoc bulunamadı. Yükleyin veya MARKTEXT_PANDOC ortam değişkenini pandoc çalıştırılabilir dosyasının yolu olarak ayarlayıp MarkText'i yeniden başlatın.",
+    "installPandoc": "Pandoc bulunamadı. Yükleyin veya MARKTEXT_PANDOC ortam değişkenini pandoc çalıştırılabilir dosyasının yolu olarak ayarlayıp Masa notu'i yeniden başlatın.",
     "exportWarning": "Dışa aktarma uyarısı",
     "exportWarningMore": "…ve {count} tane daha",
     "keepOpen": "Açık tut",
@@ -922,7 +925,7 @@
     "configSchemaViolation": "Yapılandırma şeması ihlali",
     "copyError": "Kopyalama hatası",
     "initializationFailed": "Başlatma başarısız {hint}",
-    "otherInstanceDetected": "Başka bir MarkText penceresi zaten açık",
+    "otherInstanceDetected": "Başka bir Masa notu penceresi zaten açık",
     "report": "Bildir",
     "startupError": "Başlangıç hatası",
     "terminatedDueToError": "Hata nedeniyle sonlandırıldı",

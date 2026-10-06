@@ -27,6 +27,7 @@ export function setLanguage(language: string): void {
   const windows = BrowserWindow.getAllWindows()
   windows.forEach((window) => {
     if (window && !window.isDestroyed()) {
+      window.setTitle(getTranslation('app.displayName', language))
       window.webContents.send('language-changed', language)
     }
   })

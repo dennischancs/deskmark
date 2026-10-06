@@ -19,6 +19,9 @@ import { setPlantumlServerSource } from './ipc/diagram'
 process.env.MARKTEXT_VERSION = MARKTEXT_VERSION
 process.env.MARKTEXT_VERSION_STRING = MARKTEXT_VERSION_STRING
 
+// Internal id. Distinct from MarkText so user data and the installer can coexist.
+app.setName('deskmark')
+
 // -----------------------------------------------
 // Exception handling and logging setup
 setupExceptionHandler()
@@ -54,7 +57,7 @@ initializeLogger(appEnvironment)
 // Handles native level crashes
 crashReporter.start({
   companyName: '',
-  productName: 'MarkText',
+  productName: 'Deskmark',
   uploadToServer: false, // collect locally
   compress: true
 })
@@ -86,7 +89,7 @@ if (!process.mas && !import.meta.env.DEV) {
 registerSandboxIpcHandlers()
 
 // Windows-specific AppUserModelID
-electronApp.setAppUserModelId('com.electron.marktext')
+electronApp.setAppUserModelId('app.deskmark.desktop')
 
 // Dev shortcuts and reload suppression
 app.on('browser-window-created', (_, window) => {

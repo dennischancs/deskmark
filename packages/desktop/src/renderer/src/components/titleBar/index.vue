@@ -241,21 +241,21 @@ const showTitleBar = computed(() => {
   return shouldShowInAppTitleBar(titleBarStyle.value, isOsx)
 })
 
+const productName = computed(() => t('app.displayName'))
+
 watch(
-  () => props.filename,
-  (value) => {
-    // Set filename when hover on dock
+  () => [props.filename, props.project?.name, productName.value],
+  () => {
+    const filename = props.filename
     const hasOpenFolder = !!(props.project && props.project.name)
     const projectName = props.project?.name ?? ''
-    let title = ''
-    if (value) {
-      title = hasOpenFolder ? `${value} - ${projectName}` : `${value}`
-    } else {
-      title = hasOpenFolder ? projectName : ''
-    }
-
-    document.title = title
-  }
+    const product = productName.value
+    if (filename && hasOpenFolder) document.title = `${filename} - ${projectName} - ${product}`
+    else if (filename) document.title = `${filename} - ${product}`
+    else if (hasOpenFolder) document.title = `${projectName} - ${product}`
+    else document.title = product
+  },
+  { immediate: true }
 )
 
 const handleWordClick = () => {
