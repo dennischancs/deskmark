@@ -1264,6 +1264,7 @@ const scrollToAnchorElement = (element: unknown) => {
 }
 
 const revealDeskmarkLine = (line: unknown) => {
+  if (sourceCode.value) return
   if (!editor.value || typeof line !== 'number' || !Number.isInteger(line) || line < 1) return
   const index = line - 1
   editor.value.setCursorByOffset({

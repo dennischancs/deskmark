@@ -39,6 +39,15 @@ const commitTimer = ref<ReturnType<typeof setTimeout> | null>(null)
 const viewDestroyed = ref(false)
 const tabId = ref<string | null>(null)
 
+const revealDeskmarkLine = (line: unknown): void => {
+  const cm = editor.value
+  if (!cm || typeof line !== 'number' || !Number.isInteger(line) || line < 1) return
+  const index = Math.min(line - 1, Math.max(cm.lineCount() - 1, 0))
+  const pos = { line: index, ch: 0 }
+  cm.setSelection(pos, pos, { scroll: true })
+  cm.focus()
+}
+
 const {
   theme,
   sourceCode,
@@ -398,6 +407,7 @@ onMounted(() => {
   bus.on('redo', handleRedo)
   bus.on('image-action', handleImageAction)
   bus.on('scroll-to-header', handleScrollToHeader)
+  bus.on('deskmark:reveal-line', revealDeskmarkLine)
 
   // CodeMirror's line tree relies on object identity and must not be proxied by Vue.
   const codeMirrorInstance = markRaw(codeMirror(container, codeMirrorConfig))
@@ -437,6 +447,7 @@ onBeforeUnmount(() => {
   editorStore.SET_SELECTION_WORD_COUNT(null)
   lastSelectionKey = ''
   bus.off('scroll-to-header', handleScrollToHeader)
+  bus.off('deskmark:reveal-line', revealDeskmarkLine)
 
   if (editor.value) {
     const { cursor, markdown: newMarkdown } = getMarkdownAndCursor(editor.value)

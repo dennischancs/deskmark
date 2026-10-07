@@ -1327,6 +1327,7 @@ export const useEditorStore = defineStore('editor', {
       if (existingTab) {
         this.UPDATE_CURRENT_FILE(existingTab)
         if (options.anchor) this.SCROLL_TO_ANCHOR(options.anchor)
+        revealDeskmarkLine(options.deskmarkLine)
         return
       }
 
