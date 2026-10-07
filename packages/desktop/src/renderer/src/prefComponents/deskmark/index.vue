@@ -24,6 +24,19 @@
           :notes="t('preferences.deskmark.reminderLimit')"
           :on-change="(value) => onSelectChange('deskmarkReminders', value)"
         />
+        <label class="scan-label">
+          {{ t('preferences.deskmark.reminderSeconds') }}
+          <input
+            class="scan-text seconds"
+            type="number"
+            min="1"
+            max="600"
+            step="1"
+            :value="deskmarkReminderSeconds"
+            @change="setSeconds(($event.target as HTMLInputElement).value)"
+          >
+        </label>
+        <p class="seconds-hint">{{ t('preferences.deskmark.reminderSecondsHint') }}</p>
         <bool
           :description="t('preferences.deskmark.wordCount')"
           :bool="deskmarkWordCount"
@@ -122,6 +135,7 @@ const {
   deskmarkCalendar,
   deskmarkTasks,
   deskmarkReminders,
+  deskmarkReminderSeconds,
   deskmarkWordCount,
   deskmarkScanExtensions,
   deskmarkRuleTaskLine,
@@ -146,6 +160,12 @@ const onSelectChange = (type: keyof PreferencesState, value: boolean): void => {
 
 const setText = (type: 'deskmarkScanExtensions' | 'deskmarkExtraPrefixes', value: string): void => {
   preferenceStore.SET_SINGLE_PREFERENCE({ type, value })
+}
+
+const setSeconds = (value: string): void => {
+  const parsed = Number(value)
+  const seconds = Number.isFinite(parsed) ? Math.min(600, Math.max(1, Math.round(parsed))) : 30
+  preferenceStore.SET_SINGLE_PREFERENCE({ type: 'deskmarkReminderSeconds', value: seconds })
 }
 
 const extensionOn = (ext: string): boolean => normalizeExtensions(deskmarkScanExtensions.value).includes(ext)
@@ -190,6 +210,14 @@ const setLogin = (enabled: boolean): void => {
   border: 1px solid var(--editorColor30, var(--tableBorderColor));
   border-radius: 4px;
   padding: 4px 8px;
+}
+.seconds {
+  width: 6em;
+  margin-left: 8px;
+}
+.seconds-hint {
+  margin: 0 0 8px;
+  color: var(--editorColor60, var(--editorColor));
 }
 .ext-list input[type='checkbox'] {
   accent-color: var(--themeColor);

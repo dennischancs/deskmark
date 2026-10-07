@@ -28,6 +28,7 @@ export interface IUserPreferences {
   deskmarkCalendar?: boolean
   deskmarkTasks?: boolean
   deskmarkReminders?: boolean
+  deskmarkReminderSeconds?: number
   deskmarkWordCount?: boolean
   deskmarkScanExtensions?: string
   deskmarkRuleTaskLine?: boolean

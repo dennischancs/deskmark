@@ -65,6 +65,7 @@ export interface PreferencesState {
   deskmarkCalendar: boolean
   deskmarkTasks: boolean
   deskmarkReminders: boolean
+  deskmarkReminderSeconds: number
   deskmarkWordCount: boolean
   deskmarkScanExtensions: string
   deskmarkRuleTaskLine: boolean
@@ -196,6 +197,7 @@ export const usePreferencesStore = defineStore('preferences', {
     deskmarkCalendar: true,
     deskmarkTasks: true,
     deskmarkReminders: true,
+    deskmarkReminderSeconds: 30,
     deskmarkWordCount: true,
     deskmarkScanExtensions: 'markdown,mdown,mkdn,md,mkd,mdwn,mdtxt,mdtext,mdx,text,txt',
     deskmarkRuleTaskLine: true,

@@ -5,7 +5,7 @@ import log from 'electron-log'
 import { planReminders, type ReminderTask } from '../../../../deskmark-core/src/reminders.ts'
 import type { DeskmarkReminderNotice } from '@shared/types/ipc'
 import { t } from '../i18n'
-import { reminderCaption, reminderTimeoutType } from './windowsToast'
+import { normalizeReminderSeconds, reminderCaption, reminderTimeoutType } from './windowsToast'
 import { readTaskGroups } from './tasks'
 import { whenScanFinishes } from './scanner'
 
@@ -15,9 +15,14 @@ let tickFn: (() => void) | null = null
 // Notification, the click listener can be collected before the user presses it.
 const shownNotices = new Set<Notification>()
 
-function showSystemNotice(note: Notification, open?: () => void): void {
+function showSystemNotice(note: Notification, visibleMs: number, open?: () => void): void {
   shownNotices.add(note)
+  let settled = false
+  let timer: ReturnType<typeof setTimeout> | null = null
   const drop = (): void => {
+    if (settled) return
+    settled = true
+    if (timer) clearTimeout(timer)
     shownNotices.delete(note)
   }
   note.on('show', () => {
@@ -36,6 +41,13 @@ function showSystemNotice(note: Notification, open?: () => void): void {
     drop()
     open?.()
   })
+  if (visibleMs > 0) {
+    timer = setTimeout(() => {
+      if (settled) return
+      drop()
+      note.close()
+    }, visibleMs)
+  }
   note.show()
 }
 
@@ -53,6 +65,7 @@ export function startReminderLoop(options: {
   userDataPath: string
   getVault?: () => string | null
   remindersEnabled?: () => boolean
+  reminderSeconds?: () => unknown
   openNote: (vault: string, notePath: string, line: number | null) => void
   announce?: (notice: DeskmarkReminderNotice) => void
 }): void {
@@ -95,6 +108,7 @@ export function startReminderLoop(options: {
       })
       write({ fired: plan.fired, summaryDay: plan.summaryDay })
       const system = Notification.isSupported()
+      const visibleMs = normalizeReminderSeconds(options.reminderSeconds?.()) * 1000
       for (const task of plan.notify) {
         const body = reminderCaption(task.path, task.remind)
         if (system) {
@@ -104,7 +118,7 @@ export function startReminderLoop(options: {
             timeoutType: reminderTimeoutType(process.platform),
             actions: [{ type: 'button', text: t('reminder.open') }]
           })
-          showSystemNotice(note, () => options.openNote(vault, task.path, task.line))
+          showSystemNotice(note, visibleMs, () => options.openNote(vault, task.path, task.line))
         }
         options.announce?.({
           title: task.text,
@@ -122,7 +136,7 @@ export function startReminderLoop(options: {
             body: '',
             timeoutType: reminderTimeoutType(process.platform)
           })
-          showSystemNotice(summary)
+          showSystemNotice(summary, visibleMs)
         }
         options.announce?.({
           title,

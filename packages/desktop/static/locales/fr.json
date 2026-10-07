@@ -805,6 +805,8 @@
       "wordCount": "Afficher le nombre de mots",
       "detail": "La date, le rappel, la priorité et la répétition se règlent sur la tâche. Le mois montre les tâches ouvertes. Les glisser sur un autre jour, ou les poser sur le jour choisi, ne change que la date de la ligne originale. Ici, on ne fait que les activer.",
       "reminderLimit": "Les rappels arrivent seulement pendant que Pense-bête est ouvert. Une fois fermé, l’heure ne sonne pas.",
+      "reminderSeconds": "Secondes d'affichage du rappel",
+      "reminderSecondsHint": "Sans ouverture, il se cache au bout de ce délai.",
       "openAtLogin": "Ouvrir à la connexion",
       "extensions": "Extensions de texte",
       "extensionsHint": "Séparez par des virgules. Les cases sont les types que cet éditeur ouvrait déjà.",

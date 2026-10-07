@@ -805,6 +805,8 @@
       "wordCount": "Show word count",
       "detail": "Each task keeps its own date, reminder, priority, and repeat. Change those beside the task. The month shows open tasks. Dragging one to another day, or placing it on the selected day, changes the date on the original line and does not copy it. These switches only turn the features on or off.",
       "reminderLimit": "Reminders only arrive while Deskmark is open. After you quit, a due time does not ring.",
+      "reminderSeconds": "Seconds a reminder stays on screen",
+      "reminderSecondsHint": "If you do not open it, it hides when the time is up.",
       "openAtLogin": "Open at login",
       "extensions": "Plain text extensions",
       "extensionsHint": "Separate with commas. The boxes are the kinds this editor already opens.",

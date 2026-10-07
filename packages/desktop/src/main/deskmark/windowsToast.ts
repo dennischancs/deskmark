@@ -71,9 +71,18 @@ export function reminderCaption(notePath: string, remind: string | null): string
   return clock ? `${file} / ${clock}` : file
 }
 
-// Windows drops a default toast into the notification center after a few
-// seconds, so the Open button is gone before it can be pressed. 'never'
-// keeps that banner up until the user acts on it.
+export const DEFAULT_REMINDER_SECONDS = 30
+export const MIN_REMINDER_SECONDS = 1
+export const MAX_REMINDER_SECONDS = 600
+
+export function normalizeReminderSeconds(value: unknown): number {
+  const seconds = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(seconds)) return DEFAULT_REMINDER_SECONDS
+  return Math.min(MAX_REMINDER_SECONDS, Math.max(MIN_REMINDER_SECONDS, Math.round(seconds)))
+}
+
+// A default Windows toast hides in a few seconds. 'never' holds the banner
+// so the app can hide it itself after the seconds chosen in settings.
 export function reminderTimeoutType(platform: string): 'never' | undefined {
   return platform === 'win32' ? 'never' : undefined
 }

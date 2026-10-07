@@ -226,6 +226,13 @@
     "type": "boolean",
     "default": true
   },
+  "deskmarkReminderSeconds": {
+    "description": "Deskmark--Seconds a reminder stays on screen before it hides",
+    "type": "number",
+    "minimum": 1,
+    "maximum": 600,
+    "default": 30
+  },
   "deskmarkWordCount": {
     "description": "Deskmark--Word count",
     "type": "boolean",

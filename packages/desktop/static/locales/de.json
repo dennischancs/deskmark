@@ -805,6 +805,8 @@
       "wordCount": "Wörter anzeigen",
       "detail": "Datum, Erinnerung, Wichtigkeit und Wiederholung stehen an der Aufgabe selbst. Der Monat zeigt offene Aufgaben. Ziehen auf einen anderen Tag, oder auf den gewählten Tag legen, ändert nur das Datum in der ursprünglichen Zeile. Hier wird die Funktion nur ein- oder ausgeschaltet.",
       "reminderLimit": "Erinnerungen kommen nur, solange Tischzettel geöffnet ist. Nach dem Beenden klingelt nichts.",
+      "reminderSeconds": "Sekunden, die eine Erinnerung sichtbar bleibt",
+      "reminderSecondsHint": "Ohne Öffnen verschwindet sie nach dieser Zeit.",
       "openAtLogin": "Beim Anmelden öffnen",
       "extensions": "Textdateiendungen",
       "extensionsHint": "Mit Kommas trennen. Die Häkchen sind die Arten, die dieser Editor schon öffnet.",

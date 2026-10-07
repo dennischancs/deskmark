@@ -805,6 +805,8 @@
       "wordCount": "Mostrar palabras",
       "detail": "La fecha, el aviso, la prioridad y la repetición se cambian en la propia tarea. El mes muestra las tareas abiertas. Arrastrar a otro día, o ponerla en el día elegido, solo cambia la fecha de la línea original. Aquí solo se enciende o se apaga.",
       "reminderLimit": "Los avisos solo llegan mientras Nota de mesa está abierta. Si se cierra, la hora no suena.",
+      "reminderSeconds": "Segundos que el aviso permanece",
+      "reminderSecondsHint": "Si no lo abres, se oculta al cumplirse el tiempo.",
       "openAtLogin": "Abrir al iniciar sesión",
       "extensions": "Extensiones de texto",
       "extensionsHint": "Sepáralas con comas. Las casillas son los tipos que este editor ya abría.",

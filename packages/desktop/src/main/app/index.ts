@@ -479,6 +479,7 @@ class App {
     startReminderLoop({
       userDataPath: this._accessor.paths.userDataPath,
       remindersEnabled: () => this._accessor.preferences.getItem('deskmarkReminders') !== false,
+      reminderSeconds: () => this._accessor.preferences.getItem('deskmarkReminderSeconds'),
       openNote: openReminder,
       announce: (notice) => {
         for (const entry of this._windowManager.getWindowsByType('editor')) {

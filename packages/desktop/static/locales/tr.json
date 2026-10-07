@@ -805,6 +805,8 @@
       "wordCount": "Kelime sayısını göster",
       "detail": "Tarih, anımsatma, öncelik ve yineleme görevin kendisinde değişir. Ay açık görevleri gösterir. Başka bir güne sürüklemek veya seçilen güne koymak yalnızca özgün satırın tarihini değiştirir. Burada yalnızca açılır veya kapanır.",
       "reminderLimit": "Anımsatmalar yalnızca Masa notu açıkken gelir. Kapanınca saat çalmaz.",
+      "reminderSeconds": "Anımsatmanın ekranda kalacağı saniye",
+      "reminderSecondsHint": "Açılmazsa süre dolunca gizlenir.",
       "openAtLogin": "Oturum açılınca aç",
       "extensions": "Metin uzantıları",
       "extensionsHint": "Virgülle ayırın. Kutular, bu düzenleyicinin zaten açtığı türlerdir.",

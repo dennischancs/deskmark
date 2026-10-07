@@ -805,6 +805,8 @@
       "wordCount": "Woorden tonen",
       "detail": "Datum, herinnering, prioriteit en herhaling staan bij de taak zelf. De maand toont open taken. Slepen naar een andere dag, of op de gekozen dag zetten, wijzigt alleen de datum in de oorspronkelijke regel. Hier zet je de functie alleen aan of uit.",
       "reminderLimit": "Herinneringen komen alleen zolang Bureaubriefje open is. Na afsluiten gaat er niets af.",
+      "reminderSeconds": "Seconden dat een herinnering blijft staan",
+      "reminderSecondsHint": "Zonder openen verdwijnt hij na die tijd.",
       "openAtLogin": "Openen bij aanmelden",
       "extensions": "Tekstextensies",
       "extensionsHint": "Scheid ze met komma’s. De vakjes zijn de soorten die deze editor al opende.",
