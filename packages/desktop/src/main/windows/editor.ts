@@ -621,6 +621,17 @@ class EditorWindow extends BaseWindow {
     this._filesToOpen!.length = 0
   }
 
+  readRestoreState(): unknown | null {
+    const filePath = this.bufferStoreInfo?.filePath
+    if (!filePath || !fs.existsSync(filePath)) return null
+    try {
+      return JSON.parse(fs.readFileSync(filePath, 'utf-8'))
+    } catch (error) {
+      log.error('Failed to read the editor buffer for restore:', error)
+      return null
+    }
+  }
+
   private _restoreAllState(): void {
     if (this.lifecycle !== WindowLifecycle.READY) {
       throw new Error('Invalid state.')

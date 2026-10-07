@@ -1,19 +1,38 @@
 import { expect, test } from '@playwright/test'
-import type { Page } from 'playwright'
+import type { ElectronApplication, Page } from 'playwright'
 import { execSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
 import { launchElectron, launchWithMarkdown, sendIpcToRenderer } from './helpers'
 
-const stopApp = (app: { process(): { pid?: number } }): void => {
-  const pid = app.process().pid
+const stopApp = (app: ElectronApplication): void => {
+  let pid: number | undefined
+  try {
+    pid = app.process().pid
+  } catch {
+    return
+  }
   if (!pid) return
   try {
     execSync(`taskkill /PID ${pid} /T /F`, { stdio: 'ignore' })
   } catch {
     // The process already exited.
   }
+}
+
+const openedNames = (page: Page): Promise<string[]> =>
+  page.locator('.opened-file .name').allTextContents()
+
+const pageWith = async(app: ElectronApplication, selector: string): Promise<Page> => {
+  const deadline = Date.now() + 15000
+  while (Date.now() < deadline) {
+    for (const candidate of app.windows()) {
+      if (await candidate.locator(selector).count() > 0) return candidate
+    }
+    await new Promise((resolve) => setTimeout(resolve, 200))
+  }
+  throw new Error(`no window matched ${selector}`)
 }
 
 // The quick-insert node is always in the document. Hidden, it sits at
@@ -79,6 +98,60 @@ test('dragging a calendar chip moves that task onto another day', async() => {
   } finally {
     stopApp(app)
     fs.rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test('reordering the open-file list survives a restart', async() => {
+  test.setTimeout(70000)
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'deskmark-order-'))
+  const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'deskmark-order-user-'))
+  for (const name of ['alpha.md', 'beta.md', 'gamma.md']) {
+    fs.writeFileSync(path.join(dir, name), `# ${name}\n`, 'utf8')
+  }
+  const first = await launchElectron([dir], { preferences: { language: 'en' }, userDataDir: userData })
+  let second: ElectronApplication | null = null
+  try {
+    const page = await pageWith(first.app, '.side-bar-file:has-text("alpha.md")')
+    for (const name of ['alpha.md', 'beta.md', 'gamma.md']) {
+      await page.locator('.side-bar-file', { hasText: name }).click({ timeout: 8000 })
+    }
+    await expect.poll(async() => (await openedNames(page)).length, { timeout: 8000 }).toBe(3)
+    const before = await openedNames(page)
+    const rows = page.locator('.opened-file')
+    const top = await rows.nth(0).boundingBox()
+    const list = await page.locator('.opened-files-list').boundingBox()
+    expect(top).toBeTruthy()
+    expect(list).toBeTruthy()
+    if (!top || !list) return
+    await page.mouse.move(top.x + 40, top.y + top.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(list.x + 40, list.y + list.height - 2, { steps: 18 })
+    await page.mouse.up()
+    await expect.poll(async() => openedNames(page), { timeout: 4000 }).not.toEqual(before)
+    const moved = await openedNames(page)
+    await new Promise((resolve) => setTimeout(resolve, 1200))
+    const sessionPath = path.join(userData, 'open-session', 'session.json')
+    expect(fs.existsSync(sessionPath)).toBe(true)
+    const saved = (JSON.parse(fs.readFileSync(sessionPath, 'utf8')) as { files: { name: string }[] }).files.map((file) => file.name)
+    expect(saved).toEqual(moved)
+    const editorStates = path.join(userData, 'editorStates')
+    const bufferName = fs.readdirSync(editorStates).find((name) => name.endsWith('_editor_buffer_store.json'))
+    expect(bufferName).toBeTruthy()
+    const buffer = JSON.parse(fs.readFileSync(path.join(editorStates, bufferName || ''), 'utf8')) as {
+      editor?: { tabs?: { filename?: string }[] }
+      tabs?: { filename?: string }[]
+    }
+    const bufferNames = (buffer.editor?.tabs || buffer.tabs || []).map((tab) => tab.filename)
+    expect(bufferNames).toEqual(moved)
+    stopApp(first.app)
+    second = (await launchElectron([dir], { userDataDir: userData })).app
+    const restored = await pageWith(second, '.opened-file')
+    await expect.poll(async() => openedNames(restored), { timeout: 10000 }).toEqual(moved)
+  } finally {
+    stopApp(first.app)
+    if (second) stopApp(second)
+    fs.rmSync(dir, { recursive: true, force: true })
+    fs.rmSync(userData, { recursive: true, force: true })
   }
 })
 

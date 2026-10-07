@@ -343,6 +343,7 @@ export interface IpcMainEventChannels {
   'mt::invalidate-image-cache': []
   'mt::keybindings-response': [bindings: unknown]
   'mt::load-state': [state: BufferedStateType]
+  'mt::request-buffer-state': []
   'mt::menu::click': [menuId: string]
   'mt::menu::closed': []
   'mt::new-untitled-tab': [selected?: boolean, markdown?: string]

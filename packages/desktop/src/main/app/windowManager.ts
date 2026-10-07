@@ -378,6 +378,13 @@ class WindowManager extends TypedEmitter<WindowManagerEvents> {
       editor.addToOpenedFiles(filePath)
     })
 
+    ipcMain.on('mt::request-buffer-state', (e) => {
+      const win = BrowserWindow.fromWebContents(e.sender)
+      const editor = win ? this.get(win.id) as EditorWindow | undefined : undefined
+      const state = editor?.readRestoreState()
+      if (state) e.sender.send('mt::load-state', state)
+    })
+
     // Force close a BrowserWindow
     ipcMain.on('mt::close-window', (e) => {
       const win = BrowserWindow.fromWebContents(e.sender)

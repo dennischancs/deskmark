@@ -1823,6 +1823,8 @@ export const useEditorStore = defineStore('editor', {
       window.electron.ipcRenderer.on('mt::load-state', (_, state) => {
         this.RESTORE_BUFFERED_STATE(state)
       })
+      // did-finish-load can send the snapshot before this listener exists.
+      window.electron.ipcRenderer.send('mt::request-buffer-state')
     }
   }
 })
