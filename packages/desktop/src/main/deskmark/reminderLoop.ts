@@ -5,7 +5,7 @@ import log from 'electron-log'
 import { planReminders, type ReminderTask } from '../../../../deskmark-core/src/reminders.ts'
 import type { DeskmarkReminderNotice } from '@shared/types/ipc'
 import { t } from '../i18n'
-import { reminderCaption } from './windowsToast'
+import { reminderCaption, reminderTimeoutType } from './windowsToast'
 import { readTaskGroups } from './tasks'
 import { whenScanFinishes } from './scanner'
 
@@ -101,6 +101,7 @@ export function startReminderLoop(options: {
           const note = new Notification({
             title: task.text,
             body,
+            timeoutType: reminderTimeoutType(process.platform),
             actions: [{ type: 'button', text: t('reminder.open') }]
           })
           showSystemNotice(note, () => options.openNote(vault, task.path, task.line))
@@ -116,7 +117,11 @@ export function startReminderLoop(options: {
       if (plan.summary) {
         const title = t('reminder.missed', { count: plan.summary })
         if (system) {
-          const summary = new Notification({ title, body: '' })
+          const summary = new Notification({
+            title,
+            body: '',
+            timeoutType: reminderTimeoutType(process.platform)
+          })
           showSystemNotice(summary)
         }
         options.announce?.({
