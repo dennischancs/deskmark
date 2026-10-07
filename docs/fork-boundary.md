@@ -25,6 +25,8 @@
 
 ## 三平台构建
 
-命令已经在 `packages/desktop/package.json`：`build:win`、`build:mac`、`build:linux`。安装结果写到仓库根目录的 `dist/`。
+同一条命令在三个系统上都能用：`pnpm run clean` 和 `pnpm run build:release`。实现在 `scripts/workspace.ts`。构建按当前系统调用 `packages/desktop/package.json` 里的 `build:win`、`build:win:arm64`、`build:mac` 或 `build:linux`。安装结果写到仓库根目录的 `dist/`。
+
+`clean` 不删除已经打好的安装包，只去掉解包目录、编译中间文件和调试日志。要连安装包一起删，加上 `--installers`。
 
 这台机器可以打 Windows x64。macOS 的 dmg 要在 macOS 上打，并且沿用上游的未签名状态。Linux 的 deb 和 AppImage 要在 Linux 上打。签名不挡住内部构建。

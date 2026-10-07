@@ -41,6 +41,16 @@
 
 文件很多时，不在窗口那条线程里读完。另开一条线程一层层往下看，读纯文本、抽出待办，再一小批一小批写进索引。窗口同时还能打字、切换文件。先比较修改时间，没改过的文件不再读内容。待办列表上的数字是已经点过的名字个数，所以下载文件夹里大量图片时数字也会往前走；大约每秒才把整份待办重画一次。单个文件超过 2MB 就跳过。侧栏的文件列表也是分批放上去的，打开文件夹时不会把每一篇都读进内存。
 
+## 清理和构建
+
+Windows、macOS 和 Linux 用同一条命令。脚本在 `scripts/workspace.ts`，按当前系统选择已有的打包命令。
+
+- `pnpm run clean`：删掉这次编译的中间文件、解包目录、测试输出和调试日志。已经打好的安装包留在 `dist/`。`node_modules` 不动。
+- `pnpm run build:release`：按当前系统打安装包。Windows 普通机器打 x64，ARM 机器打 arm64。macOS 和 Linux 只能在各自的系统上打，不能在 Windows 上代打。
+- `pnpm run rebuild`：先做上面的清理，再打安装包。
+
+连已有安装包一起删：`pnpm run clean -- --installers`。只编译、不打安装包：`pnpm run build`。
+
 <br>
 
 <div align="center">

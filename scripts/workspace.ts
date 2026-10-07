@@ -9,8 +9,8 @@ export type WorkspaceCommand = 'clean' | 'build' | 'rebuild'
 export type ReleaseTarget = 'win' | 'mac' | 'linux'
 
 // Generated output only. node_modules stays, so a clean does not force a reinstall.
+// dist/ itself stays too: this checkout keeps every already-built installer there.
 export const CLEAN_RELATIVE_PATHS = [
-  'dist',
   'packages/desktop/out',
   '.eslintcache',
   'packages/desktop/.eslintcache',
@@ -24,8 +24,26 @@ export const CLEAN_RELATIVE_PATHS = [
   'packages/muya/e2e/playwright-report',
   'packages/website/.next',
   'packages/website/out',
-  'packages/website/.open-next'
+  'packages/website/.open-next',
+  'logs',
+  'temp'
 ]
+
+// Regenerated on the next package. Named installers next to these are kept.
+export const DIST_CURRENT_OUTPUTS = [
+  'dist/win-unpacked',
+  'dist/win-arm64-unpacked',
+  'dist/linux-unpacked',
+  'dist/mac',
+  'dist/mac-arm64',
+  'dist/latest.yml',
+  'dist/latest-mac.yml',
+  'dist/latest-linux.yml',
+  'dist/builder-debug.yml',
+  'dist/builder-effective-config.yaml'
+]
+
+const DEBUG_PREFIXES = ['.build-', '.e2e-', '.hand-', '.ver-', '.vitest-']
 
 export function resolveInside(root: string, relative: string): string {
   const base = path.resolve(root)
@@ -53,26 +71,42 @@ export function releaseScriptName(target: ReleaseTarget, arch: string, unpack: b
   return 'build:linux'
 }
 
-export function parseArgs(argv: string[]): { command: WorkspaceCommand, unpack: boolean } {
+export function parseArgs(argv: string[]): { command: WorkspaceCommand, unpack: boolean, installers: boolean } {
   const [command, ...rest] = argv
   if (command !== 'clean' && command !== 'build' && command !== 'rebuild') {
-    throw new Error('Usage: tsx scripts/workspace.ts <clean|build|rebuild> [--unpack]')
+    throw new Error('Usage: tsx scripts/workspace.ts <clean|build|rebuild> [--unpack] [--installers]')
   }
-  const unknown = rest.filter(item => item !== '--unpack')
+  const unknown = rest.filter(item => item !== '--unpack' && item !== '--installers')
   if (unknown.length > 0) throw new Error(`Unknown option: ${unknown.join(' ')}`)
   if (command === 'clean' && rest.includes('--unpack')) {
     throw new Error('--unpack only applies to build or rebuild')
   }
-  return { command, unpack: rest.includes('--unpack') }
+  if (command === 'build' && rest.includes('--installers')) {
+    throw new Error('--installers only applies to clean or rebuild')
+  }
+  return {
+    command,
+    unpack: rest.includes('--unpack'),
+    installers: rest.includes('--installers')
+  }
 }
 
-export function cleanWorkspace(root: string): string[] {
+function removeIfPresent(root: string, relative: string, removed: string[]): void {
+  const target = resolveInside(root, relative)
+  if (!existsSync(target)) return
+  rmSync(target, { recursive: true, force: true })
+  removed.push(relative)
+}
+
+export function cleanWorkspace(root: string, installers = false): string[] {
   const removed: string[] = []
   for (const relative of CLEAN_RELATIVE_PATHS) {
-    const target = resolveInside(root, relative)
-    if (!existsSync(target)) continue
-    rmSync(target, { recursive: true, force: true })
-    removed.push(relative)
+    removeIfPresent(root, relative, removed)
+  }
+  if (installers) {
+    removeIfPresent(root, 'dist', removed)
+  } else {
+    for (const relative of DIST_CURRENT_OUTPUTS) removeIfPresent(root, relative, removed)
   }
   const locales = resolveInside(root, 'packages/desktop/static/locales')
   if (existsSync(locales)) {
@@ -81,6 +115,12 @@ export function cleanWorkspace(root: string): string[] {
       rmSync(path.join(locales, name), { force: true })
       removed.push(`packages/desktop/static/locales/${name}`)
     }
+  }
+  for (const entry of readdirSync(root, { withFileTypes: true })) {
+    const name = entry.name
+    const debug = name.endsWith('.log') || name.includes('.log.') || DEBUG_PREFIXES.some(prefix => name.startsWith(prefix))
+    if (!debug) continue
+    removeIfPresent(root, name, removed)
   }
   return removed
 }
@@ -104,9 +144,9 @@ function runRelease(unpack: boolean): number {
 }
 
 function main(): void {
-  const { command, unpack } = parseArgs(process.argv.slice(2))
+  const { command, unpack, installers } = parseArgs(process.argv.slice(2))
   if (command === 'clean' || command === 'rebuild') {
-    const removed = cleanWorkspace(repoRoot)
+    const removed = cleanWorkspace(repoRoot, installers)
     if (removed.length === 0) console.log('Nothing to clean')
     else for (const relative of removed) console.log(`removed ${relative}`)
   }
