@@ -5,6 +5,7 @@ import {
   agendaFromMarkdown,
   applyTaskEdit,
   appendJournalTask,
+  blankTodoNote,
   agendaCounts,
   bridgeForDay,
   calendarGroup,
@@ -298,4 +299,14 @@ test('待办可以按字搜索，并按日期或标题重排', () => {
   assert.match(renamed.markdown, /due=2026-10-08/)
   assert.match(renamed.markdown, /priority=high/)
   assert.equal(renamed.markdown.match(/^- \[ \]/gm)?.length, 1)
+})
+
+test('新待办笔记没有日期，标题进收件箱', () => {
+  const markdown = blankTodoNote('01ARZ3NDEKTSV4RRFFQ69G5FAV', '回信')
+  const items = agendaFromMarkdown('todos/note.md', markdown)
+  assert.equal(items.length, 1)
+  assert.equal(items[0].text, '回信')
+  assert.equal(items[0].due, null)
+  assert.equal(items[0].source, 'note')
+  assert.equal(calendarGroup(items[0], new Date('2026-10-08T04:00:00.000Z'), 'Asia/Shanghai'), 'undated')
 })

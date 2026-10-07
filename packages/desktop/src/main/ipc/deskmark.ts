@@ -6,7 +6,7 @@ import type { DeskmarkScanOptions } from '@shared/types/ipc'
 import { getStickyHost } from '../deskmark/stickies'
 import { setReminderVault } from '../deskmark/reminderLoop'
 import { handlePluginCall, loadSamplePlugin, rememberPluginNote } from '../deskmark/pluginGuest'
-import { appendJournalTask, blankJournal, createUlid, journalPath } from '../../../../deskmark-core/src/index.ts'
+import { appendJournalTask, blankJournal, blankTodoNote, createUlid, journalPath, todoNotePath } from '../../../../deskmark-core/src/index.ts'
 import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 
@@ -115,6 +115,24 @@ export const registerDeskmarkHandlers = (): void => {
       return { path: absolute, relative, created }
     } catch (error) {
       log.error('Failed to open journal', error)
+      return null
+    }
+  })
+
+  ipcMain.handle('mt::deskmark::new-todo-note', async(_event, root: string, title: string) => {
+    if (!root) return null
+    try {
+      const id = createUlid()
+      const relative = todoNotePath(id)
+      const absolute = join(root, relative)
+      mkdirSync(dirname(absolute), { recursive: true })
+      const temporary = `${absolute}.deskmark-tmp`
+      const { writeFileSync, renameSync } = await import('node:fs')
+      writeFileSync(temporary, blankTodoNote(id, title || ''))
+      renameSync(temporary, absolute)
+      return { path: absolute, relative }
+    } catch (error) {
+      log.error('Failed to create todo note', error)
       return null
     }
   })

@@ -131,6 +131,7 @@
       "deskmark": "Deskmark",
       "openCalendar": "Open calendar",
       "openTasks": "Open tasks",
+      "newTodoNote": "New todo note",
       "openWordCount": "Open word count",
       "stick": "Stick current note",
       "calendar": "Calendar",
@@ -837,6 +838,7 @@
     "file": {
       "newWindow": "New Window",
       "newTab": "New Tab",
+      "newTodoNote": "New todo note",
       "openFile": "Open File",
       "openFolder": "Open Folder",
       "save": "Save",

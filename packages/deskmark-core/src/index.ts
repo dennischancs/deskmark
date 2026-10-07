@@ -10,6 +10,7 @@ export type { MonthCell, QuickAction } from './calendar.ts'
 export {
   appendJournalTask,
   blankJournal,
+  blankTodoNote,
   completeInlineTask,
   applyTaskEdit,
   completeNote,
@@ -18,6 +19,7 @@ export {
   parseNote,
   repeatSupported,
   temporaryKey,
+  todoNotePath,
   updateInlineTask
 } from './note.ts'
 export { addMonths, formatInZone, localDateTimeToIso, moveDueToDay, shiftDue, shiftRemind } from './time.ts'

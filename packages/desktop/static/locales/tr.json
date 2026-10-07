@@ -131,6 +131,7 @@
       "deskmark": "Masa notu",
       "openCalendar": "Takvimi aç",
       "openTasks": "Görevleri aç",
+      "newTodoNote": "Yeni görev notu",
       "openWordCount": "Kelime sayısını aç",
       "stick": "Geçerli notu yapıştır",
       "calendar": "Takvim",
@@ -837,6 +838,7 @@
     "file": {
       "newWindow": "Yeni Pencere",
       "newTab": "Yeni Sekme",
+      "newTodoNote": "Yeni görev notu",
       "openFile": "Dosya Aç",
       "openFolder": "Klasör Aç",
       "save": "Kaydet",

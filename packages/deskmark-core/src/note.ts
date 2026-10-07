@@ -133,6 +133,16 @@ export function blankJournal(day: string): string {
   return `---\ntitle: ${day}\ndeskmark:\n  kind: note\n---\n\n`
 }
 
+export function todoNotePath(id: string): string {
+  return `todos/${id}.md`
+}
+
+export function blankTodoNote(id: string, title: string): string {
+  const name = title.replace(/[\r\n]/g, ' ').trim() || '待办'
+  const quoted = /[:#]|^\s|\s$/.test(name) ? JSON.stringify(name) : name
+  return `---\ntitle: ${quoted}\ndeskmark:\n  id: ${id}\n  kind: todo\n---\n\n`
+}
+
 export function appendJournalTask(existing: string | null, text: string, due: string, id: string): string {
   const line = `- [ ] ${text} <!-- deskmark: id=${id}; due=${due} -->`
   if (existing == null || existing.length === 0) {

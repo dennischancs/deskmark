@@ -131,6 +131,7 @@
       "deskmark": "Pense-bête",
       "openCalendar": "Ouvrir le calendrier",
       "openTasks": "Ouvrir les tâches",
+      "newTodoNote": "Nouvelle note de tâche",
       "openWordCount": "Ouvrir le nombre de mots",
       "stick": "Épingler la note actuelle",
       "calendar": "Calendrier",
@@ -837,6 +838,7 @@
     "file": {
       "newWindow": "Nouvelle fenêtre",
       "newTab": "Nouvel onglet",
+      "newTodoNote": "Nouvelle note de tâche",
       "openFile": "Ouvrir un fichier",
       "openFolder": "Ouvrir un dossier",
       "save": "Enregistrer",

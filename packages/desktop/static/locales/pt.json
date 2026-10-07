@@ -131,6 +131,7 @@
       "deskmark": "Nota de mesa",
       "openCalendar": "Abrir calendário",
       "openTasks": "Abrir tarefas",
+      "newTodoNote": "Nova nota de tarefa",
       "openWordCount": "Abrir contagem de palavras",
       "stick": "Fixar a nota atual",
       "calendar": "Calendário",
@@ -837,6 +838,7 @@
     "file": {
       "newWindow": "Nova Janela",
       "newTab": "Nova Aba",
+      "newTodoNote": "Nova nota de tarefa",
       "openFile": "Abrir Arquivo",
       "openFolder": "Abrir Pasta",
       "save": "Salvar",

@@ -131,6 +131,7 @@
       "deskmark": "桌箋",
       "openCalendar": "打開日曆",
       "openTasks": "打開待辦",
+      "newTodoNote": "新待辦筆記",
       "openWordCount": "打開字數",
       "stick": "把目前筆記貼到桌面",
       "calendar": "日曆",
@@ -837,6 +838,7 @@
     "file": {
       "newWindow": "新建視窗",
       "newTab": "新建標籤頁",
+      "newTodoNote": "新待辦筆記",
       "openFile": "開啟檔案",
       "openFolder": "開啟資料夾",
       "save": "儲存",

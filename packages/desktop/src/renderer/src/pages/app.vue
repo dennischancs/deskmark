@@ -92,6 +92,7 @@ import { useListenForMainStore } from '@/store/listenForMain'
 import { usePreferencesStore } from '@/store/preferences'
 import { useEditorStore } from '@/store/editor'
 import { useCommandCenterStore } from '@/store/commandCenter'
+import { createTodoNote } from '@/util/createTodoNote'
 import { useProjectStore } from '@/store/project'
 import { useAutoUpdatesStore } from '@/store/autoUpdates'
 import { useNotificationStore } from '@/store/notification'
@@ -257,7 +258,13 @@ onMounted(async () => {
   const stopDeskmarkShow = window.electron.ipcRenderer.on('mt::deskmark-show', (_event, target) => {
     showDeskmarkTarget(target)
   })
-  onBeforeUnmount(stopDeskmarkShow)
+  const stopNewTodo = window.electron.ipcRenderer.on('mt::deskmark-new-todo', () => {
+    createTodoNote().catch(() => {})
+  })
+  onBeforeUnmount(() => {
+    stopDeskmarkShow()
+    stopNewTodo()
+  })
 
   // module: notification
   notificationStore.listenForNotification()

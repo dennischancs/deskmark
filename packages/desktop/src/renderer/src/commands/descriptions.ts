@@ -13,6 +13,7 @@ const COMMAND_KEY_MAP: Record<string, string> = {
   // File creation and opening
   'file.new-window': 'commands.file.newWindow',
   'file.new-tab': 'commands.file.newTab',
+  'file.new-todo-note': 'commands.file.newTodoNote',
   'file.open-file': 'commands.file.openFile',
   'file.open-folder': 'commands.file.openFolder',
   'file.quick-open': 'commands.file.quickOpen',

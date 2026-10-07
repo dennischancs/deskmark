@@ -131,6 +131,7 @@
       "deskmark": "책상메모",
       "openCalendar": "달력 열기",
       "openTasks": "할 일 열기",
+      "newTodoNote": "새 할 일 노트",
       "openWordCount": "글자 수 열기",
       "stick": "현재 노트를 바탕화면에 붙이기",
       "calendar": "달력",
@@ -837,6 +838,7 @@
     "file": {
       "newWindow": "새 창",
       "newTab": "새 탭",
+      "newTodoNote": "새 할 일 노트",
       "openFile": "파일 열기",
       "openFolder": "폴더 열기",
       "save": "저장",

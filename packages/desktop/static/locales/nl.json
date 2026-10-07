@@ -131,6 +131,7 @@
       "deskmark": "Bureaubriefje",
       "openCalendar": "Kalender openen",
       "openTasks": "Taken openen",
+      "newTodoNote": "Nieuwe taaknotitie",
       "openWordCount": "Woorden openen",
       "stick": "Huidige notitie vastzetten",
       "calendar": "Kalender",
@@ -837,6 +838,7 @@
     "file": {
       "newWindow": "Nieuw venster",
       "newTab": "Nieuw tabblad",
+      "newTodoNote": "Nieuwe taaknotitie",
       "openFile": "Bestand openen",
       "openFolder": "Map openen",
       "save": "Opslaan",

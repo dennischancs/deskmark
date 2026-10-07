@@ -114,6 +114,12 @@ export default function(
           }
         },
         {
+          label: t('menu.view.newTodoNote'),
+          click(_item, focusedWindow) {
+            actions.newTodoNote(focusedWindow as BrowserWindow | undefined)
+          }
+        },
+        {
           label: t('menu.view.openWordCount'),
           click(_item, focusedWindow) {
             actions.showDeskmark(focusedWindow as BrowserWindow | undefined, 'wordcount')

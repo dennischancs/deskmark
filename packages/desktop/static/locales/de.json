@@ -131,6 +131,7 @@
       "deskmark": "Tischzettel",
       "openCalendar": "Kalender öffnen",
       "openTasks": "Aufgaben öffnen",
+      "newTodoNote": "Neue Aufgabennotiz",
       "openWordCount": "Wörter öffnen",
       "stick": "Aktuelle Notiz anheften",
       "calendar": "Kalender",
@@ -837,6 +838,7 @@
     "file": {
       "newWindow": "Neues Fenster",
       "newTab": "Neuer Tab",
+      "newTodoNote": "Neue Aufgabennotiz",
       "openFile": "Datei öffnen",
       "openFolder": "Ordner öffnen",
       "save": "Speichern",

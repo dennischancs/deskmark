@@ -131,6 +131,7 @@
       "deskmark": "デスクメモ",
       "openCalendar": "カレンダーを開く",
       "openTasks": "やることを開く",
+      "newTodoNote": "新しいタスクノート",
       "openWordCount": "文字数を開く",
       "stick": "このノートをデスクトップに貼る",
       "calendar": "カレンダー",
@@ -837,6 +838,7 @@
     "file": {
       "newWindow": "新しいウィンドウ",
       "newTab": "新しいタブ",
+      "newTodoNote": "新しいタスクノート",
       "openFile": "ファイルを開く",
       "openFolder": "フォルダーを開く",
       "save": "保存",

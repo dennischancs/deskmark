@@ -141,6 +141,10 @@ export interface IpcInvokeChannels {
     args: [root: string, day: string]
     ret: { path: string, relative: string, created: boolean } | null
   }
+  'mt::deskmark::new-todo-note': {
+    args: [root: string, title: string]
+    ret: { path: string, relative: string } | null
+  }
   'mt::deskmark::login-get': {
     args: []
     ret: boolean
@@ -386,6 +390,7 @@ export interface IpcMainEventChannels {
   'mt::set-pathname': [payload: { id: string; pathname: string; filename: string }]
   'mt::set-view-layout': [layout: unknown]
   'mt::deskmark-show': [target: 'calendar' | 'tasks' | 'wordcount' | 'sticky']
+  'mt::deskmark-new-todo': []
   'mt::deskmark-index-tick': [payload: { seen: number, scanning: boolean, changed: boolean }]
   'mt::deskmark-reminder': [notice: DeskmarkReminderNotice]
   'mt::show-command-palette': []
