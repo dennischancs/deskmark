@@ -299,7 +299,8 @@
       "openNote": "In notitie openen",
       "noMatch": "Geen overeenkomende taken",
       "sort": "Sorteren",
-      "scanning": "Bestanden bekijken {done}"
+      "scanning": "Bestanden bekijken {done}",
+      "unreadable": "Metagegevens konden niet worden gelezen"
     }
   },
   "commandPalette": {

@@ -299,7 +299,8 @@
       "openNote": "Notta aç",
       "noMatch": "Eşleşen görev yok",
       "sort": "Sırala",
-      "scanning": "Dosyalara bakılıyor {done}"
+      "scanning": "Dosyalara bakılıyor {done}",
+      "unreadable": "Üst veri okunamadı"
     }
   },
   "commandPalette": {

@@ -47,11 +47,23 @@
       </div>
     </div>
     <p
-      v-if="root && query.trim() && visibleGroups.length === 0"
+      v-if="root && query.trim() && visibleGroups.length === 0 && unreadable.length === 0"
       class="empty"
     >
       {{ t('sideBar.tasks.noMatch') }}
     </p>
+    <section v-if="unreadable.length">
+      <h3>{{ t('sideBar.tasks.unreadable') }}</h3>
+      <button
+        v-for="note of unreadable"
+        :key="note.path"
+        type="button"
+        class="deskmark-hover unreadable-note"
+        @click="openUnreadable(note.path)"
+      >
+        {{ note.path }}
+      </button>
+    </section>
     <section
       v-for="group of visibleGroups"
       :key="group.id"
@@ -221,6 +233,12 @@ const visibleGroups = computed(() => {
     items: sortTasks(filterTasks(group.items, query.value), order.value)
   })).filter(group => group.items.length > 0)
 })
+const unreadable = computed(() => {
+  const items = groups.value?.unreadable ?? []
+  const needle = query.value.trim().toLowerCase()
+  if (!needle) return items
+  return items.filter(item => item.path.toLowerCase().includes(needle))
+})
 
 const load = async (resetProgress = false): Promise<void> => {
   if (resetProgress) progress.value = null
@@ -302,6 +320,15 @@ const openNote = (task: DeskmarkTaskRef): void => {
   deskmarkStore.select(task)
   const fullPath = window.path.join(root.value, task.notePath)
   window.electron.ipcRenderer.send('mt::open-file', fullPath, task.line ? { deskmarkLine: task.line } : {})
+}
+
+const openUnreadable = (notePath: string): void => {
+  if (!root.value) return
+  if (!preferenceStore.sourceCode) {
+    preferenceStore.sourceCode = true
+    preferenceStore.DISPATCH_EDITOR_VIEW_STATE({ sourceCode: true })
+  }
+  window.electron.ipcRenderer.send('mt::open-file', window.path.join(root.value, notePath), {})
 }
 
 const save = (task: DeskmarkTaskRef): void => {
@@ -432,5 +459,14 @@ h3 {
   border-radius: 4px;
   font-size: 12px;
   color: var(--themeColor);
+}
+.unreadable-note {
+  display: block;
+  width: 100%;
+  margin: 0 0 4px;
+  padding: 3px 4px;
+  border-radius: 4px;
+  text-align: left;
+  word-break: break-all;
 }
 </style>

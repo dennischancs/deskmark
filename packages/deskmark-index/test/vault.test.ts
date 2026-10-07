@@ -3,8 +3,23 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
-import { collectVaultFiles, groupTasks, listTextFiles } from '../src/index.ts'
+import { DEFAULT_EXTRACT_RULES } from '../../deskmark-core/src/index.ts'
+import { collectVaultFiles, groupTasks, listTextFiles, prepareVaultFile, unreadableNotes } from '../src/index.ts'
 import type { TaskRow } from '../src/database.ts'
+
+test('文首没有收尾时，这篇被标出来，旁边的笔记还在', () => {
+  const broken = prepareVaultFile({
+    path: 'notes/broken.md',
+    content: '---\ntitle: 坏了\n\n正文\n',
+    mtimeMs: 1
+  }, DEFAULT_EXTRACT_RULES)
+  assert.equal(broken.parseError, 'unclosed')
+  assert.equal(broken.failed, false)
+  assert.deepEqual(unreadableNotes([
+    { path: broken.path, parseError: broken.parseError },
+    { path: 'notes/ok.md', parseError: null }
+  ]), [{ path: 'notes/broken.md' }])
+})
 
 test('收集笔记时跳过索引目录', () => {
   const root = join(tmpdir(), `deskmark-vault-${Date.now()}`)

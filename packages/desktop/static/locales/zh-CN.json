@@ -299,7 +299,8 @@
       "openNote": "在笔记里打开",
       "noMatch": "没有符合的待办",
       "sort": "排序",
-      "scanning": "正在查看文件 {done}"
+      "scanning": "正在查看文件 {done}",
+      "unreadable": "元数据无法读取"
     }
   },
   "commandPalette": {

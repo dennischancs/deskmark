@@ -299,7 +299,8 @@
       "openNote": "In der Notiz öffnen",
       "noMatch": "Keine passenden Aufgaben",
       "sort": "Sortieren",
-      "scanning": "Dateien werden angesehen {done}"
+      "scanning": "Dateien werden angesehen {done}",
+      "unreadable": "Metadaten konnten nicht gelesen werden"
     }
   },
   "commandPalette": {

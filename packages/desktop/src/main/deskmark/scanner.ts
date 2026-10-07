@@ -5,7 +5,7 @@ import { Worker } from 'node:worker_threads'
 import { BrowserWindow } from 'electron'
 import type { ExtractRules } from '../../../../deskmark-core/src/index.ts'
 import { normalizeExtensions } from '../../../../deskmark-core/src/extensions.ts'
-import { groupTasks, indexTextFiles, VaultIndex, type IndexEvent } from '../../../../deskmark-index/src/index.ts'
+import { groupTasks, indexTextFiles, unreadableNotes, VaultIndex, type IndexEvent } from '../../../../deskmark-index/src/index.ts'
 import type { DeskmarkScanOptions, DeskmarkTaskGroups } from '@shared/types/ipc'
 
 // The counter can move often. Reloading every task into the window cannot.
@@ -98,6 +98,7 @@ const snapshot = (root: string, now: Date, timeZone: string): DeskmarkTaskGroups
   const groups = groupTasks(current.index.tasks(), now, timeZone)
   return {
     ...groups,
+    unreadable: unreadableNotes(current.index.notes()),
     scanning: current.running,
     seen: current.seen
   }

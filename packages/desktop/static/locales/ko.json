@@ -299,7 +299,8 @@
       "openNote": "노트에서 열기",
       "noMatch": "일치하는 할 일이 없습니다",
       "sort": "정렬",
-      "scanning": "파일을 살펴보는 중 {done}"
+      "scanning": "파일을 살펴보는 중 {done}",
+      "unreadable": "메타데이터를 읽을 수 없습니다"
     }
   },
   "commandPalette": {

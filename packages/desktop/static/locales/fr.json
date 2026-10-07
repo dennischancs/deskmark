@@ -299,7 +299,8 @@
       "openNote": "Ouvrir dans la note",
       "noMatch": "Aucune tâche correspondante",
       "sort": "Trier",
-      "scanning": "Lecture des fichiers {done}"
+      "scanning": "Lecture des fichiers {done}",
+      "unreadable": "Les métadonnées n'ont pas pu être lues"
     }
   },
   "commandPalette": {

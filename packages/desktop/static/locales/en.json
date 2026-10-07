@@ -299,7 +299,8 @@
       "openNote": "Open note",
       "noMatch": "No matching tasks",
       "sort": "Sort",
-      "scanning": "Looking through files {done}"
+      "scanning": "Looking through files {done}",
+      "unreadable": "Metadata could not be read"
     }
   },
   "commandPalette": {

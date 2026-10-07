@@ -126,3 +126,7 @@ export function groupTasks(tasks: TaskRow[], now: Date, timeZone: string): Recor
   }
   return groups
 }
+
+export function unreadableNotes(notes: { path: string, parseError: string | null }[]): { path: string }[] {
+  return notes.filter(note => Boolean(note.parseError)).map(note => ({ path: note.path }))
+}

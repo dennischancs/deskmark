@@ -299,7 +299,8 @@
       "openNote": "在筆記裡打開",
       "noMatch": "沒有符合的待辦",
       "sort": "排序",
-      "scanning": "正在查看檔案 {done}"
+      "scanning": "正在查看檔案 {done}",
+      "unreadable": "無法讀取元資料"
     }
   },
   "commandPalette": {

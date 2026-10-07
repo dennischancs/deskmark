@@ -76,8 +76,13 @@ export interface DeskmarkTaskGroups {
   upcoming: DeskmarkTaskRef[]
   overdue: DeskmarkTaskRef[]
   done: DeskmarkTaskRef[]
+  unreadable?: DeskmarkUnreadableNote[]
   scanning?: boolean
   seen?: number
+}
+
+export interface DeskmarkUnreadableNote {
+  path: string
 }
 
 export interface DeskmarkScanOptions {

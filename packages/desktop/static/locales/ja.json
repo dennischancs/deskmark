@@ -299,7 +299,8 @@
       "openNote": "ノートで開く",
       "noMatch": "一致するタスクはありません",
       "sort": "並べ替え",
-      "scanning": "ファイルを見ています {done}"
+      "scanning": "ファイルを見ています {done}",
+      "unreadable": "メタデータを読めません"
     }
   },
   "commandPalette": {

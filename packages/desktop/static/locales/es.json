@@ -299,7 +299,8 @@
       "openNote": "Abrir en la nota",
       "noMatch": "No hay tareas coincidentes",
       "sort": "Ordenar",
-      "scanning": "Revisando archivos {done}"
+      "scanning": "Revisando archivos {done}",
+      "unreadable": "No se pudieron leer los metadatos"
     }
   },
   "commandPalette": {
