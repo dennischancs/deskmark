@@ -9,4 +9,4 @@
 - 笔记写入和待办写入现在明确回答还不能写入。
 - 读取当前笔记和读取待办仍然可用。没有相应允许时，调用照旧被拒绝。
 
-这次还没有打 Windows 安装包。macOS 和 Linux 也没有打包。
+Windows x64 安装包是 dist/marktext-win-x64-7.14.1-setup.exe。解包程序和安装包的文件版本都是 7.14.1。macOS 和 Linux 没有打包。
