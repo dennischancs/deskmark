@@ -1077,6 +1077,8 @@
     "pin": "Fixar",
     "wayland": "Esta área de trabalho pode não manter a nota à frente.",
     "capture": "Nova nota",
+    "newFile": "Novo ficheiro",
+    "note": "Nota",
     "show": "Mostrar Nota de mesa",
     "login": "Abrir ao iniciar sessão",
     "quit": "Sair"

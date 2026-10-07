@@ -1,6 +1,7 @@
 import { appendFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 import { app, Menu, Tray, nativeImage } from 'electron'
+import type { BrowserWindow, MenuItemConstructorOptions } from 'electron'
 import type { WindowRect } from 'common/windowRect'
 import {
   closeSticky,
@@ -34,6 +35,8 @@ export class StickyHost {
   private readonly windows = new Map<string, EditorWindow>()
   private vaultRoot: string | null = null
   private tray: Tray | null = null
+  private trayMenu: Menu | null = null
+  private trayClicksBound = false
   trayAvailable = false
 
   constructor(
@@ -49,6 +52,7 @@ export class StickyHost {
       this.tray = new Tray(image)
       this.tray.setToolTip(t('app.displayName'))
       this.refreshTrayMenu()
+      this.bindTrayClicks()
       this.trayAvailable = true
       return true
     } catch {
@@ -59,6 +63,7 @@ export class StickyHost {
 
   setVault(vaultRoot: string): void {
     this.vaultRoot = vaultRoot
+    this.refreshTrayMenu()
   }
 
   restore(vaultRoot: string): void {
@@ -68,6 +73,7 @@ export class StickyHost {
     for (const sticky of state.stickies) {
       if (existsSync(sticky.path)) this.open(vaultRoot, sticky.path)
     }
+    this.refreshTrayMenu()
   }
 
   open(vaultRoot: string, notePath: string): void {
@@ -193,20 +199,82 @@ export class StickyHost {
   }
 
   private refreshTrayMenu(): void {
-    if (!this.tray || !this.vaultRoot) return
-    const state = loadUiState(this.vaultRoot)
-    this.tray.setContextMenu(Menu.buildFromTemplate([
-      { label: t('sticky.capture'), click: () => this.capture() },
+    if (!this.tray) return
+    const template: MenuItemConstructorOptions[] = [
+      { label: t('sticky.newFile'), click: () => this.newFile() },
+      { label: t('menu.view.tasks'), click: () => this.showDeskmark('tasks') },
+      { label: t('menu.view.calendar'), click: () => this.showDeskmark('calendar') },
+      { label: t('sticky.note'), click: () => this.openSticky() },
+      { type: 'separator' },
       { label: t('sticky.show'), click: () => this.showMain() },
       {
         label: t('sticky.login'),
         type: 'checkbox',
-        checked: state.openAtLogin,
+        checked: this.loginEnabled(),
         click: () => this.toggleLogin()
       },
       { type: 'separator' },
       { label: t('sticky.quit'), click: () => app.quit() }
-    ]))
+    ]
+    this.trayMenu = Menu.buildFromTemplate(template)
+  }
+
+  // Windows only opens a menu set with setContextMenu on right-click, and that
+  // menu used to wait until a folder was open, so neither button did anything.
+  // Both buttons pop the same menu, including before a folder is chosen.
+  private bindTrayClicks(): void {
+    if (!this.tray || this.trayClicksBound) return
+    this.trayClicksBound = true
+    const pop = (): void => {
+      this.refreshTrayMenu()
+      if (this.tray && this.trayMenu) this.tray.popUpContextMenu(this.trayMenu)
+    }
+    this.tray.on('click', pop)
+    this.tray.on('right-click', pop)
+  }
+
+  private mainBrowser(): BrowserWindow | null {
+    this.showMain()
+    const editors = this.windowManager.getWindowsByType('editor')
+    const main = editors.find(entry => !(entry.win as EditorWindow).stickyPath)
+    const browser = main?.win.browserWindow
+    if (!browser || browser.isDestroyed()) return null
+    return browser
+  }
+
+  private whenReady(browser: BrowserWindow, send: () => void): void {
+    if (browser.isDestroyed()) return
+    if (browser.webContents.isLoading()) {
+      browser.webContents.once('did-finish-load', send)
+      return
+    }
+    send()
+  }
+
+  private newFile(): void {
+    const browser = this.mainBrowser()
+    if (!browser) return
+    this.whenReady(browser, () => {
+      if (browser.isDestroyed()) return
+      browser.webContents.send('mt::new-untitled-tab')
+      browser.webContents.send('mt::set-view-layout', { showTabBar: true })
+    })
+  }
+
+  private showDeskmark(target: 'tasks' | 'calendar'): void {
+    const browser = this.mainBrowser()
+    if (!browser) return
+    this.whenReady(browser, () => {
+      if (!browser.isDestroyed()) browser.webContents.send('mt::deskmark-show', target)
+    })
+  }
+
+  private openSticky(): void {
+    if (this.vaultRoot) {
+      this.capture()
+      return
+    }
+    this.showMain()
   }
 }
 

@@ -1077,6 +1077,8 @@
     "pin": "Sabitle",
     "wayland": "Bu masaüstü notu önde tutamayabilir.",
     "capture": "Yeni not",
+    "newFile": "Yeni dosya",
+    "note": "Not",
     "show": "Masa notunu göster",
     "login": "Oturum açınca aç",
     "quit": "Çık"

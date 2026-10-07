@@ -1077,6 +1077,8 @@
     "pin": "Vastzetten",
     "wayland": "Dit bureaublad kan het briefje misschien niet vooraan houden.",
     "capture": "Nieuw briefje",
+    "newFile": "Nieuw bestand",
+    "note": "Notitie",
     "show": "Bureaubriefje tonen",
     "login": "Openen bij aanmelden",
     "quit": "Afsluiten"

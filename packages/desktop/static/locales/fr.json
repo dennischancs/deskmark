@@ -1077,6 +1077,8 @@
     "pin": "Épingler",
     "wayland": "Ce bureau peut ne pas garder le pense-bête devant.",
     "capture": "Nouvelle note",
+    "newFile": "Nouveau fichier",
+    "note": "Mémo",
     "show": "Afficher Pense-bête",
     "login": "Ouvrir à la connexion",
     "quit": "Quitter"

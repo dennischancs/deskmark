@@ -1077,6 +1077,8 @@
     "pin": "Anheften",
     "wayland": "Diese Oberfläche kann den Zettel vielleicht nicht vorne halten.",
     "capture": "Neue Notiz",
+    "newFile": "Neue Datei",
+    "note": "Notiz",
     "show": "Tischzettel zeigen",
     "login": "Beim Anmelden öffnen",
     "quit": "Beenden"

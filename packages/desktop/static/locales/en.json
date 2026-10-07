@@ -1077,6 +1077,8 @@
     "pin": "Pin",
     "wayland": "This desktop may not keep the note in front.",
     "capture": "New note",
+    "newFile": "New file",
+    "note": "Sticky note",
     "show": "Show Deskmark",
     "login": "Open at login",
     "quit": "Quit"
