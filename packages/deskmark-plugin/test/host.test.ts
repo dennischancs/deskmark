@@ -79,3 +79,21 @@ test('主进程只把当前笔记交给已允许的读取，外面的路径读�
   })
   assert.equal(write.ok, false)
 })
+
+test('声明了任务读取才返回待办，库外路径不出现', () => {
+  const manifest = readManifest({ ...good, permissions: ['tasks.read'] })
+  const result = answerPluginCall({
+    manifest,
+    call: { id: '4', method: 'tasks.read' },
+    snapshot: null,
+    readVaultFile: () => null,
+    tasks: [
+      { text: '买牛奶', path: 'notes/a.md', line: 3, due: '2026-10-08', done: false },
+      { text: '秘密', path: '../secret.md', line: 1, due: null, done: false }
+    ]
+  })
+  assert.equal(result.ok, true)
+  const tasks = (result.result as { tasks: Array<{ text: string }> }).tasks
+  assert.deepEqual(tasks.map(task => task.text), ['买牛奶'])
+  assert.throws(() => authorize(readManifest(good), 'tasks.read'), /允许/)
+})

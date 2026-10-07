@@ -187,11 +187,20 @@ export interface NoteSnapshot {
   markdown: string
 }
 
+export interface PluginTaskView {
+  text: string
+  path: string
+  line: number | null
+  due: string | null
+  done: boolean
+}
+
 export function answerPluginCall(input: {
   manifest: PluginManifest
   call: PluginCall
   snapshot: NoteSnapshot | null
   readVaultFile: (relativePath: string) => string | null
+  tasks?: PluginTaskView[]
 }): { id: string, ok: boolean, result?: unknown, error?: string } {
   const id = input.call.id || ''
   if (!input.call.id || !input.call.method) {
@@ -199,6 +208,10 @@ export function answerPluginCall(input: {
   }
   try {
     const permission = authorize(input.manifest, input.call.method)
+    if (permission === 'tasks.read') {
+      const tasks = (input.tasks ?? []).filter(task => noteInsideVault(task.path))
+      return { id, ok: true, result: { tasks } }
+    }
     if (permission !== 'notes.read') {
       return { id, ok: true, result: { accepted: true } }
     }

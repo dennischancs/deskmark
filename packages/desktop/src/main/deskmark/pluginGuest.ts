@@ -8,8 +8,10 @@ import {
   noteInsideVault,
   readManifest,
   type NoteSnapshot,
+  type PluginTaskView,
   type PluginManifest
 } from '../../../../deskmark-plugin/src/index.ts'
+import { readTaskGroups } from './tasks'
 
 let snapshot: NoteSnapshot | null = null
 let manifest: PluginManifest | null = null
@@ -63,10 +65,28 @@ export function retainPluginWebview(webPreferences: WebPreferences, params: { sr
 
 export function handlePluginCall(call: { id?: string, method?: string, path?: string }): { id: string, ok: boolean, result?: unknown, error?: string } {
   if (!manifest) return { id: call.id || '', ok: false, error: '这个小功能没能打开' }
+  const tasks: PluginTaskView[] = []
+  if (call.method === 'tasks.read' && snapshot) {
+    try {
+      const groups = readTaskGroups(snapshot.vault)
+      for (const task of [groups.inbox, groups.today, groups.upcoming, groups.overdue, groups.done].flat()) {
+        tasks.push({
+          text: task.text,
+          path: task.notePath,
+          line: task.line,
+          due: task.due,
+          done: task.status === 'done'
+        })
+      }
+    } catch {
+      // A vault that cannot be scanned still answers the call with no tasks.
+    }
+  }
   return answerPluginCall({
     manifest,
     call: { id: call.id || '', method: call.method || '', path: call.path },
     snapshot,
+    tasks,
     readVaultFile: (relative) => {
       if (!snapshot || !noteInsideVault(relative)) return null
       const root = resolve(snapshot.vault)
