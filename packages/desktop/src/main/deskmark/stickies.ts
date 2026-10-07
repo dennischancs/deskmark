@@ -15,6 +15,7 @@ import { t } from '../i18n'
 import EditorWindow from '../windows/editor'
 import type WindowManager from '../app/windowManager'
 import type Accessor from '../app/accessor'
+import { trayMenuEntries, type TrayAction } from './trayMenu'
 
 const DEFAULT_BOUNDS = { x: 80, y: 80, width: 360, height: 320 }
 
@@ -38,6 +39,7 @@ export class StickyHost {
   private trayMenu: Menu | null = null
   private trayClicksBound = false
   trayAvailable = false
+  private trayPops = 0
 
   constructor(
     private readonly accessor: Accessor,
@@ -53,6 +55,7 @@ export class StickyHost {
       this.tray.setToolTip(t('app.displayName'))
       this.refreshTrayMenu()
       this.bindTrayClicks()
+      this.publishTrayHook()
       this.trayAvailable = true
       return true
     } catch {
@@ -200,23 +203,21 @@ export class StickyHost {
 
   private refreshTrayMenu(): void {
     if (!this.tray) return
-    const template: MenuItemConstructorOptions[] = [
-      { label: t('sticky.newFile'), click: () => this.newFile() },
-      { label: t('menu.view.tasks'), click: () => this.showDeskmark('tasks') },
-      { label: t('menu.view.calendar'), click: () => this.showDeskmark('calendar') },
-      { label: t('sticky.note'), click: () => this.openSticky() },
-      { type: 'separator' },
-      { label: t('sticky.show'), click: () => this.showMain() },
-      {
-        label: t('sticky.login'),
-        type: 'checkbox',
-        checked: this.loginEnabled(),
-        click: () => this.toggleLogin()
-      },
-      { type: 'separator' },
-      { label: t('sticky.quit'), click: () => app.quit() }
-    ]
+    const template: MenuItemConstructorOptions[] = trayMenuEntries().map(entry => {
+      if (entry.separator) return { type: 'separator' }
+      const label = t(entry.labelKey || '')
+      if (entry.checkbox) {
+        return {
+          label,
+          type: 'checkbox',
+          checked: this.loginEnabled(),
+          click: () => this.runTrayAction(entry.action)
+        }
+      }
+      return { label, click: () => this.runTrayAction(entry.action) }
+    })
     this.trayMenu = Menu.buildFromTemplate(template)
+    this.publishTrayHook()
   }
 
   // Windows only opens a menu set with setContextMenu on right-click, and that
@@ -226,11 +227,35 @@ export class StickyHost {
     if (!this.tray || this.trayClicksBound) return
     this.trayClicksBound = true
     const pop = (): void => {
+      this.trayPops += 1
       this.refreshTrayMenu()
       if (this.tray && this.trayMenu) this.tray.popUpContextMenu(this.trayMenu)
     }
     this.tray.on('click', pop)
     this.tray.on('right-click', pop)
+  }
+
+  private runTrayAction(action: TrayAction | undefined): void {
+    if (action === 'newFile') this.newFile()
+    else if (action === 'tasks') this.showDeskmark('tasks')
+    else if (action === 'calendar') this.showDeskmark('calendar')
+    else if (action === 'note') this.openSticky()
+    else if (action === 'show') this.showMain()
+    else if (action === 'login') this.toggleLogin()
+    else if (action === 'quit') app.quit()
+  }
+
+  private publishTrayHook(): void {
+    if (process.env.DESKMARK_E2E !== '1' || !this.tray) return
+    const tray = this.tray
+    const labels = this.trayMenu?.items.flatMap(item => item.label ? [item.label] : []) ?? []
+    const hook = {
+      labels,
+      pops: this.trayPops,
+      click: tray.listenerCount('click'),
+      rightClick: tray.listenerCount('right-click')
+    }
+    ;(global as typeof globalThis & { __deskmarkTray?: typeof hook }).__deskmarkTray = hook
   }
 
   private mainBrowser(): BrowserWindow | null {

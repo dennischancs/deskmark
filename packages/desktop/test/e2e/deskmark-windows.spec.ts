@@ -70,6 +70,31 @@ test('typing slash on an empty line opens the insert menu on screen', async() =>
   }
 })
 
+test('both tray buttons open a menu with a new file, tasks, the calendar, and a sticky note', async() => {
+  test.setTimeout(45000)
+  const launched = await launchElectron([], {
+    preferences: { language: 'zh-CN' },
+    env: { DESKMARK_E2E: '1' }
+  })
+  const { app } = launched
+  try {
+    await expect.poll(async() => app.evaluate(() => {
+      const hook = (global as { __deskmarkTray?: { labels?: string[] } }).__deskmarkTray
+      return hook?.labels?.join('|') || ''
+    }), { timeout: 10000 }).toContain('新建文件')
+    const hook = await app.evaluate(() => {
+      return (global as {
+        __deskmarkTray?: { labels: string[], click: number, rightClick: number }
+      }).__deskmarkTray
+    })
+    expect(hook?.labels).toEqual(['新建文件', '待办', '日历', '便签', '显示桌笺', '登录时打开', '退出'])
+    expect(hook?.click).toBeGreaterThan(0)
+    expect(hook?.rightClick).toBeGreaterThan(0)
+  } finally {
+    stopApp(app)
+  }
+})
+
 test('closing the main window keeps the tray process', async() => {
   test.setTimeout(45000)
   const launched = await launchElectron([], { preferences: { language: 'zh-CN' } })
