@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import notice, { type NotifyOptions } from '../services/notification'
 import { t } from '../i18n'
+import { normalizeReminderSeconds } from 'common/reminderSeconds'
 import type { DeskmarkReminderNotice } from '@shared/types/ipc'
 
 export const useNotificationStore = defineStore('notification', () => {
@@ -22,7 +23,7 @@ export const useNotificationStore = defineStore('notification', () => {
         title: reminder.title,
         message: reminder.body,
         type: 'primary',
-        time: 20000
+        time: normalizeReminderSeconds(reminder.seconds) * 1000
       }).then(() => {
         if (!reminder.notePath) return
         window.electron.ipcRenderer.send('mt::deskmark::reminder-open', reminder)

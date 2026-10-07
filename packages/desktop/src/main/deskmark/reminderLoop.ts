@@ -2,10 +2,11 @@ import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from '
 import { join } from 'node:path'
 import { Notification } from 'electron'
 import log from 'electron-log'
+import { normalizeReminderSeconds } from 'common/reminderSeconds'
 import { planReminders, type ReminderTask } from '../../../../deskmark-core/src/reminders.ts'
 import type { DeskmarkReminderNotice } from '@shared/types/ipc'
 import { t } from '../i18n'
-import { normalizeReminderSeconds, reminderCaption, reminderTimeoutType } from './windowsToast'
+import { reminderCaption, reminderTimeoutType } from './windowsToast'
 import { readTaskGroups } from './tasks'
 import { whenScanFinishes } from './scanner'
 
@@ -106,9 +107,9 @@ export function startReminderLoop(options: {
         fired: previous.fired,
         summaryDay: previous.summaryDay
       })
-      write({ fired: plan.fired, summaryDay: plan.summaryDay })
       const system = Notification.isSupported()
-      const visibleMs = normalizeReminderSeconds(options.reminderSeconds?.()) * 1000
+      const seconds = normalizeReminderSeconds(options.reminderSeconds?.())
+      const visibleMs = seconds * 1000
       for (const task of plan.notify) {
         const body = reminderCaption(task.path, task.remind)
         if (system) {
@@ -125,7 +126,8 @@ export function startReminderLoop(options: {
           body,
           vault,
           notePath: task.path,
-          line: task.line
+          line: task.line,
+          seconds
         })
       }
       if (plan.summary) {
@@ -143,11 +145,14 @@ export function startReminderLoop(options: {
           body: '',
           vault,
           notePath: '',
-          line: null
+          line: null,
+          seconds
         })
       }
-    } catch {
-      // A bad vault should not stop the editor.
+      // A throw above skips this write, so the next tick can try the reminder again.
+      write({ fired: plan.fired, summaryDay: plan.summaryDay })
+    } catch (error) {
+      log.warn('reminder tick failed', error)
     }
   }
   whenScanFinishes(tick)

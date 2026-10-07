@@ -67,6 +67,7 @@ export interface DeskmarkReminderNotice {
   vault: string
   notePath: string
   line: number | null
+  seconds?: number
 }
 
 export interface DeskmarkTaskGroups {

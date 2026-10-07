@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeReminderSeconds, reminderTimeoutType } from 'main_renderer/deskmark/windowsToast'
+import { normalizeReminderSeconds } from 'common/reminderSeconds'
+import { reminderTimeoutType } from 'main_renderer/deskmark/windowsToast'
 
 describe('reminder toast lifetime', () => {
   it('holds a Windows banner so the app can hide it after the chosen seconds', () => {

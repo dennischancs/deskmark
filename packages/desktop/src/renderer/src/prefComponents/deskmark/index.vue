@@ -127,6 +127,7 @@ import { usePreferencesStore } from '@/store/preferences'
 import type { PreferencesState } from '@/store/preferences'
 import Compound from '../common/compound/index.vue'
 import Bool from '../common/bool/index.vue'
+import { normalizeReminderSeconds } from 'common/reminderSeconds'
 import { normalizeExtensions, PLAIN_TEXT_EXTENSIONS } from '../../../../../../deskmark-core/src/extensions.ts'
 
 const { t } = useI18n()
@@ -163,9 +164,7 @@ const setText = (type: 'deskmarkScanExtensions' | 'deskmarkExtraPrefixes', value
 }
 
 const setSeconds = (value: string): void => {
-  const parsed = Number(value)
-  const seconds = Number.isFinite(parsed) ? Math.min(600, Math.max(1, Math.round(parsed))) : 30
-  preferenceStore.SET_SINGLE_PREFERENCE({ type: 'deskmarkReminderSeconds', value: seconds })
+  preferenceStore.SET_SINGLE_PREFERENCE({ type: 'deskmarkReminderSeconds', value: normalizeReminderSeconds(value) })
 }
 
 const extensionOn = (ext: string): boolean => normalizeExtensions(deskmarkScanExtensions.value).includes(ext)
