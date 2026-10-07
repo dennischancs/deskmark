@@ -91,6 +91,32 @@ export function compareAgenda(left: AgendaSortable, right: AgendaSortable): numb
   return left.text.localeCompare(right.text)
 }
 
+export type TaskOrder = 'priority' | 'due' | 'title'
+
+export function filterTasks<T extends { text: string, notePath?: string }>(items: readonly T[], query: string): T[] {
+  const needle = query.trim().toLocaleLowerCase()
+  if (!needle) return [...items]
+  return items.filter(item => `${item.text} ${item.notePath ?? ''}`.toLocaleLowerCase().includes(needle))
+}
+
+export function sortTasks<T extends AgendaSortable>(items: readonly T[], order: TaskOrder): T[] {
+  const copy = [...items]
+  if (order === 'title') {
+    copy.sort((left, right) => left.text.localeCompare(right.text, 'en') || compareAgenda(left, right))
+    return copy
+  }
+  if (order === 'due') {
+    copy.sort((left, right) => {
+      const dueDelta = dueRank(left.due).localeCompare(dueRank(right.due))
+      if (dueDelta) return dueDelta
+      return left.text.localeCompare(right.text, 'en')
+    })
+    return copy
+  }
+  copy.sort((left, right) => compareAgenda(left, right))
+  return copy
+}
+
 export interface DayBridge<T> {
   onDay: T[]
   carried: T[]

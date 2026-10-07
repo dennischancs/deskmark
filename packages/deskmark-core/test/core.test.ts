@@ -20,6 +20,8 @@ import {
   parseNote,
   previewTasks,
   smartList,
+  filterTasks,
+  sortTasks,
   tasksOnDate,
   updateInlineTask
 } from '../src/index.ts'
@@ -278,4 +280,22 @@ test('勾选普通待办只改方括号', () => {
 
 test('本地时间 9 点写成带时区的提醒', () => {
   assert.equal(localDateTimeToIso('2026-10-09T09:00', 'Asia/Shanghai'), '2026-10-09T09:00:00+08:00')
+})
+
+test('待办可以按字搜索，并按日期或标题重排', () => {
+  const items = [
+    { done: false, due: '2026-10-20', text: 'zeta', priority: 'low', notePath: 'notes/a.md' },
+    { done: false, due: '2026-10-08', text: '买牛奶', priority: 'high', notePath: 'notes/milk.md' },
+    { done: false, due: null, text: 'alpha', priority: 'normal', notePath: 'notes/b.md' }
+  ]
+  assert.deepEqual(filterTasks(items, ' 牛奶 ').map(item => item.text), ['买牛奶'])
+  assert.deepEqual(filterTasks(items, 'MILK').map(item => item.text), ['买牛奶'])
+  assert.deepEqual(sortTasks(items, 'priority').map(item => item.text), ['买牛奶', 'alpha', 'zeta'])
+  assert.deepEqual(sortTasks(items, 'due').map(item => item.text), ['买牛奶', 'zeta', 'alpha'])
+  assert.deepEqual(sortTasks(items, 'title').map(item => item.text), ['alpha', 'zeta', '买牛奶'])
+  const renamed = applyTaskEdit('- [ ] 买牛奶 <!-- deskmark: id=A; due=2026-10-08; priority=high -->\n', 1, { text: '买面包' }, new Date('2026-10-06T01:00:00.000Z'), 'Asia/Shanghai')
+  assert.match(renamed.markdown, /买面包/)
+  assert.match(renamed.markdown, /due=2026-10-08/)
+  assert.match(renamed.markdown, /priority=high/)
+  assert.equal(renamed.markdown.match(/^- \[ \]/gm)?.length, 1)
 })

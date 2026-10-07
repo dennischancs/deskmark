@@ -289,7 +289,12 @@
       "none": "Нет",
       "daily": "Каждый день",
       "weekly": "Каждую неделю",
-      "monthly": "Каждый месяц"
+      "monthly": "Каждый месяц",
+      "search": "Поиск",
+      "sortPriority": "По важности",
+      "sortDue": "По дате",
+      "sortTitle": "По названию",
+      "sentence": "Текст"
     }
   },
   "commandPalette": {

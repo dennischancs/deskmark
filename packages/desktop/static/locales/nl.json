@@ -289,7 +289,12 @@
       "none": "Nooit",
       "daily": "Elke dag",
       "weekly": "Elke week",
-      "monthly": "Elke maand"
+      "monthly": "Elke maand",
+      "search": "Zoeken",
+      "sortPriority": "Op prioriteit",
+      "sortDue": "Op datum",
+      "sortTitle": "Op titel",
+      "sentence": "Tekst"
     }
   },
   "commandPalette": {

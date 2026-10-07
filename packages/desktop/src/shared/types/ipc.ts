@@ -70,6 +70,7 @@ export interface DeskmarkTaskGroups {
 }
 
 export interface DeskmarkTaskPatch {
+  text?: string
   checked?: boolean
   due?: string | null
   remind?: string | null

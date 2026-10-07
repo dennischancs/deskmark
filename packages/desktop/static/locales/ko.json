@@ -289,7 +289,12 @@
       "none": "없음",
       "daily": "매일",
       "weekly": "매주",
-      "monthly": "매월"
+      "monthly": "매월",
+      "search": "할 일 검색",
+      "sortPriority": "우선순위",
+      "sortDue": "날짜",
+      "sortTitle": "제목",
+      "sentence": "내용"
     }
   },
   "commandPalette": {

@@ -289,7 +289,12 @@
       "none": "不重複",
       "daily": "每天",
       "weekly": "每週",
-      "monthly": "每月"
+      "monthly": "每月",
+      "search": "搜尋待辦",
+      "sortPriority": "按優先順序",
+      "sortDue": "按日期",
+      "sortTitle": "按標題",
+      "sentence": "這一句"
     }
   },
   "commandPalette": {

@@ -14,6 +14,27 @@
     >
       {{ t('sticky.open') }}
     </button>
+    <div
+      v-if="root"
+      class="tools"
+    >
+      <input
+        v-model="query"
+        type="search"
+        :placeholder="t('sideBar.tasks.search')"
+      >
+      <select v-model="order">
+        <option value="priority">
+          {{ t('sideBar.tasks.sortPriority') }}
+        </option>
+        <option value="due">
+          {{ t('sideBar.tasks.sortDue') }}
+        </option>
+        <option value="title">
+          {{ t('sideBar.tasks.sortTitle') }}
+        </option>
+      </select>
+    </div>
     <section
       v-for="group of visibleGroups"
       :key="group.id"
@@ -52,7 +73,7 @@ import { useDeskmarkStore } from '@/store/deskmark'
 import { editDeskmarkTask } from '@/util/deskmarkEdit'
 import { showDeskmarkTarget } from '@/util/deskmarkView'
 import TaskLine from '@/components/taskLine.vue'
-import { calendarGroup } from '../../../../../../deskmark-core/src/agenda.ts'
+import { calendarGroup, filterTasks, sortTasks, type TaskOrder } from '../../../../../../deskmark-core/src/agenda.ts'
 import type { DeskmarkTaskGroups, DeskmarkTaskRef } from '@shared/types/ipc'
 
 const { t } = useI18n()
@@ -63,6 +84,8 @@ const { projectTree } = storeToRefs(projectStore)
 const { revision } = storeToRefs(deskmarkStore)
 const { currentFile } = storeToRefs(editorStore)
 const groups = ref<DeskmarkTaskGroups | null>(null)
+const query = ref('')
+const order = ref<TaskOrder>('priority')
 const currentPath = computed(() => currentFile.value?.pathname || '')
 
 const root = computed(() => projectTree.value?.pathname || '')
@@ -80,7 +103,10 @@ const visibleGroups = computed(() => {
     { id: 'later', label: 'calendar.later', items: later },
     { id: 'inbox', label: 'sideBar.tasks.inbox', items: value.inbox },
     { id: 'done', label: 'sideBar.tasks.done', items: value.done }
-  ].filter(group => group.items.length > 0)
+  ].map(group => ({
+    ...group,
+    items: sortTasks(filterTasks(group.items, query.value), order.value)
+  })).filter(group => group.items.length > 0)
 })
 
 const load = async (): Promise<void> => {
@@ -154,6 +180,20 @@ h3 {
 }
 .stick {
   margin-bottom: 8px;
+}
+.tools {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.tools input,
+.tools select {
+  min-width: 0;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+.tools input {
+  flex: 1;
 }
 .calendar-link {
   margin: 0 0 8px 22px;

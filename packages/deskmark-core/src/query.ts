@@ -7,10 +7,12 @@ export {
   calendarGroup,
   compareAgenda,
   DEADLINE_WARNING_DAYS,
+  filterTasks,
   isOverdue,
   markedDates,
   previewTasks,
   smartList,
+  sortTasks,
   tasksForAgenda,
   tasksOnDate
 } from './agenda.ts'

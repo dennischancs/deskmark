@@ -289,7 +289,12 @@
       "none": "不重复",
       "daily": "每天",
       "weekly": "每周",
-      "monthly": "每月"
+      "monthly": "每月",
+      "search": "搜索待办",
+      "sortPriority": "按优先级",
+      "sortDue": "按日期",
+      "sortTitle": "按标题",
+      "sentence": "这句话"
     }
   },
   "commandPalette": {

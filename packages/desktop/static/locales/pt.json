@@ -289,7 +289,12 @@
       "none": "Nunca",
       "daily": "Todo dia",
       "weekly": "Toda semana",
-      "monthly": "Todo mês"
+      "monthly": "Todo mês",
+      "search": "Procurar",
+      "sortPriority": "Por prioridade",
+      "sortDue": "Por data",
+      "sortTitle": "Por título",
+      "sentence": "Texto"
     }
   },
   "commandPalette": {

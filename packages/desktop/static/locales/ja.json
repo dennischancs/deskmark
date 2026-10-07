@@ -289,7 +289,12 @@
       "none": "なし",
       "daily": "毎日",
       "weekly": "毎週",
-      "monthly": "毎月"
+      "monthly": "毎月",
+      "search": "やることを検索",
+      "sortPriority": "優先度",
+      "sortDue": "日付",
+      "sortTitle": "タイトル",
+      "sentence": "文"
     }
   },
   "commandPalette": {

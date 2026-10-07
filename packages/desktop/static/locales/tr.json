@@ -289,7 +289,12 @@
       "none": "Yok",
       "daily": "Her gün",
       "weekly": "Her hafta",
-      "monthly": "Her ay"
+      "monthly": "Her ay",
+      "search": "Ara",
+      "sortPriority": "Önceliğe göre",
+      "sortDue": "Tarihe göre",
+      "sortTitle": "Başlığa göre",
+      "sentence": "Metin"
     }
   },
   "commandPalette": {

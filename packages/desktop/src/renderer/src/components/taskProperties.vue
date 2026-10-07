@@ -5,6 +5,13 @@
   >
     <h2>{{ selected.text }}</h2>
     <label>
+      {{ t('sideBar.tasks.sentence') }}
+      <input
+        v-model="sentence"
+        type="text"
+      >
+    </label>
+    <label>
       {{ t('sideBar.tasks.due') }}
       <input
         v-model="due"
@@ -61,10 +68,12 @@ const { selected } = storeToRefs(deskmarkStore)
 const { projectTree } = storeToRefs(projectStore)
 const due = ref('')
 const remind = ref('')
+const sentence = ref('')
 const priority = ref<'low' | 'normal' | 'high'>('normal')
 const repeat = ref('none')
 
 watch(selected, (task) => {
+  sentence.value = task?.text ?? ''
   due.value = task?.due?.slice(0, 10) ?? ''
   remind.value = task?.remindAt ? task.remindAt.slice(0, 16) : ''
   priority.value = task?.priority === 'low' || task?.priority === 'high' ? task.priority : 'normal'
@@ -77,6 +86,7 @@ const save = async (): Promise<void> => {
   if (!task?.line || !root) return
   const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
   const groups = await editDeskmarkTask(root, task.notePath, task.line, {
+    text: sentence.value.trim() || task.text,
     due: due.value || null,
     remind: remind.value ? localDateTimeToIso(remind.value, timeZone) : null,
     priority: priority.value,
