@@ -227,6 +227,9 @@ export function answerPluginCall(input: {
       const tasks = (input.tasks ?? []).filter(task => noteInsideVault(task.path))
       return { id, ok: true, result: { tasks } }
     }
+    if (permission === 'notes.write' || permission === 'tasks.write') {
+      return { id, ok: false, error: '这个小功能还不能写入' }
+    }
     if (permission !== 'notes.read') {
       return { id, ok: true, result: { accepted: true } }
     }

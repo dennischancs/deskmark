@@ -92,6 +92,25 @@ test('主进程只把当前笔记交给已允许的读取，外面的路径读�
   assert.equal(write.ok, false)
 })
 
+test('即使声明了写入，现在也不会假装已经写上', () => {
+  const manifest = readManifest({ ...good, permissions: ['notes.write', 'tasks.write'] })
+  const note = answerPluginCall({
+    manifest,
+    call: { id: '9', method: 'notes.write', path: 'a.md' },
+    snapshot: { vault: 'D:/notes', path: 'a.md', markdown: '原来' },
+    readVaultFile: () => '原来'
+  })
+  const task = answerPluginCall({
+    manifest,
+    call: { id: '10', method: 'tasks.write' },
+    snapshot: null,
+    readVaultFile: () => null
+  })
+  assert.equal(note.ok, false)
+  assert.match(note.error ?? '', /写入/)
+  assert.equal(task.ok, false)
+})
+
 test('声明了任务读取才返回待办，库外路径不出现', () => {
   const manifest = readManifest({ ...good, permissions: ['tasks.read'] })
   const result = answerPluginCall({
