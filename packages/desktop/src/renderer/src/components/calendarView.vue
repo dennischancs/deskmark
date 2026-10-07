@@ -245,6 +245,7 @@ import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useProjectStore } from '@/store/project'
 import { useDeskmarkStore } from '@/store/deskmark'
+import { usePreferencesStore } from '@/store/preferences'
 import { editDeskmarkTask } from '@/util/deskmarkEdit'
 import TaskLine from '@/components/taskLine.vue'
 import { agendaCounts, bridgeForDay, calendarGroup, DEADLINE_WARNING_DAYS, previewTasks, tasksForAgenda, type CalendarGroup } from '../../../../../deskmark-core/src/agenda.ts'
@@ -258,8 +259,17 @@ type AgendaMode = 'day' | CalendarGroup
 const { t, locale } = useI18n()
 const projectStore = useProjectStore()
 const deskmarkStore = useDeskmarkStore()
+const preferenceStore = usePreferencesStore()
 const { projectTree } = storeToRefs(projectStore)
 const { revision } = storeToRefs(deskmarkStore)
+const {
+  deskmarkScanExtensions,
+  deskmarkRuleTaskLine,
+  deskmarkRuleComment,
+  deskmarkRuleFrontMatter,
+  deskmarkRuleDateInText,
+  deskmarkExtraPrefixes
+} = storeToRefs(preferenceStore)
 const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
 const warningDays = DEADLINE_WARNING_DAYS
 const localDay = (): string => formatInZone(new Date(), zone).slice(0, 10)
@@ -272,6 +282,7 @@ const mode = ref<AgendaMode>('day')
 const text = ref('')
 const hoverDay = ref<string | null>(null)
 const groups = ref<DeskmarkTaskGroups | null>(null)
+let loadTicket = 0
 const root = computed(() => projectTree.value?.pathname || '')
 const title = computed(() => new Intl.DateTimeFormat(String(locale.value || 'en'), {
   year: 'numeric',
@@ -339,16 +350,30 @@ const heading = computed(() => {
 })
 
 const load = async (): Promise<void> => {
+  const ticket = ++loadTicket
   if (!root.value) {
     groups.value = null
     return
   }
-  groups.value = await window.electron.ipcRenderer.invoke('mt::deskmark::tasks', root.value)
+  const next = await window.electron.ipcRenderer.invoke('mt::deskmark::tasks', root.value, {
+    extensions: deskmarkScanExtensions.value,
+    taskLine: deskmarkRuleTaskLine.value,
+    commentMeta: deskmarkRuleComment.value,
+    frontMatter: deskmarkRuleFrontMatter.value,
+    dateInText: deskmarkRuleDateInText.value,
+    extraPrefixes: deskmarkExtraPrefixes.value
+  })
+  if (ticket !== loadTicket) return
+  groups.value = next
 }
 
 watch([root, revision], () => {
   load().catch((error) => console.error(error))
 }, { immediate: true })
+
+const stopIndexTick = window.electron.ipcRenderer.on('mt::deskmark-index-tick', () => {
+  load().catch((error) => console.error(error))
+})
 
 const shift = (delta: number): void => {
   const next = new Date(year.value, month.value - 1 + delta, 1)
@@ -515,6 +540,7 @@ const clearHover = (): void => {
 
 onMounted(() => window.addEventListener('dragend', clearHover))
 onBeforeUnmount(() => {
+  stopIndexTick()
   window.removeEventListener('dragend', clearHover)
   window.removeEventListener('pointermove', onChipMove)
   window.removeEventListener('pointerup', onChipUp)

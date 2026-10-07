@@ -4,7 +4,7 @@ import { execSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { launchElectron, launchWithMarkdown, sendIpcToRenderer } from './helpers'
+import { launchElectron, launchWithMarkdown, removeTree, sendIpcToRenderer } from './helpers'
 
 const stopApp = (app: ElectronApplication): void => {
   let pid: number | undefined
@@ -97,7 +97,7 @@ test('dragging a calendar chip moves that task onto another day', async() => {
     expect(saved.match(/买牛奶/g)?.length).toBe(1)
   } finally {
     stopApp(app)
-    fs.rmSync(dir, { recursive: true, force: true })
+    removeTree(dir)
   }
 })
 
@@ -150,7 +150,7 @@ test('reordering the open-file list survives a restart', async() => {
   } finally {
     stopApp(first.app)
     if (second) stopApp(second)
-    fs.rmSync(dir, { recursive: true, force: true })
+    removeTree(dir)
     fs.rmSync(userData, { recursive: true, force: true })
   }
 })

@@ -68,6 +68,21 @@ export interface LaunchOptions {
   userDataDir?: string
 }
 
+export const removeTree = (dir: string): void => {
+  for (let attempt = 0; attempt < 10; attempt += 1) {
+    try {
+      fs.rmSync(dir, { recursive: true, force: true })
+      return
+    } catch (error) {
+      if (attempt === 9) throw error
+      const end = Date.now() + 200
+      while (Date.now() < end) {
+        // The index keeps the folder locked until the killed process exits.
+      }
+    }
+  }
+}
+
 export const launchElectron = async(
   userArgs?: string[],
   options: LaunchOptions = {}

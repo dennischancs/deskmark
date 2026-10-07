@@ -4,7 +4,7 @@ import { execSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
-import { launchElectron, sendIpcToRenderer } from './helpers'
+import { launchElectron, removeTree, sendIpcToRenderer } from './helpers'
 
 const stopApp = (app: ElectronApplication): void => {
   let pid: number | undefined
@@ -87,6 +87,6 @@ test('German, French, Russian, and Japanese calendar buttons stay inside the cal
     }
   } finally {
     stopApp(app)
-    fs.rmSync(dir, { recursive: true, force: true })
+    removeTree(dir)
   }
 })
