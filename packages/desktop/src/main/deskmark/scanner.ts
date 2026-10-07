@@ -34,6 +34,11 @@ interface OpenScan {
 }
 
 let open: OpenScan | null = null
+let onFinished: (() => void) | null = null
+
+export function whenScanFinishes(fn: () => void): void {
+  onFinished = fn
+}
 
 const rulesFrom = (options: DeskmarkScanOptions): ExtractRules => ({
   taskLine: options.taskLine !== false,
@@ -118,6 +123,7 @@ async function runScan(token: number, root: string, options: DeskmarkScanOptions
   }
   current.running = false
   publish()
+  onFinished?.()
 }
 
 export function ensureScan(root: string, options: DeskmarkScanOptions | null | undefined, now: Date, timeZone: string): DeskmarkTaskGroups {

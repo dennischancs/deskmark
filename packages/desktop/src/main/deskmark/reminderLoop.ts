@@ -7,11 +7,14 @@ import type { DeskmarkReminderNotice } from '@shared/types/ipc'
 import { t } from '../i18n'
 import { reminderCaption } from './windowsToast'
 import { readTaskGroups } from './tasks'
+import { whenScanFinishes } from './scanner'
 
 let currentVault: string | null = null
+let tickFn: (() => void) | null = null
 
 export function setReminderVault(vault: string | null): void {
   currentVault = vault || null
+  if (currentVault) setTimeout(() => tickFn?.(), 300)
 }
 
 interface ReminderFile {
@@ -64,18 +67,20 @@ export function startReminderLoop(options: {
         summaryDay: previous.summaryDay
       })
       write({ fired: plan.fired, summaryDay: plan.summaryDay })
-      if (!Notification.isSupported()) return
+      const system = Notification.isSupported()
       for (const task of plan.notify) {
         const body = reminderCaption(task.path, task.remind)
-        const note = new Notification({
-          title: task.text,
-          body
-        })
-        note.on('failed', (_event, error) => {
-          log.warn('reminder toast failed', error)
-        })
-        note.on('click', () => options.openNote(vault, task.path, task.line))
-        note.show()
+        if (system) {
+          const note = new Notification({
+            title: task.text,
+            body
+          })
+          note.on('failed', (_event, error) => {
+            log.warn('reminder toast failed', error)
+          })
+          note.on('click', () => options.openNote(vault, task.path, task.line))
+          note.show()
+        }
         options.announce?.({
           title: task.text,
           body,
@@ -86,11 +91,13 @@ export function startReminderLoop(options: {
       }
       if (plan.summary) {
         const title = t('reminder.missed', { count: plan.summary })
-        const summary = new Notification({ title, body: '' })
-        summary.on('failed', (_event, error) => {
-          log.warn('reminder toast failed', error)
-        })
-        summary.show()
+        if (system) {
+          const summary = new Notification({ title, body: '' })
+          summary.on('failed', (_event, error) => {
+            log.warn('reminder toast failed', error)
+          })
+          summary.show()
+        }
         options.announce?.({
           title,
           body: '',
@@ -103,5 +110,8 @@ export function startReminderLoop(options: {
       // A bad vault should not stop the editor.
     }
   }
+  whenScanFinishes(tick)
+  tickFn = tick
+  setTimeout(tick, 1000)
   setInterval(tick, 60_000)
 }
