@@ -1,7 +1,8 @@
-import { app, webContents } from 'electron'
+import { app, webContents, type WebPreferences } from 'electron'
 import { existsSync, readFileSync } from 'node:fs'
 import { join, resolve, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import { samePluginEntry } from './pluginEntry'
 import {
   answerPluginCall,
   noteInsideVault,
@@ -45,25 +46,19 @@ export function rememberPluginNote(next: NoteSnapshot | null): void {
   else snapshot = next
   if (!entryUrl) return
   for (const contents of webContents.getAllWebContents()) {
-    if (contents.getURL() === entryUrl) contents.send('mt::deskmark::plugin-refresh')
+    if (samePluginEntry(entryUrl, contents.getURL())) contents.send('mt::deskmark::plugin-refresh')
   }
 }
 
-export function registerPluginGuestGuard(): void {
-  app.on('web-contents-created', (_event, contents) => {
-    contents.on('will-attach-webview', (event, webPreferences, params) => {
-      if (!entryUrl || params.src !== entryUrl) {
-        event.preventDefault()
-        return
-      }
-      webPreferences.nodeIntegration = false
-      webPreferences.nodeIntegrationInSubFrames = false
-      webPreferences.contextIsolation = true
-      webPreferences.sandbox = true
-      webPreferences.webSecurity = true
-      webPreferences.preload = pluginPreloadPath()
-    })
-  })
+export function retainPluginWebview(webPreferences: WebPreferences, params: { src?: string }): boolean {
+  if (!samePluginEntry(entryUrl, params.src || '')) return false
+  webPreferences.nodeIntegration = false
+  webPreferences.nodeIntegrationInSubFrames = false
+  webPreferences.contextIsolation = true
+  webPreferences.sandbox = true
+  webPreferences.webSecurity = true
+  webPreferences.preload = pluginPreloadPath()
+  return true
 }
 
 export function handlePluginCall(call: { id?: string, method?: string, path?: string }): { id: string, ok: boolean, result?: unknown, error?: string } {

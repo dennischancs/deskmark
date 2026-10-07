@@ -22,6 +22,7 @@ import { WindowType } from '../windows/base'
 import EditorWindow from '../windows/editor'
 import { StickyHost, markQuitting, setStickyHost } from '../deskmark/stickies'
 import { startReminderLoop } from '../deskmark/reminderLoop'
+import { retainPluginWebview } from '../deskmark/pluginGuest'
 import { join as pathJoin } from 'node:path'
 import SettingWindow from '../windows/setting'
 import { setLanguage } from '../i18n'
@@ -155,10 +156,11 @@ class App {
       }
     })
 
-    // Prevent to load webview and opening links or new windows via HTML/JS.
+    // Upstream blocks every webview. The word-count page is the one guest
+    // that may attach, and only on its own file URL.
     app.on('web-contents-created', (_event, contents) => {
-      contents.on('will-attach-webview', (event) => {
-        event.preventDefault()
+      contents.on('will-attach-webview', (event, webPreferences, params) => {
+        if (!retainPluginWebview(webPreferences, params)) event.preventDefault()
       })
       contents.on('will-navigate', (event) => {
         event.preventDefault()

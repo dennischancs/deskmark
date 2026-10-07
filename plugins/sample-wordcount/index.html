@@ -2,27 +2,105 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Word count</title>
+  <title>Words</title>
   <style>
-    body { margin: 12px; font: 13px/1.4 sans-serif; color: var(--deskmark-fg, CanvasText); background: transparent; }
-    strong { font-size: 28px; }
+    :root { color-scheme: light dark; }
+    body {
+      margin: 0;
+      padding: 4px 14px 16px;
+      font: 13px/1.45 "Segoe UI", sans-serif;
+      letter-spacing: 0;
+      color: var(--deskmark-fg, CanvasText);
+      background: transparent;
+    }
+    .value {
+      margin: 4px 0 12px;
+      font-size: 32px;
+      font-weight: 600;
+      line-height: 1.1;
+    }
+    .unit {
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0.72;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 0;
+      border-top: 1px solid color-mix(in srgb, currentColor 16%, transparent);
+    }
+    .path, .hint {
+      margin: 10px 0 0;
+      opacity: 0.72;
+      word-break: break-all;
+    }
   </style>
 </head>
 <body>
-  <div id="count">0</div>
-  <script>
-    const count = document.querySelector("#count")
+  <p class="value"><span id="value">-</span> <span id="unit" class="unit"></span></p>
+  <div id="rows"></div>
+  <p class="path" id="path"></p>
+  <p class="hint" id="hint"></p>
+  <script type="module">
+    import { presentNote } from './measure.mjs'
+
+    const params = new URLSearchParams(location.search)
+    const lang = params.get('lang') || navigator.language || 'en'
+    const safeColor = (value) => /^(#[0-9a-fA-F]{3,8}|rgba?\([^)]+\)|hsla?\([^)]+\))$/.test(value || '') ? value : ''
+    const fg = safeColor(params.get('fg'))
+    if (fg) document.documentElement.style.setProperty('--deskmark-fg', fg)
+
+    const valueEl = document.querySelector('#value')
+    const unitEl = document.querySelector('#unit')
+    const rowsEl = document.querySelector('#rows')
+    const pathEl = document.querySelector('#path')
+    const hintEl = document.querySelector('#hint')
+
+    const paint = (state) => {
+      valueEl.textContent = state.value
+      unitEl.textContent = state.unit
+      rowsEl.replaceChildren()
+      for (const row of state.rows) {
+        const line = document.createElement('div')
+        line.className = 'row'
+        const name = document.createElement('span')
+        name.textContent = row.name
+        const num = document.createElement('span')
+        num.textContent = row.value
+        line.append(name, num)
+        rowsEl.append(line)
+      }
+      pathEl.textContent = state.path
+      hintEl.textContent = state.hint
+    }
+
     const show = async () => {
       const bridge = window.deskmark
-      if (!bridge) throw new Error("missing")
-      const note = await bridge.call("notes.read", {})
-      const text = String(note && note.result && note.result.markdown || "")
-      if (!note.ok) throw new Error(note.error || "failed")
-      const words = text.trim() ? text.trim().split(/\s+/).length : 0
-      count.textContent = String(words)
+      if (!bridge) {
+        paint(presentNote({ lang, state: 'failed' }))
+        return
+      }
+      const note = await bridge.call('notes.read', {})
+      if (!note || !note.ok) {
+        paint(presentNote({ lang, state: 'empty' }))
+        return
+      }
+      paint(presentNote({
+        markdown: String(note.result && note.result.markdown || ''),
+        path: String(note.result && note.result.path || ''),
+        lang,
+        state: 'ready'
+      }))
     }
-    if (window.deskmark && window.deskmark.onNote) window.deskmark.onNote(() => { show().catch(() => { count.textContent = "-" }) })
-    show().catch(() => { count.textContent = "-" })
+
+    if (window.deskmark && window.deskmark.onNote) {
+      window.deskmark.onNote(() => {
+        show().catch(() => paint(presentNote({ lang, state: 'failed' })))
+      })
+    }
+    show().catch(() => paint(presentNote({ lang, state: 'failed' })))
   </script>
 </body>
 </html>

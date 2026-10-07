@@ -11,6 +11,8 @@
           v-for="(c, index) of sideBarIcons"
           :key="index"
           :class="{ active: c.id === rightColumn }"
+          :title="c.name()"
+          :aria-label="c.name()"
           @click="handleLeftIconClick(c.id)"
         >
           <component :is="c.icon" />
@@ -20,6 +22,8 @@
         <li
           v-for="(c, index) of sideBarBottomIcons"
           :key="index"
+          :title="c.name()"
+          :aria-label="c.name()"
           @click="handleLeftBottomClick(c.id)"
         >
           <component :is="c.icon" />
@@ -41,6 +45,7 @@
       <task-lists v-else-if="rightColumn === 'tasks'" />
       <plugin-panel
         v-else-if="pluginView"
+        :title="t('plugin.words')"
         :close-label="t('plugin.close')"
         @close="unloadSample"
       />
@@ -149,10 +154,10 @@ const sideBarIcons = computed(() => [
   ...(deskmarkWordCount.value === false
     ? []
     : pluginHost.views().filter(view => !view.builtin).map(view => ({
-    id: view.id,
-    name: () => t('plugin.words'),
-    icon: WordsIcon
-  })))
+      id: view.id,
+      name: () => t('plugin.words'),
+      icon: WordsIcon
+    })))
 ])
 
 watch(deskmarkCalendar, (enabled) => {
