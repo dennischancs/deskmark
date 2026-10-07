@@ -14,16 +14,10 @@ import {
     getLabelFromEvent,
     MENU_CONFIG,
 } from './config';
+import { isBareSlash, mentionQuery, quickInsertQuery } from './trigger';
 
 import './index.css';
 
-const checkQuickInsert = (text: string) => /^[/、]\S*$/.test(text);
-const checkShowPlaceholder = (text: string) => /^[/、]$/.test(text);
-const mentionQuery = (text: string): string | null => {
-    if (!/(?:^|\s)@\S*$/.test(text) || /\w@\S*$/.test(text))
-        return null;
-    return /(?:^|\s)@(\S*)$/.exec(text)?.[1] ?? '';
-};
 function checkCanInsertFrontMatter(muya: Muya, block: ParagraphContent) {
     const { frontMatter } = muya.options;
 
@@ -80,19 +74,19 @@ export class ParagraphQuickInsertMenu extends BaseScrollFloat {
                 return;
 
             const { text, domNode } = block;
-            const needToShowQuickInsert = checkQuickInsert(text);
+            const slashQuery = quickInsertQuery(text);
             const atQuery = mentionQuery(text);
-            const needToShowPlaceholder = checkShowPlaceholder(text);
+            const needToShowPlaceholder = isBareSlash(text);
             if (needToShowPlaceholder)
                 domNode!.setAttribute('placeholder', i18n.t('Search keyword...'));
             else
                 domNode!.removeAttribute('placeholder');
 
-            if (needToShowQuickInsert || atQuery !== null) {
+            if (slashQuery !== null || atQuery !== null) {
                 this._block = block;
-                this._mention = atQuery !== null && !needToShowQuickInsert;
+                this._mention = atQuery !== null && slashQuery === null;
                 this.show(domNode);
-                this._search(needToShowQuickInsert ? text.substring(1) : atQuery!);
+                this._search(slashQuery !== null ? slashQuery : atQuery!);
             }
             else {
                 this.hide();
