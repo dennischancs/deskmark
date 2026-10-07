@@ -114,8 +114,7 @@ import { usePreferencesStore } from '@/store/preferences'
 import type { PreferencesState } from '@/store/preferences'
 import Compound from '../common/compound/index.vue'
 import Bool from '../common/bool/index.vue'
-import { MARKDOWN_EXTENSIONS } from 'common/filesystem/paths'
-import { normalizeExtensions } from '../../../../../../deskmark-core/src/extract.ts'
+import { normalizeExtensions, PLAIN_TEXT_EXTENSIONS } from '../../../../../../deskmark-core/src/extensions.ts'
 
 const { t } = useI18n()
 const preferenceStore = usePreferencesStore()
@@ -133,7 +132,7 @@ const {
 } =
   storeToRefs(preferenceStore)
 const openAtLogin = ref(false)
-const knownExtensions = MARKDOWN_EXTENSIONS
+const knownExtensions = PLAIN_TEXT_EXTENSIONS
 
 onMounted(() => {
   window.electron.ipcRenderer.invoke('mt::deskmark::login-get').then((enabled) => {

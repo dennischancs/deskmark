@@ -18,16 +18,6 @@ export const DEFAULT_EXTRACT_RULES: ExtractRules = {
   extraPrefixes: []
 }
 
-export function normalizeExtensions(value: string): string[] {
-  const seen = new Set<string>()
-  for (const part of value.split(/[,，\s]+/)) {
-    const ext = part.trim().toLowerCase().replace(/^\.+/, '')
-    if (!ext || ext.length > 20 || /[\\/:*?"<>|]/.test(ext)) continue
-    seen.add(ext)
-  }
-  return [...seen]
-}
-
 const DATE_IN_TEXT = /(?:^|[^\d])(\d{4}-\d{2}-\d{2})(?!\d)/
 
 export function agendaForIndex(path: string, markdown: string, rules: ExtractRules = DEFAULT_EXTRACT_RULES): AgendaItem[] {

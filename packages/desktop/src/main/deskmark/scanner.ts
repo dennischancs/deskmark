@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { BrowserWindow } from 'electron'
 import type { ExtractRules } from '../../../../deskmark-core/src/index.ts'
-import { normalizeExtensions } from '../../../../deskmark-core/src/extract.ts'
+import { normalizeExtensions } from '../../../../deskmark-core/src/extensions.ts'
 import { groupTasks, listTextFiles, VaultIndex } from '../../../../deskmark-index/src/index.ts'
 import type { DeskmarkScanOptions, DeskmarkTaskGroups } from '@shared/types/ipc'
 
