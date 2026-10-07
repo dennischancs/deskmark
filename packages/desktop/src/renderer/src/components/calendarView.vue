@@ -551,17 +551,34 @@ const openJournal = async (): Promise<void> => {
   min-width: 280px;
 }
 .agenda {
-  width: 320px;
-  flex: 0 0 320px;
+  width: min(320px, 100%);
+  flex: 1 1 280px;
+  min-width: 0;
 }
 header, form, .chips {
   display: flex;
   gap: 8px;
   align-items: center;
 }
+.calendar-view header {
+  flex-wrap: wrap;
+}
+.calendar-view header h2 {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
 .chips {
   flex-wrap: wrap;
   margin-bottom: 8px;
+}
+.journal,
+.chips button,
+.calendar-view header button {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: start;
 }
 .weekdays, .grid {
   display: grid;
@@ -573,6 +590,10 @@ header, form, .chips {
   font-size: 12px;
   opacity: 0.7;
   text-align: center;
+}
+.weekdays span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .grid {
   margin-top: 4px;
