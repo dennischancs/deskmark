@@ -1,5 +1,5 @@
 import path from 'path'
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import fsPromises from 'fs/promises'
 import { exec } from 'child_process'
 import dayjs from 'dayjs'
@@ -22,6 +22,7 @@ import { WindowType } from '../windows/base'
 import EditorWindow from '../windows/editor'
 import { StickyHost, markQuitting, setStickyHost } from '../deskmark/stickies'
 import { startReminderLoop } from '../deskmark/reminderLoop'
+import { installedShortcutCandidates, toastShortcutPlan } from '../deskmark/windowsToast'
 import { retainPluginWebview } from '../deskmark/pluginGuest'
 import { join as pathJoin } from 'node:path'
 import SettingWindow from '../windows/setting'
@@ -171,6 +172,24 @@ class App {
     })
   }
 
+  private _ensureToastShortcut(): void {
+    if (!isWindows) return
+    const appData = app.getPath('appData')
+    const plan = toastShortcutPlan({
+      appData,
+      packaged: app.isPackaged,
+      execPath: process.execPath,
+      installedShortcutExists: installedShortcutCandidates(appData).some(candidate => existsSync(candidate))
+    })
+    if (!plan) return
+    const wrote = shell.writeShortcutLink(plan.path, 'replace', {
+      target: plan.target,
+      appUserModelId: plan.appUserModelId,
+      description: 'Deskmark'
+    })
+    if (!wrote) log.warn('Could not register the Windows toast shortcut')
+  }
+
   /**
    * Initialize the main process language from preferences, detecting the
    * system language on first start. Must run after the app is ready —
@@ -215,6 +234,7 @@ class App {
 
     // Initialize language settings (detects the system language on first start)
     this._initializeLanguage()
+    this._ensureToastShortcut()
     const { startUpAction, defaultDirectoryToOpen, theme } = preferences.getAll()
     const followSystemTheme = preferences.getItem<boolean>('followSystemTheme')
     const lastOpenedFolder = preferences.getItem<string>('lastOpenedFolder')

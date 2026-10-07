@@ -1,0 +1,55 @@
+import { join } from 'node:path'
+
+export const DESKMARK_APP_USER_MODEL_ID = 'app.deskmark.desktop'
+export const DESKMARK_DEV_APP_USER_MODEL_ID = 'app.deskmark.desktop.dev'
+
+export function appUserModelId(packaged: boolean): string {
+  return packaged ? DESKMARK_APP_USER_MODEL_ID : DESKMARK_DEV_APP_USER_MODEL_ID
+}
+
+export function installedShortcutCandidates(appData: string): string[] {
+  const programs = join(appData, 'Microsoft', 'Windows', 'Start Menu', 'Programs')
+  return [
+    join(programs, 'Deskmark.lnk'),
+    join(programs, 'Deskmark', 'Deskmark.lnk')
+  ]
+}
+
+export function devShortcutPath(appData: string): string {
+  return join(appData, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Deskmark Dev.lnk')
+}
+
+export interface ToastShortcutPlan {
+  path: string
+  appUserModelId: string
+  target: string
+}
+
+// Windows hides a toast until some Start Menu shortcut carries the same
+// AppUserModelID. The installer writes that shortcut; an unpacked run does not.
+export function toastShortcutPlan(input: {
+  appData: string
+  packaged: boolean
+  execPath: string
+  installedShortcutExists: boolean
+}): ToastShortcutPlan | null {
+  if (input.packaged) {
+    if (input.installedShortcutExists) return null
+    return {
+      path: installedShortcutCandidates(input.appData)[0],
+      appUserModelId: DESKMARK_APP_USER_MODEL_ID,
+      target: input.execPath
+    }
+  }
+  return {
+    path: devShortcutPath(input.appData),
+    appUserModelId: DESKMARK_DEV_APP_USER_MODEL_ID,
+    target: input.execPath
+  }
+}
+
+export function reminderCaption(notePath: string, remind: string | null): string {
+  const file = notePath.split('/').pop() || notePath
+  const clock = remind?.match(/T(\d{2}:\d{2})/)?.[1] || ''
+  return clock ? `${file} / ${clock}` : file
+}

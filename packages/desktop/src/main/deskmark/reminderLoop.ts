@@ -1,7 +1,9 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { Notification } from 'electron'
+import log from 'electron-log'
 import { planReminders, type ReminderTask } from '../../../../deskmark-core/src/reminders.ts'
+import { reminderCaption } from './windowsToast'
 import { readTaskGroups } from './tasks'
 
 let currentVault: string | null = null
@@ -61,12 +63,22 @@ export function startReminderLoop(options: {
       write({ fired: plan.fired, summaryDay: plan.summaryDay })
       if (!Notification.isSupported()) return
       for (const task of plan.notify) {
-        const note = new Notification({ title: task.text, body: task.remind || '' })
+        const note = new Notification({
+          title: task.text,
+          body: reminderCaption(task.path, task.remind)
+        })
+        note.on('failed', (_event, error) => {
+          log.warn('reminder toast failed', error)
+        })
         note.on('click', () => options.openNote(vault, task.path, task.line))
         note.show()
       }
       if (plan.summary) {
-        new Notification({ title: String(plan.summary), body: '' }).show()
+        const summary = new Notification({ title: String(plan.summary), body: '' })
+        summary.on('failed', (_event, error) => {
+          log.warn('reminder toast failed', error)
+        })
+        summary.show()
       }
     } catch {
       // A bad vault should not stop the editor.
