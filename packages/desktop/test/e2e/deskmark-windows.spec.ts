@@ -17,7 +17,11 @@ const stopApp = (app: ElectronApplication): void => {
   try {
     execSync(`taskkill /PID ${pid} /T /F`, { stdio: 'ignore' })
   } catch {
-    // The process already exited.
+    try {
+      process.kill(pid)
+    } catch {
+      // The process already exited.
+    }
   }
 }
 
@@ -109,7 +113,7 @@ test('the installed program keeps running after the main window closes', async()
     }), { timeout: 8000 }).toBe(true)
   } finally {
     stopApp(app)
-    fs.rmSync(userData, { recursive: true, force: true })
+    removeTree(userData)
   }
 })
 
@@ -231,7 +235,7 @@ test('reordering the open-file list survives a restart', async() => {
     stopApp(first.app)
     if (second) stopApp(second)
     removeTree(dir)
-    fs.rmSync(userData, { recursive: true, force: true })
+    removeTree(userData)
   }
 })
 
