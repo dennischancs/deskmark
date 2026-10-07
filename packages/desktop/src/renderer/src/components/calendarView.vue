@@ -36,6 +36,7 @@
           v-for="(cell, index) of cells"
           :key="index"
           class="cell"
+          :data-day="cell.date || undefined"
           :class="{ selected: mode === 'day' && cell.date === selected, today: cell.date === todayKey, pad: !cell.date, drop: cell.date != null && cell.date === hoverDay }"
           @dragover="allowDrop(cell.date, $event)"
           @drop="dropDue(cell.date, $event)"
@@ -48,19 +49,20 @@
           >
             {{ cell.day }}
           </button>
-          <button
+          <div
             v-for="task of dayPreview(cell.date).shown"
             :key="`${cell.date}:${task.taskKey}`"
-            type="button"
+            role="button"
+            tabindex="0"
             class="chip deskmark-hover"
-            :class="{ late: cell.date != null && lateDates.has(cell.date) }"
-            :draggable="task.status !== 'done' && task.line != null"
-            @dragstart="dragPayload(task, $event)"
-            @dragend="endTaskDrag"
-            @click="openTask(task)"
+            :class="{ late: cell.date != null && lateDates.has(cell.date), grabbing: chipDragging }"
+            @pointerdown="onChipDown(task, $event)"
+            @click="onChipClick(task)"
+            @keydown.enter.prevent="openTask(task)"
+            @keydown.space.prevent="openTask(task)"
           >
             {{ task.text }}
-          </button>
+          </div>
           <span
             v-if="dayPreview(cell.date).extra"
             class="more"
@@ -248,7 +250,7 @@ import TaskLine from '@/components/taskLine.vue'
 import { agendaCounts, bridgeForDay, calendarGroup, DEADLINE_WARNING_DAYS, previewTasks, tasksForAgenda, type CalendarGroup } from '../../../../../deskmark-core/src/agenda.ts'
 import { buildMonth, weekdayLabels } from '../../../../../deskmark-core/src/calendar.ts'
 import { formatInZone, moveDueToDay } from '../../../../../deskmark-core/src/time.ts'
-import { beginTaskDrag, endTaskDrag, readTaskDrag } from '@/util/taskDrag'
+import { endTaskDrag, readTaskDrag } from '@/util/taskDrag'
 import type { DeskmarkTaskGroups, DeskmarkTaskRef } from '@shared/types/ipc'
 
 type AgendaMode = 'day' | CalendarGroup
@@ -421,8 +423,59 @@ const clearDate = (task: DeskmarkTaskRef): void => {
   writeDue(task, null)
 }
 
-const dragPayload = (task: DeskmarkTaskRef, event: DragEvent): void => {
-  beginTaskDrag(task.taskKey, task.line, task.status, event)
+const chipDragging = ref(false)
+let chipDrag: { task: DeskmarkTaskRef, x: number, y: number, moved: boolean } | null = null
+let ignoreChipClick = false
+
+const dayAt = (x: number, y: number): string | null => {
+  const hit = document.elementFromPoint(x, y)
+  if (!(hit instanceof Element)) return null
+  const marked = hit.closest('[data-day]')
+  const day = marked?.getAttribute('data-day')
+  if (day) return day
+  if (mode.value === 'day' && hit.closest('.agenda')) return selected.value
+  return null
+}
+
+const onChipMove = (event: PointerEvent): void => {
+  if (!chipDrag) return
+  const dx = event.clientX - chipDrag.x
+  const dy = event.clientY - chipDrag.y
+  if (!chipDrag.moved && dx * dx + dy * dy < 16) return
+  chipDrag.moved = true
+  chipDragging.value = true
+  hoverDay.value = dayAt(event.clientX, event.clientY)
+}
+
+const onChipUp = (): void => {
+  window.removeEventListener('pointermove', onChipMove)
+  window.removeEventListener('pointerup', onChipUp)
+  const drag = chipDrag
+  chipDrag = null
+  chipDragging.value = false
+  const day = hoverDay.value
+  hoverDay.value = null
+  if (!drag?.moved) return
+  ignoreChipClick = true
+  if (!day || drag.task.due?.slice(0, 10) === day) return
+  const due = moveDueToDay(drag.task.due, day)
+  if (due) writeDue(drag.task, due)
+}
+
+// Chromium treats a drag that starts on a button as a text selection.
+const onChipDown = (task: DeskmarkTaskRef, event: PointerEvent): void => {
+  if (event.button !== 0 || task.status === 'done' || task.line == null) return
+  chipDrag = { task, x: event.clientX, y: event.clientY, moved: false }
+  window.addEventListener('pointermove', onChipMove)
+  window.addEventListener('pointerup', onChipUp)
+}
+
+const onChipClick = (task: DeskmarkTaskRef): void => {
+  if (ignoreChipClick) {
+    ignoreChipClick = false
+    return
+  }
+  openTask(task)
 }
 
 const allowDrop = (day: string | null, event: DragEvent): void => {
@@ -461,7 +514,11 @@ const clearHover = (): void => {
 }
 
 onMounted(() => window.addEventListener('dragend', clearHover))
-onBeforeUnmount(() => window.removeEventListener('dragend', clearHover))
+onBeforeUnmount(() => {
+  window.removeEventListener('dragend', clearHover)
+  window.removeEventListener('pointermove', onChipMove)
+  window.removeEventListener('pointerup', onChipUp)
+})
 
 const create = async (): Promise<void> => {
   if (!root.value || mode.value !== 'day' || !selected.value || !text.value.trim()) return
@@ -529,6 +586,7 @@ header, form, .chips {
   min-height: 76px;
   padding: 3px;
   border-radius: 4px;
+  user-select: none;
 }
 .daynum {
   align-self: center;
@@ -552,12 +610,16 @@ header, form, .chips {
   text-overflow: ellipsis;
   white-space: nowrap;
   cursor: grab;
+  user-select: none;
   color: var(--editorColor);
   background: color-mix(in srgb, var(--themeColor) 22%, var(--editorBgColor));
   border-radius: 2px;
 }
 .chip.late {
   background: color-mix(in srgb, var(--deleteColor) 24%, var(--editorBgColor));
+}
+.chip.grabbing {
+  cursor: grabbing;
 }
 .more {
   padding-left: 3px;
