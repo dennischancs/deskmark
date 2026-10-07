@@ -104,13 +104,14 @@ const sampleManifest: PluginManifest = {
   name: 'Word count',
   api: 1,
   entry: 'index.html',
-  permissions: ['notes.read', 'ui.command', 'ui.panel']
+  permissions: ['notes.read', 'ui.command', 'ui.panel', 'settings']
 }
 const pluginLoaded = ref(false)
 try {
   const loaded = pluginHost.load(readManifest(sampleManifest), {
     commands: [{ id: 'count', title: t('plugin.words') }],
-    views: [{ id: 'panel', title: t('plugin.words') }]
+    views: [{ id: 'panel', title: t('plugin.words') }],
+    settings: [{ id: 'panel', title: t('plugin.words') }]
   })
   const commandCenter = useCommandCenterStore()
   for (const command of loaded.commands) {

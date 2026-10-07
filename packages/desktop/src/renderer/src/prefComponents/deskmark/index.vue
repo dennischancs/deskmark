@@ -49,6 +49,19 @@
         <p class="seconds-hint">
           {{ t('preferences.deskmark.captureShortcutHint') }}
         </p>
+        <h6 class="title">
+          {{ t('preferences.deskmark.pluginSettings') }}
+        </h6>
+        <p class="seconds-hint">
+          {{ t('preferences.deskmark.pluginSettingsHint') }}
+        </p>
+        <p
+          v-for="item of pluginSettings"
+          :key="item.id"
+          class="seconds-hint"
+        >
+          {{ item.title }}
+        </p>
         <bool
           :description="t('preferences.deskmark.wordCount')"
           :bool="deskmarkWordCount"
@@ -132,7 +145,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { usePreferencesStore } from '@/store/preferences'
@@ -142,6 +155,7 @@ import Bool from '../common/bool/index.vue'
 import { normalizeReminderSeconds } from 'common/reminderSeconds'
 import { normalizeCaptureAccelerator } from 'common/captureShortcut'
 import { normalizeExtensions, PLAIN_TEXT_EXTENSIONS } from '../../../../../../deskmark-core/src/extensions.ts'
+import { PluginHost, readManifest, type PluginManifest } from '../../../../../../deskmark-plugin/src/index.ts'
 
 const { t } = useI18n()
 const preferenceStore = usePreferencesStore()
@@ -162,6 +176,24 @@ const {
   storeToRefs(preferenceStore)
 const openAtLogin = ref(false)
 const knownExtensions = PLAIN_TEXT_EXTENSIONS
+const pluginSettings = computed(() => {
+  const host = new PluginHost()
+  const manifest: PluginManifest = {
+    id: 'wordcount',
+    name: 'Word count',
+    api: 1,
+    entry: 'index.html',
+    permissions: ['notes.read', 'ui.command', 'ui.panel', 'settings']
+  }
+  try {
+    host.load(readManifest(manifest), {
+      settings: [{ id: 'panel', title: t('plugin.words') }]
+    })
+  } catch {
+    return []
+  }
+  return host.settings().filter(item => !item.builtin)
+})
 
 onMounted(() => {
   window.electron.ipcRenderer.invoke('mt::deskmark::login-get').then((enabled) => {

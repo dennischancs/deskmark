@@ -809,6 +809,8 @@
       "reminderSecondsHint": "開かなければ、その秒数で隠れます。",
       "captureShortcut": "新しい付箋のショートカット",
       "captureShortcutHint": "空にすると無効。初期値は Ctrl+Alt+N。",
+      "pluginSettings": "小さな機能",
+      "pluginSettingsHint": "ここに出ている機能は設定へ登録されています。",
       "openAtLogin": "ログイン時に開く",
       "extensions": "テキストの拡張子",
       "extensionsHint": "コンマで区切ります。チェックは、このエディタがもともと開ける種類です。",

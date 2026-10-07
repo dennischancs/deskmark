@@ -33,7 +33,7 @@ export interface PluginView {
 export interface HostContribution {
   id: string
   title: string
-  kind: 'command' | 'view'
+  kind: 'command' | 'view' | 'settings'
   builtin: boolean
 }
 
@@ -114,6 +114,7 @@ export interface LoadedPlugin {
   manifest: PluginManifest
   commands: PluginCommand[]
   views: PluginView[]
+  settings: PluginCommand[]
 }
 
 export class PluginHost {
@@ -125,17 +126,21 @@ export class PluginHost {
     this.builtins.push(contribution)
   }
 
-  load(manifest: PluginManifest, contributions: { commands?: PluginCommand[], views?: PluginView[] } = {}): LoadedPlugin {
+  load(manifest: PluginManifest, contributions: { commands?: PluginCommand[], views?: PluginView[], settings?: PluginCommand[] } = {}): LoadedPlugin {
     if (this.plugins.has(manifest.id)) throw new PluginError('这个小功能已经打开')
     const commands = contributions.commands ?? []
     const views = contributions.views ?? []
+    const settings = contributions.settings ?? []
     if (commands.length && !manifest.permissions.includes('ui.command')) {
       throw new PluginError('这个小功能没有得到相应允许')
     }
     if (views.length && !manifest.permissions.includes('ui.panel')) {
       throw new PluginError('这个小功能没有得到相应允许')
     }
-    const loaded = { manifest, commands, views }
+    if (settings.length && !manifest.permissions.includes('settings')) {
+      throw new PluginError('这个小功能没有得到相应允许')
+    }
+    const loaded = { manifest, commands, views, settings }
     this.plugins.set(manifest.id, loaded)
     return loaded
   }
@@ -162,6 +167,16 @@ export class PluginHost {
       }
     }
     return [...this.builtins.filter(item => item.kind === 'view'), ...extra]
+  }
+
+  settings(): HostContribution[] {
+    const extra: HostContribution[] = []
+    for (const plugin of this.plugins.values()) {
+      for (const page of plugin.settings) {
+        extra.push({ id: `${plugin.manifest.id}:${page.id}`, title: page.title, kind: 'settings', builtin: false })
+      }
+    }
+    return [...this.builtins.filter(item => item.kind === 'settings'), ...extra]
   }
 }
 

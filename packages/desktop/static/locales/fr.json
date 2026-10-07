@@ -809,6 +809,8 @@
       "reminderSecondsHint": "Sans ouverture, il se cache au bout de ce délai.",
       "captureShortcut": "Raccourci pour une nouvelle note",
       "captureShortcutHint": "Laisser vide pour désactiver. Par défaut : Ctrl+Alt+N.",
+      "pluginSettings": "Petites fonctions",
+      "pluginSettingsHint": "Celles-ci se sont inscrites dans les réglages.",
       "openAtLogin": "Ouvrir à la connexion",
       "extensions": "Extensions de texte",
       "extensionsHint": "Séparez par des virgules. Les cases sont les types que cet éditeur ouvrait déjà.",

@@ -809,6 +809,8 @@
       "reminderSecondsHint": "Açılmazsa süre dolunca gizlenir.",
       "captureShortcut": "Yeni not kısayolu",
       "captureShortcutHint": "Kapatmak için boş bırakın. Varsayılan Ctrl+Alt+N.",
+      "pluginSettings": "Küçük işlevler",
+      "pluginSettingsHint": "Bunlar ayarlara kaydoldu.",
       "openAtLogin": "Oturum açılınca aç",
       "extensions": "Metin uzantıları",
       "extensionsHint": "Virgülle ayırın. Kutular, bu düzenleyicinin zaten açtığı türlerdir.",

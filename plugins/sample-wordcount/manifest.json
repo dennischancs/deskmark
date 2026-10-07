@@ -3,5 +3,5 @@
   "name": "Word count",
   "api": 1,
   "entry": "index.html",
-  "permissions": ["notes.read", "ui.command", "ui.panel"]
+  "permissions": ["notes.read", "ui.command", "ui.panel", "settings"]
 }

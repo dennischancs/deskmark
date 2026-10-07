@@ -809,6 +809,8 @@
       "reminderSecondsHint": "Zonder openen verdwijnt hij na die tijd.",
       "captureShortcut": "Sneltoets voor een nieuw briefje",
       "captureShortcutHint": "Leeg laten om uit te zetten. Standaard is Ctrl+Alt+N.",
+      "pluginSettings": "Kleine functies",
+      "pluginSettingsHint": "Deze hebben zich in de instellingen aangemeld.",
       "openAtLogin": "Openen bij aanmelden",
       "extensions": "Tekstextensies",
       "extensionsHint": "Scheid ze met komma’s. De vakjes zijn de soorten die deze editor al opende.",

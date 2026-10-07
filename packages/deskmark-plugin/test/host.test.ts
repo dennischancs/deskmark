@@ -47,6 +47,18 @@ test('卸载后命令消失，内置命令还在', () => {
   assert.equal(host.views().some(item => item.id === 'calendar.open'), true)
 })
 
+test('没有设置权限就不能登记设置页', () => {
+  const host = new PluginHost()
+  assert.throws(() => host.load(readManifest(good), {
+    settings: [{ id: 'panel', title: '字数' }]
+  }), /允许/)
+  const manifest = readManifest({ ...good, permissions: [...good.permissions, 'settings'] })
+  host.load(manifest, { settings: [{ id: 'panel', title: '字数' }] })
+  assert.equal(host.settings().some(item => item.id === 'wordcount:panel' && item.kind === 'settings'), true)
+  host.unload('wordcount')
+  assert.equal(host.settings().some(item => item.id === 'wordcount:panel'), false)
+})
+
 test('超过时限就停下来，不继续做', () => {
   const deadline = createDeadline(5, Date.now() - 10)
   assert.equal(deadline.expired(), true)

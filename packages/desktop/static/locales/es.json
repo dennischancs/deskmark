@@ -809,6 +809,8 @@
       "reminderSecondsHint": "Si no lo abres, se oculta al cumplirse el tiempo.",
       "captureShortcut": "Atajo para una nota nueva",
       "captureShortcutHint": "Déjalo vacío para desactivarlo. El predeterminado es Ctrl+Alt+N.",
+      "pluginSettings": "Funciones pequeñas",
+      "pluginSettingsHint": "Estas se registraron en los ajustes.",
       "openAtLogin": "Abrir al iniciar sesión",
       "extensions": "Extensiones de texto",
       "extensionsHint": "Sepáralas con comas. Las casillas son los tipos que este editor ya abría.",

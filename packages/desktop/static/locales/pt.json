@@ -809,6 +809,8 @@
       "reminderSecondsHint": "Se não abrir, esconde-se quando o tempo acabar.",
       "captureShortcut": "Atalho para uma nova nota",
       "captureShortcutHint": "Deixe vazio para desligar. A predefinição é Ctrl+Alt+N.",
+      "pluginSettings": "Pequenas funções",
+      "pluginSettingsHint": "Estas registaram-se nas definições.",
       "openAtLogin": "Abrir ao iniciar sessão",
       "extensions": "Extensões de texto",
       "extensionsHint": "Separe por vírgulas. As caixas são os tipos que este editor já abria.",
