@@ -10,4 +10,4 @@
 - 「设置 - 桌笺」里可以改这个快捷键。留空就关掉。
 - 没有打开笔记文件夹时，快捷键不会新建文件。
 
-这次还没有打 Windows 安装包。macOS 和 Linux 也没有打包。
+Windows x64 安装包是 dist/marktext-win-x64-7.10.0-setup.exe。解包程序文件版本是 7.10.0。macOS 和 Linux 没有打包。
