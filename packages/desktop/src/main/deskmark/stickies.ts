@@ -17,6 +17,19 @@ import type Accessor from '../app/accessor'
 
 const DEFAULT_BOUNDS = { x: 80, y: 80, width: 360, height: 320 }
 
+// The packaged icon lives in resources/static. A dev run still has static/ next to the working directory.
+export function resolveTrayIcon(
+  resourcesPath: string,
+  cwd: string,
+  exists: (file: string) => boolean
+): string | null {
+  const candidates = [
+    join(resourcesPath, 'static', 'logo-small.png'),
+    join(cwd, 'static', 'logo-small.png')
+  ]
+  return candidates.find(file => exists(file)) ?? null
+}
+
 export class StickyHost {
   private readonly windows = new Map<string, EditorWindow>()
   private vaultRoot: string | null = null
