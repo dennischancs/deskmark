@@ -297,7 +297,8 @@
       "sentence": "这句话",
       "openNote": "在笔记里打开",
       "noMatch": "没有符合的待办",
-      "sort": "排序"
+      "sort": "排序",
+      "scanning": "正在查看文件 {done}"
     }
   },
   "commandPalette": {
@@ -804,7 +805,17 @@
       "wordCount": "显示字数",
       "detail": "每条待办的日期、提醒、优先级和重复，在待办旁边的属性里改。月历上能看到未完成的待办。拖到另一天，或放到选中的那一天，只改原来那一行的日期，不另抄一份。这里只决定这些功能开不开。",
       "reminderLimit": "提醒只在这个程序还开着的时候发出。关掉之后，到点不会响。",
-      "openAtLogin": "登录后自动打开"
+      "openAtLogin": "登录后自动打开",
+      "extensions": "纯文本扩展名",
+      "extensionsHint": "用逗号分开。勾选的是这个编辑器本来就能打开的几种。",
+      "rules": "识别规则",
+      "rulesHint": "待办和日期仍写在原来的文件里。这些开关只决定日历和待办列表显示什么。",
+      "ruleTask": "像 - [ ] 这样的一行",
+      "ruleComment": "行尾 deskmark 注释里的日期和提醒",
+      "ruleFront": "文首写了 kind: todo 的整篇",
+      "ruleDate": "待办文字里的 YYYY-MM-DD",
+      "extraPrefixes": "额外的行开头",
+      "extraPrefixesHint": "TODO:、待办:"
     }
   },
   "about": {

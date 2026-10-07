@@ -231,6 +231,36 @@
     "type": "boolean",
     "default": true
   },
+  "deskmarkScanExtensions": {
+    "description": "Deskmark--Plain text extensions to scan for tasks",
+    "type": "string",
+    "default": "markdown,mdown,mkdn,md,mkd,mdwn,mdtxt,mdtext,mdx,text,txt"
+  },
+  "deskmarkRuleTaskLine": {
+    "description": "Deskmark--Recognize Markdown task lines",
+    "type": "boolean",
+    "default": true
+  },
+  "deskmarkRuleComment": {
+    "description": "Deskmark--Read dates from deskmark comments",
+    "type": "boolean",
+    "default": true
+  },
+  "deskmarkRuleFrontMatter": {
+    "description": "Deskmark--Recognize a whole note marked kind todo",
+    "type": "boolean",
+    "default": true
+  },
+  "deskmarkRuleDateInText": {
+    "description": "Deskmark--Treat YYYY-MM-DD in the task text as a date",
+    "type": "boolean",
+    "default": false
+  },
+  "deskmarkExtraPrefixes": {
+    "description": "Deskmark--Extra line prefixes that start a task",
+    "type": "string",
+    "default": ""
+  },
   "hideLinkPopup": {
     "description": "Editor--Hide link popup when the cursor is hover on the link",
     "type": "boolean",

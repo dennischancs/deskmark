@@ -297,7 +297,8 @@
       "sentence": "내용",
       "openNote": "노트에서 열기",
       "noMatch": "일치하는 할 일이 없습니다",
-      "sort": "정렬"
+      "sort": "정렬",
+      "scanning": "파일을 살펴보는 중 {done}"
     }
   },
   "commandPalette": {
@@ -804,7 +805,17 @@
       "wordCount": "글자 수 표시",
       "detail": "날짜, 알림, 우선순위, 반복은 각 할 일에서 바꿉니다. 달에는 끝나지 않은 할 일이 보입니다. 다른 날로 끌거나 고른 날에 두면 원래 줄의 날짜만 바뀝니다. 여기서는 기능만 켜고 끕니다.",
       "reminderLimit": "알림은 책상메모가 열려 있을 때만 옵니다. 종료하면 시간이 되어도 울리지 않습니다.",
-      "openAtLogin": "로그인할 때 열기"
+      "openAtLogin": "로그인할 때 열기",
+      "extensions": "텍스트 확장자",
+      "extensionsHint": "쉼표로 구분합니다. 체크는 이 편집기가 원래 여는 종류입니다.",
+      "rules": "알아보는 규칙",
+      "rulesHint": "할 일과 날짜는 원래 파일에 남습니다. 이 스위치는 달력과 목록에 보일 것만 정합니다.",
+      "ruleTask": "- [ ] 처럼 생긴 줄",
+      "ruleComment": "줄 끝 deskmark 주석의 날짜와 알림",
+      "ruleFront": "머리에 kind: todo 라고 쓴 노트 전체",
+      "ruleDate": "할 일 문장의 YYYY-MM-DD",
+      "extraPrefixes": "다른 줄 시작",
+      "extraPrefixesHint": "TODO:, 待办:"
     }
   },
   "about": {

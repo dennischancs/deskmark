@@ -297,7 +297,8 @@
       "sentence": "Tekst",
       "openNote": "In notitie openen",
       "noMatch": "Geen overeenkomende taken",
-      "sort": "Sorteren"
+      "sort": "Sorteren",
+      "scanning": "Bestanden bekijken {done}"
     }
   },
   "commandPalette": {
@@ -804,7 +805,17 @@
       "wordCount": "Woorden tonen",
       "detail": "Datum, herinnering, prioriteit en herhaling staan bij de taak zelf. De maand toont open taken. Slepen naar een andere dag, of op de gekozen dag zetten, wijzigt alleen de datum in de oorspronkelijke regel. Hier zet je de functie alleen aan of uit.",
       "reminderLimit": "Herinneringen komen alleen zolang Bureaubriefje open is. Na afsluiten gaat er niets af.",
-      "openAtLogin": "Openen bij aanmelden"
+      "openAtLogin": "Openen bij aanmelden",
+      "extensions": "Tekstextensies",
+      "extensionsHint": "Scheid ze met komma’s. De vakjes zijn de soorten die deze editor al opende.",
+      "rules": "Wat herkend wordt",
+      "rulesHint": "Taken en datums blijven in het oorspronkelijke bestand. Deze schakelaars bepalen alleen wat de kalender en de lijst tonen.",
+      "ruleTask": "Regels zoals - [ ]",
+      "ruleComment": "Datum en herinnering in het deskmark-commentaar aan het regeleinde",
+      "ruleFront": "Een hele notitie met kind: todo in de kop",
+      "ruleDate": "Een YYYY-MM-DD in de taaktekst",
+      "extraPrefixes": "Andere regelbeginselen",
+      "extraPrefixesHint": "TODO:, 待办:"
     }
   },
   "about": {

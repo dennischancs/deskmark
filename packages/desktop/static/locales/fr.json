@@ -297,7 +297,8 @@
       "sentence": "Texte",
       "openNote": "Ouvrir dans la note",
       "noMatch": "Aucune tâche correspondante",
-      "sort": "Trier"
+      "sort": "Trier",
+      "scanning": "Lecture des fichiers {done}"
     }
   },
   "commandPalette": {
@@ -804,7 +805,17 @@
       "wordCount": "Afficher le nombre de mots",
       "detail": "La date, le rappel, la priorité et la répétition se règlent sur la tâche. Le mois montre les tâches ouvertes. Les glisser sur un autre jour, ou les poser sur le jour choisi, ne change que la date de la ligne originale. Ici, on ne fait que les activer.",
       "reminderLimit": "Les rappels arrivent seulement pendant que Pense-bête est ouvert. Une fois fermé, l’heure ne sonne pas.",
-      "openAtLogin": "Ouvrir à la connexion"
+      "openAtLogin": "Ouvrir à la connexion",
+      "extensions": "Extensions de texte",
+      "extensionsHint": "Séparez par des virgules. Les cases sont les types que cet éditeur ouvrait déjà.",
+      "rules": "Ce qui est reconnu",
+      "rulesHint": "Les tâches et les dates restent dans le fichier d’origine. Ces choix changent seulement ce que le calendrier et la liste montrent.",
+      "ruleTask": "Les lignes comme - [ ]",
+      "ruleComment": "Date et rappel dans le commentaire deskmark en fin de ligne",
+      "ruleFront": "Une note entière dont l’en-tête dit kind: todo",
+      "ruleDate": "Un YYYY-MM-DD dans le texte de la tâche",
+      "extraPrefixes": "Autres débuts de ligne",
+      "extraPrefixesHint": "TODO :, 待办:"
     }
   },
   "about": {

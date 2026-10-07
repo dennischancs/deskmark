@@ -1,5 +1,6 @@
 export { IndexLock } from './lock.ts'
-export { collectVaultFiles, groupTasks } from './vault.ts'
+export { collectVaultFiles, groupTasks, listTextFiles, matchesExtension } from './vault.ts'
+export { normalizeExtensions } from '../../deskmark-core/src/index.ts'
 export { editTaskFile } from './editTask.ts'
 export {
   SCHEMA_VERSION,

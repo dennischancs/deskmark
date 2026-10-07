@@ -2,6 +2,7 @@ import { ipcMain } from 'electron'
 import log from 'electron-log'
 import { join } from 'node:path'
 import type { InlinePatch } from '../../../../deskmark-core/src/index.ts'
+import type { DeskmarkScanOptions } from '@shared/types/ipc'
 import { getStickyHost } from '../deskmark/stickies'
 import { setReminderVault } from '../deskmark/reminderLoop'
 import { handlePluginCall, loadSamplePlugin, rememberPluginNote } from '../deskmark/pluginGuest'
@@ -21,12 +22,12 @@ export const registerDeskmarkHandlers = (): void => {
   ipcMain.handle('mt::deskmark::plugin-call', async(_event, call: { id?: string, method?: string, path?: string }) => {
     return handlePluginCall(call || {})
   })
-  ipcMain.handle('mt::deskmark::tasks', async(_event, root: string) => {
+  ipcMain.handle('mt::deskmark::tasks', async(_event, root: string, options?: DeskmarkScanOptions | null) => {
     try {
       if (!root) return null
       const { readTaskGroups } = await import('../deskmark/tasks')
       const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
-      return readTaskGroups(root, new Date(), timeZone)
+      return readTaskGroups(root, new Date(), timeZone, options)
     } catch (error) {
       log.error('Failed to read tasks', error)
       return null
@@ -53,8 +54,9 @@ export const registerDeskmarkHandlers = (): void => {
         request.content,
         request.write
       )
-      const { readTaskGroups } = await import('../deskmark/tasks')
-      return { ...result, groups: readTaskGroups(request.root, new Date(), timeZone) }
+      const { rememberFile, currentGroups } = await import('../deskmark/scanner')
+      if (result.changed) rememberFile(request.root, request.notePath, result.markdown)
+      return { ...result, groups: currentGroups(request.root, new Date(), timeZone) }
     } catch (error) {
       log.error('Failed to edit task', error)
       return null

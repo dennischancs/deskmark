@@ -297,7 +297,8 @@
       "sentence": "文",
       "openNote": "ノートで開く",
       "noMatch": "一致するタスクはありません",
-      "sort": "並べ替え"
+      "sort": "並べ替え",
+      "scanning": "ファイルを見ています {done}"
     }
   },
   "commandPalette": {
@@ -804,7 +805,17 @@
       "wordCount": "文字数を表示",
       "detail": "日付、通知、優先度、繰り返しは各やることで変えます。月の上に未完了のやることを表示します。別の日へドラッグするか、選んだ日に置くと、元の行の日付だけが変わります。ここでは機能のオンとオフだけです。",
       "reminderLimit": "通知はデスクメモが開いているときだけ届きます。終了したあとは、時間になっても鳴りません。",
-      "openAtLogin": "ログイン時に開く"
+      "openAtLogin": "ログイン時に開く",
+      "extensions": "テキストの拡張子",
+      "extensionsHint": "コンマで区切ります。チェックは、このエディタがもともと開ける種類です。",
+      "rules": "認識するルール",
+      "rulesHint": "予定と日付は元のファイルに残ります。ここはカレンダーとリストに出すものだけを決めます。",
+      "ruleTask": "- [ ] のような行",
+      "ruleComment": "行末の deskmark コメントにある日付と通知",
+      "ruleFront": "先頭に kind: todo と書いたノート全体",
+      "ruleDate": "本文中の YYYY-MM-DD",
+      "extraPrefixes": "ほかの行の始まり",
+      "extraPrefixesHint": "TODO:、待办:"
     }
   },
   "about": {

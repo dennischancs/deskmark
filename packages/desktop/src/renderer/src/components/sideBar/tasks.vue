@@ -14,6 +14,12 @@
     >
       {{ t('sticky.open') }}
     </button>
+    <p
+      v-if="scanning"
+      class="empty"
+    >
+      {{ t('sideBar.tasks.scanning', { done: seen }) }}
+    </p>
     <div
       v-if="root"
       class="tools"
@@ -142,12 +148,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useProjectStore } from '@/store/project'
 import { useEditorStore } from '@/store/editor'
 import { useDeskmarkStore } from '@/store/deskmark'
+import { usePreferencesStore } from '@/store/preferences'
 import { editDeskmarkTask } from '@/util/deskmarkEdit'
 import { showDeskmarkTarget } from '@/util/deskmarkView'
 import TaskLine from '@/components/taskLine.vue'
@@ -159,10 +166,22 @@ const { t } = useI18n()
 const projectStore = useProjectStore()
 const deskmarkStore = useDeskmarkStore()
 const editorStore = useEditorStore()
+const preferenceStore = usePreferencesStore()
 const { projectTree } = storeToRefs(projectStore)
 const { revision } = storeToRefs(deskmarkStore)
 const { currentFile } = storeToRefs(editorStore)
+const {
+  deskmarkScanExtensions,
+  deskmarkRuleTaskLine,
+  deskmarkRuleComment,
+  deskmarkRuleFrontMatter,
+  deskmarkRuleDateInText,
+  deskmarkExtraPrefixes
+} = storeToRefs(preferenceStore)
 const groups = ref<DeskmarkTaskGroups | null>(null)
+let loadTicket = 0
+const scanning = computed(() => groups.value?.scanning === true)
+const seen = computed(() => groups.value?.seen ?? 0)
 const query = ref('')
 const order = ref<TaskOrder>('priority')
 const orders: TaskOrder[] = ['priority', 'due', 'title']
@@ -202,13 +221,25 @@ const visibleGroups = computed(() => {
 })
 
 const load = async (): Promise<void> => {
+  const ticket = ++loadTicket
   if (!root.value) {
     groups.value = null
     return
   }
-  groups.value = await window.electron.ipcRenderer.invoke('mt::deskmark::tasks', root.value)
+  const next = await window.electron.ipcRenderer.invoke('mt::deskmark::tasks', root.value, {
+    extensions: deskmarkScanExtensions.value,
+    taskLine: deskmarkRuleTaskLine.value,
+    commentMeta: deskmarkRuleComment.value,
+    frontMatter: deskmarkRuleFrontMatter.value,
+    dateInText: deskmarkRuleDateInText.value,
+    extraPrefixes: deskmarkExtraPrefixes.value
+  })
+  if (ticket !== loadTicket) return
+  groups.value = next
   const names = new Map<string, string>()
-  for (const group of Object.values(groups.value ?? {})) {
+  const lists = [next?.inbox, next?.today, next?.upcoming, next?.overdue, next?.done]
+  for (const group of lists) {
+    if (!group) continue
     for (const task of group) names.set(task.notePath, task.notePath.split('/').pop() || task.notePath)
   }
   deskmarkStore.notes = [...names.entries()].map(([href, title]) => ({ title, href }))
@@ -225,6 +256,26 @@ watch(revision, () => {
     console.error(error)
   })
 })
+
+watch([
+  deskmarkScanExtensions,
+  deskmarkRuleTaskLine,
+  deskmarkRuleComment,
+  deskmarkRuleFrontMatter,
+  deskmarkRuleDateInText,
+  deskmarkExtraPrefixes
+], () => {
+  load().catch((error) => {
+    console.error(error)
+  })
+})
+
+const stopIndexTick = window.electron.ipcRenderer.on('mt::deskmark-index-tick', () => {
+  load().catch((error) => {
+    console.error(error)
+  })
+})
+onBeforeUnmount(stopIndexTick)
 
 const openTask = (task: DeskmarkTaskRef): void => {
   deskmarkStore.select(task)

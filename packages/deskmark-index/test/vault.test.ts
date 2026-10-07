@@ -14,6 +14,7 @@ test('收集笔记时跳过索引目录', () => {
   writeFileSync(join(root, '.deskmark', 'hidden.md'), '- [ ] 隐藏\n', 'utf8')
   writeFileSync(join(root, 'notes', 'b.txt'), '不是 markdown', 'utf8')
   assert.deepEqual(collectVaultFiles(root).map(file => file.path), ['notes/a.md'])
+  assert.deepEqual(collectVaultFiles(root, ['md', 'txt']).map(file => file.path), ['notes/a.md', 'notes/b.txt'])
 })
 
 test('待办按分组放好', () => {

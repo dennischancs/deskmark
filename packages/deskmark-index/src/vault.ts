@@ -1,11 +1,17 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
+import { readdir, stat } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { compareAgenda, smartList, type SmartList } from '../../deskmark-core/src/index.ts'
 import type { TaskRow, VaultFile } from './database.ts'
 
 const SKIP = new Set(['.deskmark', '.git', 'node_modules'])
 
-export function collectVaultFiles(root: string): VaultFile[] {
+export function matchesExtension(name: string, extensions: readonly string[]): boolean {
+  const lower = name.toLowerCase()
+  return extensions.some(ext => ext.length > 0 && lower.endsWith(`.${ext}`))
+}
+
+export function collectVaultFiles(root: string, extensions: readonly string[] = ['md']): VaultFile[] {
   const files: VaultFile[] = []
   const visit = (directory: string): void => {
     let entries: ReturnType<typeof readdirSync>
@@ -21,7 +27,7 @@ export function collectVaultFiles(root: string): VaultFile[] {
         visit(fullPath)
         continue
       }
-      if (!entry.isFile() || !entry.name.endsWith('.md')) continue
+      if (!entry.isFile() || entry.isSymbolicLink() || !matchesExtension(entry.name, extensions)) continue
       const stat = statSync(fullPath)
       files.push({
         path: relative(root, fullPath).split('\\').join('/'),
@@ -32,6 +38,59 @@ export function collectVaultFiles(root: string): VaultFile[] {
   }
   visit(root)
   return files.sort((left, right) => left.path.localeCompare(right.path))
+}
+
+export interface ListedFile {
+  path: string
+  fullPath: string
+  mtimeMs: number
+  size: number
+}
+
+// Yielding between directories keeps a huge folder from freezing the process.
+export async function listTextFiles(
+  root: string,
+  extensions: readonly string[],
+  shouldStop: () => boolean,
+  onFile: (file: ListedFile) => Promise<void> | void
+): Promise<number> {
+  const queue = [root]
+  let seen = 0
+  while (queue.length > 0) {
+    if (shouldStop()) return seen
+    const directory = queue.pop() as string
+    let entries: Awaited<ReturnType<typeof readdir>>
+    try {
+      entries = await readdir(directory, { withFileTypes: true })
+    } catch {
+      continue
+    }
+    for (const entry of entries) {
+      if (shouldStop()) return seen
+      if (SKIP.has(entry.name) || entry.isSymbolicLink()) continue
+      const fullPath = join(directory, entry.name)
+      if (entry.isDirectory()) {
+        queue.push(fullPath)
+        continue
+      }
+      if (!entry.isFile() || !matchesExtension(entry.name, extensions)) continue
+      let info: Awaited<ReturnType<typeof stat>>
+      try {
+        info = await stat(fullPath)
+      } catch {
+        continue
+      }
+      seen += 1
+      await onFile({
+        path: relative(root, fullPath).split('\\').join('/'),
+        fullPath,
+        mtimeMs: info.mtimeMs,
+        size: info.size
+      })
+      if (seen % 40 === 0) await new Promise<void>(resolve => setImmediate(resolve))
+    }
+  }
+  return seen
 }
 
 export function groupTasks(tasks: TaskRow[], now: Date, timeZone: string): Record<SmartList, TaskRow[]> {

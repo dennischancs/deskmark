@@ -297,7 +297,8 @@
       "sentence": "這一句",
       "openNote": "在筆記裡打開",
       "noMatch": "沒有符合的待辦",
-      "sort": "排序"
+      "sort": "排序",
+      "scanning": "正在查看檔案 {done}"
     }
   },
   "commandPalette": {
@@ -804,7 +805,17 @@
       "wordCount": "顯示字數",
       "detail": "每一條待辦的日期、提醒、優先順序和重複，在待辦旁邊的屬性裡改。月曆上能看到未完成的待辦。拖到另一天，或放到選中的那一天，只改原來那一行的日期，不另抄一份。這裡只決定功能開不開。",
       "reminderLimit": "提醒只在這個程式還開著的時候發出。關掉之後，到點不會響。",
-      "openAtLogin": "登入後自動打開"
+      "openAtLogin": "登入後自動打開",
+      "extensions": "純文字副檔名",
+      "extensionsHint": "用逗號分開。勾選的是這個編輯器本來就能打開的幾種。",
+      "rules": "識別規則",
+      "rulesHint": "待辦和日期仍寫在原來的檔案裡。這些開關只決定日曆和待辦列表顯示什麼。",
+      "ruleTask": "像 - [ ] 這樣的一行",
+      "ruleComment": "行尾 deskmark 註解裡的日期和提醒",
+      "ruleFront": "文首寫了 kind: todo 的整篇",
+      "ruleDate": "待辦文字裡的 YYYY-MM-DD",
+      "extraPrefixes": "額外的行開頭",
+      "extraPrefixesHint": "TODO:、待辦:"
     }
   },
   "about": {

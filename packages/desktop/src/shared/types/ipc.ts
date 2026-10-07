@@ -75,6 +75,17 @@ export interface DeskmarkTaskGroups {
   upcoming: DeskmarkTaskRef[]
   overdue: DeskmarkTaskRef[]
   done: DeskmarkTaskRef[]
+  scanning?: boolean
+  seen?: number
+}
+
+export interface DeskmarkScanOptions {
+  extensions: string
+  taskLine: boolean
+  commentMeta: boolean
+  frontMatter: boolean
+  dateInText: boolean
+  extraPrefixes: string
 }
 
 export interface DeskmarkTaskPatch {
@@ -115,7 +126,7 @@ export interface IpcInvokeChannels {
   }
   'mt::dialog::show-save': { args: [request: SaveDialogRequest]; ret: string | null }
   'mt::fonts::list': { args: []; ret: string[] }
-  'mt::deskmark::tasks': { args: [root: string]; ret: DeskmarkTaskGroups | null }
+  'mt::deskmark::tasks': { args: [root: string, options?: DeskmarkScanOptions | null]; ret: DeskmarkTaskGroups | null }
   'mt::deskmark::edit-task': { args: [request: DeskmarkEditRequest]; ret: DeskmarkEditResult | null }
   'mt::deskmark::sticky-open': { args: [vault: string, notePath: string]; ret: void }
   'mt::deskmark::sticky-restore': { args: [vault: string]; ret: void }
@@ -374,6 +385,7 @@ export interface IpcMainEventChannels {
   'mt::set-pathname': [payload: { id: string; pathname: string; filename: string }]
   'mt::set-view-layout': [layout: unknown]
   'mt::deskmark-show': [target: 'calendar' | 'tasks' | 'wordcount' | 'sticky']
+  'mt::deskmark-index-tick': [payload: { seen: number, scanning: boolean }]
   'mt::deskmark-reminder': [notice: DeskmarkReminderNotice]
   'mt::show-command-palette': []
   'mt::show-export-dialog': [type: ExportType]

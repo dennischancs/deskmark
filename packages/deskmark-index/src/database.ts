@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
-import { agendaFromMarkdown, parseNote, type AgendaItem } from '../../deskmark-core/src/index.ts'
+import { agendaForIndex, DEFAULT_EXTRACT_RULES, parseNote, type AgendaItem, type ExtractRules } from '../../deskmark-core/src/index.ts'
 import { IndexLock } from './lock.ts'
 
 export const SCHEMA_VERSION = 1
@@ -68,25 +68,25 @@ export class VaultIndex {
     this.lock.release()
   }
 
-  rebuild(files: VaultFile[]): RebuildReport {
+  rebuild(files: VaultFile[], rules: ExtractRules = DEFAULT_EXTRACT_RULES): RebuildReport {
     const errors: string[] = []
     const sorted = [...files].sort((left, right) => left.path.localeCompare(right.path))
     this.transaction(() => {
       this.sql().exec('DELETE FROM tasks')
       this.sql().exec('DELETE FROM notes')
       for (const file of sorted) {
-        const error = this.insertFile(file)
+        const error = this.insertFile(file, rules)
         if (error) errors.push(`${file.path}: ${error}`)
       }
     })
     return { notes: this.count('notes'), tasks: this.count('tasks'), errors }
   }
 
-  upsertFile(file: VaultFile): string | null {
+  upsertFile(file: VaultFile, rules: ExtractRules = DEFAULT_EXTRACT_RULES): string | null {
     let error: string | null = null
     this.transaction(() => {
       this.deletePath(file.path)
-      error = this.insertFile(file)
+      error = this.insertFile(file, rules)
     })
     return error
   }
@@ -95,6 +95,11 @@ export class VaultIndex {
     this.transaction(() => {
       this.deletePath(path)
     })
+  }
+
+  noteTimes(): Map<string, number> {
+    const rows = this.sql().prepare('SELECT path, mtime_ms AS mtimeMs FROM notes').all() as { path: string, mtimeMs: number }[]
+    return new Map(rows.map(row => [row.path, row.mtimeMs]))
   }
 
   notes(): NoteRow[] {
@@ -157,12 +162,12 @@ export class VaultIndex {
     }
   }
 
-  private insertFile(file: VaultFile): string | null {
+  private insertFile(file: VaultFile, rules: ExtractRules): string | null {
     let parsed: ReturnType<typeof parseNote>
     let items: AgendaItem[]
     try {
       parsed = parseNote(file.content, file.path)
-      items = agendaFromMarkdown(file.path, file.content)
+      items = agendaForIndex(file.path, file.content, rules)
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       this.sql().prepare(`

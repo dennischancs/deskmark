@@ -297,7 +297,8 @@
       "sentence": "Texto",
       "openNote": "Abrir en la nota",
       "noMatch": "No hay tareas coincidentes",
-      "sort": "Ordenar"
+      "sort": "Ordenar",
+      "scanning": "Revisando archivos {done}"
     }
   },
   "commandPalette": {
@@ -804,7 +805,17 @@
       "wordCount": "Mostrar palabras",
       "detail": "La fecha, el aviso, la prioridad y la repetición se cambian en la propia tarea. El mes muestra las tareas abiertas. Arrastrar a otro día, o ponerla en el día elegido, solo cambia la fecha de la línea original. Aquí solo se enciende o se apaga.",
       "reminderLimit": "Los avisos solo llegan mientras Nota de mesa está abierta. Si se cierra, la hora no suena.",
-      "openAtLogin": "Abrir al iniciar sesión"
+      "openAtLogin": "Abrir al iniciar sesión",
+      "extensions": "Extensiones de texto",
+      "extensionsHint": "Sepáralas con comas. Las casillas son los tipos que este editor ya abría.",
+      "rules": "Qué se reconoce",
+      "rulesHint": "Las tareas y las fechas siguen en el archivo original. Estos interruptores solo cambian lo que muestran el calendario y la lista.",
+      "ruleTask": "Líneas como - [ ]",
+      "ruleComment": "Fecha y aviso en el comentario deskmark al final de la línea",
+      "ruleFront": "Una nota entera cuyo encabezado dice kind: todo",
+      "ruleDate": "Un YYYY-MM-DD en el texto de la tarea",
+      "extraPrefixes": "Otros inicios de línea",
+      "extraPrefixesHint": "TODO:, 待办:"
     }
   },
   "about": {

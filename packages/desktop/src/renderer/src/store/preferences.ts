@@ -66,6 +66,12 @@ export interface PreferencesState {
   deskmarkTasks: boolean
   deskmarkReminders: boolean
   deskmarkWordCount: boolean
+  deskmarkScanExtensions: string
+  deskmarkRuleTaskLine: boolean
+  deskmarkRuleComment: boolean
+  deskmarkRuleFrontMatter: boolean
+  deskmarkRuleDateInText: boolean
+  deskmarkExtraPrefixes: string
   imageInsertAction: ImageInsertAction | string
   imagePreferRelativeDirectory: boolean
   imageRelativeDirectoryBase: ImageRelativeDirectoryBase | string
@@ -191,6 +197,12 @@ export const usePreferencesStore = defineStore('preferences', {
     deskmarkTasks: true,
     deskmarkReminders: true,
     deskmarkWordCount: true,
+    deskmarkScanExtensions: 'markdown,mdown,mkdn,md,mkd,mdwn,mdtxt,mdtext,mdx,text,txt',
+    deskmarkRuleTaskLine: true,
+    deskmarkRuleComment: true,
+    deskmarkRuleFrontMatter: true,
+    deskmarkRuleDateInText: false,
+    deskmarkExtraPrefixes: '',
     imageInsertAction: 'folder',
     imagePreferRelativeDirectory: false,
     imageRelativeDirectoryBase: 'file',

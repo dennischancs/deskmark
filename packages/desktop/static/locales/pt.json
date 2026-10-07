@@ -297,7 +297,8 @@
       "sentence": "Texto",
       "openNote": "Abrir na nota",
       "noMatch": "Nenhuma tarefa correspondente",
-      "sort": "Ordenar"
+      "sort": "Ordenar",
+      "scanning": "Olhando os arquivos {done}"
     }
   },
   "commandPalette": {
@@ -804,7 +805,17 @@
       "wordCount": "Mostrar palavras",
       "detail": "A data, o lembrete, a prioridade e a repetição mudam-se na própria tarefa. O mês mostra as tarefas abertas. Arrastar para outro dia, ou pôr no dia escolhido, só muda a data da linha original. Aqui só se liga ou desliga.",
       "reminderLimit": "Os lembretes só chegam enquanto a Nota de mesa está aberta. Depois de fechar, a hora não toca.",
-      "openAtLogin": "Abrir ao iniciar sessão"
+      "openAtLogin": "Abrir ao iniciar sessão",
+      "extensions": "Extensões de texto",
+      "extensionsHint": "Separe por vírgulas. As caixas são os tipos que este editor já abria.",
+      "rules": "O que reconhecer",
+      "rulesHint": "Tarefas e datas continuam no arquivo original. Estes interruptores só mudam o que o calendário e a lista mostram.",
+      "ruleTask": "Linhas como - [ ]",
+      "ruleComment": "Data e lembrete no comentário deskmark no fim da linha",
+      "ruleFront": "Uma nota inteira cujo cabeçalho diz kind: todo",
+      "ruleDate": "Um YYYY-MM-DD no texto da tarefa",
+      "extraPrefixes": "Outros inícios de linha",
+      "extraPrefixesHint": "TODO:, 待办:"
     }
   },
   "about": {

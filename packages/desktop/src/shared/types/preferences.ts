@@ -29,6 +29,12 @@ export interface IUserPreferences {
   deskmarkTasks?: boolean
   deskmarkReminders?: boolean
   deskmarkWordCount?: boolean
+  deskmarkScanExtensions?: string
+  deskmarkRuleTaskLine?: boolean
+  deskmarkRuleComment?: boolean
+  deskmarkRuleFrontMatter?: boolean
+  deskmarkRuleDateInText?: boolean
+  deskmarkExtraPrefixes?: string
   hideLinkPopup?: boolean
   autoPairBracket?: boolean
   autoPairMarkdownSyntax?: boolean

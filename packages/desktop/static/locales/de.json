@@ -297,7 +297,8 @@
       "sentence": "Text",
       "openNote": "In der Notiz öffnen",
       "noMatch": "Keine passenden Aufgaben",
-      "sort": "Sortieren"
+      "sort": "Sortieren",
+      "scanning": "Dateien werden angesehen {done}"
     }
   },
   "commandPalette": {
@@ -804,7 +805,17 @@
       "wordCount": "Wörter anzeigen",
       "detail": "Datum, Erinnerung, Wichtigkeit und Wiederholung stehen an der Aufgabe selbst. Der Monat zeigt offene Aufgaben. Ziehen auf einen anderen Tag, oder auf den gewählten Tag legen, ändert nur das Datum in der ursprünglichen Zeile. Hier wird die Funktion nur ein- oder ausgeschaltet.",
       "reminderLimit": "Erinnerungen kommen nur, solange Tischzettel geöffnet ist. Nach dem Beenden klingelt nichts.",
-      "openAtLogin": "Beim Anmelden öffnen"
+      "openAtLogin": "Beim Anmelden öffnen",
+      "extensions": "Textdateiendungen",
+      "extensionsHint": "Mit Kommas trennen. Die Häkchen sind die Arten, die dieser Editor schon öffnet.",
+      "rules": "Was erkannt wird",
+      "rulesHint": "Aufgaben und Daten bleiben in der ursprünglichen Datei. Diese Schalter ändern nur, was Kalender und Liste zeigen.",
+      "ruleTask": "Zeilen wie - [ ]",
+      "ruleComment": "Datum und Erinnerung im deskmark-Kommentar am Zeilenende",
+      "ruleFront": "Eine ganze Notiz mit kind: todo im Kopf",
+      "ruleDate": "YYYY-MM-DD im Aufgabentext",
+      "extraPrefixes": "Weitere Zeilenanfänge",
+      "extraPrefixesHint": "TODO:, 待办:"
     }
   },
   "about": {
