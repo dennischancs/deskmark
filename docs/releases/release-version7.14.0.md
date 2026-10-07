@@ -10,4 +10,4 @@
 - 达到 1 MB 时，如果正在用即时模式，会问要不要改用源码模式。
 - 达到 10 MB 时，即时模式不再打开，直接用源码模式。
 
-这次还没有打 Windows 安装包。macOS 和 Linux 也没有打包。
+Windows x64 安装包是 dist/marktext-win-x64-7.14.0-setup.exe。解包程序文件版本是 7.14.0。macOS 和 Linux 没有打包。
