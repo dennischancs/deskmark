@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import type { ElectronApplication, Page } from 'playwright'
+import { _electron, type ElectronApplication, type Page } from 'playwright'
 import { execSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
@@ -84,6 +84,32 @@ test('closing the main window keeps the tray process', async() => {
     }), { timeout: 8000 }).toBe(true)
   } finally {
     stopApp(app)
+  }
+})
+
+test('the installed program keeps running after the main window closes', async() => {
+  test.setTimeout(45000)
+  const exe = path.resolve(__dirname, '../../../../dist/win-unpacked/marktext.exe')
+  test.skip(!fs.existsSync(exe), 'packaged exe is not built')
+  const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'deskmark-packaged-'))
+  const app = await _electron.launch({
+    executablePath: exe,
+    args: ['--user-data-dir', userData],
+    timeout: 30000
+  })
+  try {
+    const page = await app.firstWindow()
+    await page.locator('.side-bar').waitFor({ state: 'visible', timeout: 15000 })
+    await app.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows().find(win => win.isVisible())?.close()
+    })
+    await expect.poll(async() => app.evaluate(({ BrowserWindow }) => {
+      const windows = BrowserWindow.getAllWindows()
+      return windows.length > 0 && windows.every(win => !win.isVisible())
+    }), { timeout: 8000 }).toBe(true)
+  } finally {
+    stopApp(app)
+    fs.rmSync(userData, { recursive: true, force: true })
   }
 })
 
