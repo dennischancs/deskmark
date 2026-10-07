@@ -294,7 +294,10 @@
       "sortPriority": "Por prioridad",
       "sortDue": "Por fecha",
       "sortTitle": "Por título",
-      "sentence": "Texto"
+      "sentence": "Texto",
+      "openNote": "Abrir en la nota",
+      "noMatch": "No hay tareas coincidentes",
+      "sort": "Ordenar"
     }
   },
   "commandPalette": {

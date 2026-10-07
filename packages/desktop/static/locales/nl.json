@@ -294,7 +294,10 @@
       "sortPriority": "Op prioriteit",
       "sortDue": "Op datum",
       "sortTitle": "Op titel",
-      "sentence": "Tekst"
+      "sentence": "Tekst",
+      "openNote": "In notitie openen",
+      "noMatch": "Geen overeenkomende taken",
+      "sort": "Sorteren"
     }
   },
   "commandPalette": {

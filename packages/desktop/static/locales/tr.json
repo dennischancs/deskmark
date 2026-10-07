@@ -294,7 +294,10 @@
       "sortPriority": "Önceliğe göre",
       "sortDue": "Tarihe göre",
       "sortTitle": "Başlığa göre",
-      "sentence": "Metin"
+      "sentence": "Metin",
+      "openNote": "Notta aç",
+      "noMatch": "Eşleşen görev yok",
+      "sort": "Sırala"
     }
   },
   "commandPalette": {

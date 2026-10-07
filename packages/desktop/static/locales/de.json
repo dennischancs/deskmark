@@ -294,7 +294,10 @@
       "sortPriority": "Nach Wichtigkeit",
       "sortDue": "Nach Datum",
       "sortTitle": "Nach Titel",
-      "sentence": "Text"
+      "sentence": "Text",
+      "openNote": "In der Notiz öffnen",
+      "noMatch": "Keine passenden Aufgaben",
+      "sort": "Sortieren"
     }
   },
   "commandPalette": {

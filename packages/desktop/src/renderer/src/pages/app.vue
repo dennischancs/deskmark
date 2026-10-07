@@ -62,7 +62,7 @@
       <rename />
       <import-modal />
     </div>
-    <task-properties v-if="deskmarkTasks !== false && !stickyProbe" />
+    <task-properties v-if="deskmarkTasks !== false && !stickyProbe && rightColumn !== 'tasks'" />
   </div>
 </template>
 
@@ -132,7 +132,7 @@ const setStickyColor = (color: string): void => {
 }
 
 const { windowActive, platform, init } = storeToRefs(mainStore)
-const { showTabBar } = storeToRefs(layoutStore)
+const { showTabBar, rightColumn } = storeToRefs(layoutStore)
 const { sourceCode, theme, customCss, textDirection, zoom, deskmarkTasks } = storeToRefs(preferencesStore)
 const { projectTree } = storeToRefs(projectStore)
 const { currentFile, selectionWordCount } = storeToRefs(editorStore)

@@ -294,7 +294,10 @@
       "sortPriority": "按优先级",
       "sortDue": "按日期",
       "sortTitle": "按标题",
-      "sentence": "这句话"
+      "sentence": "这句话",
+      "openNote": "在笔记里打开",
+      "noMatch": "没有符合的待办",
+      "sort": "排序"
     }
   },
   "commandPalette": {

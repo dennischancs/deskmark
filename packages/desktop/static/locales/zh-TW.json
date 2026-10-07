@@ -294,7 +294,10 @@
       "sortPriority": "按優先順序",
       "sortDue": "按日期",
       "sortTitle": "按標題",
-      "sentence": "這一句"
+      "sentence": "這一句",
+      "openNote": "在筆記裡打開",
+      "noMatch": "沒有符合的待辦",
+      "sort": "排序"
     }
   },
   "commandPalette": {

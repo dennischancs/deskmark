@@ -294,7 +294,10 @@
       "sortPriority": "By priority",
       "sortDue": "By date",
       "sortTitle": "By title",
-      "sentence": "Text"
+      "sentence": "Text",
+      "openNote": "Open note",
+      "noMatch": "No matching tasks",
+      "sort": "Sort"
     }
   },
   "commandPalette": {

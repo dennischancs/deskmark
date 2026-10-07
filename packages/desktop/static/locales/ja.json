@@ -294,7 +294,10 @@
       "sortPriority": "優先度",
       "sortDue": "日付",
       "sortTitle": "タイトル",
-      "sentence": "文"
+      "sentence": "文",
+      "openNote": "ノートで開く",
+      "noMatch": "一致するタスクはありません",
+      "sort": "並べ替え"
     }
   },
   "commandPalette": {

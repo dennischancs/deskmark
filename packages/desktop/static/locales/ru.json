@@ -294,7 +294,10 @@
       "sortPriority": "По важности",
       "sortDue": "По дате",
       "sortTitle": "По названию",
-      "sentence": "Текст"
+      "sentence": "Текст",
+      "openNote": "Открыть в заметке",
+      "noMatch": "Нет подходящих задач",
+      "sort": "Сортировка"
     }
   },
   "commandPalette": {

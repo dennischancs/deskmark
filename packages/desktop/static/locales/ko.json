@@ -294,7 +294,10 @@
       "sortPriority": "우선순위",
       "sortDue": "날짜",
       "sortTitle": "제목",
-      "sentence": "내용"
+      "sentence": "내용",
+      "openNote": "노트에서 열기",
+      "noMatch": "일치하는 할 일이 없습니다",
+      "sort": "정렬"
     }
   },
   "commandPalette": {
