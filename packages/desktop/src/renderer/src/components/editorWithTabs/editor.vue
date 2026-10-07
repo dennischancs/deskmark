@@ -1,7 +1,7 @@
 <template>
   <div
     class="editor-wrapper"
-    :class="[{ typewriter: typewriter, focus: focus, source: sourceCode, 'viewer-open': viewerOpen }]"
+    :class="[{ typewriter: typewriter, focus: focus, source: sourceCode, 'viewer-open': viewerOpen, sticky: stickyNote }]"
     :dir="textDirection"
   >
     <div
@@ -262,6 +262,7 @@ const tableChecker = reactive({
 const editorRef = ref<HTMLDivElement | null>(null)
 const mediaViewer = ref<InstanceType<typeof MediaViewer> | null>(null)
 const viewerOpen = ref(false)
+const stickyNote = new URLSearchParams(window.location.search).get('sticky') === '1'
 const rowInput = ref<InputNumberInstance | null>(null)
 
 // Non-reactive variables
@@ -2194,6 +2195,13 @@ onBeforeUnmount(() => {
 .editor-component .mu-container {
   padding-top: 20px;
   padding-bottom: 100vh;
+}
+.editor-wrapper.sticky :deep(.mu-container) {
+  width: 100%;
+  max-width: none;
+  padding-right: 16px;
+  padding-left: 16px;
+  padding-bottom: 24px;
 }
 
 .typewriter .editor-component {

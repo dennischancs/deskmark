@@ -3,7 +3,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import test from 'node:test'
-import { collectVaultFiles, groupTasks } from '../src/index.ts'
+import { collectVaultFiles, groupTasks, listTextFiles } from '../src/index.ts'
 import type { TaskRow } from '../src/database.ts'
 
 test('收集笔记时跳过索引目录', () => {
@@ -15,6 +15,21 @@ test('收集笔记时跳过索引目录', () => {
   writeFileSync(join(root, 'notes', 'b.txt'), '不是 markdown', 'utf8')
   assert.deepEqual(collectVaultFiles(root).map(file => file.path), ['notes/a.md'])
   assert.deepEqual(collectVaultFiles(root, ['md', 'txt']).map(file => file.path), ['notes/a.md', 'notes/b.txt'])
+})
+
+test('按扩展名往下找，并跳过 node_modules', async() => {
+  const root = join(tmpdir(), `deskmark-walk-${Date.now()}`)
+  mkdirSync(join(root, 'notes'), { recursive: true })
+  mkdirSync(join(root, 'node_modules'), { recursive: true })
+  writeFileSync(join(root, 'notes', 'a.md'), '- [ ] 甲\n', 'utf8')
+  writeFileSync(join(root, 'b.txt'), '乙\n', 'utf8')
+  writeFileSync(join(root, 'node_modules', 'c.md'), '- [ ] 隐藏\n', 'utf8')
+  const found: string[] = []
+  const seen = await listTextFiles(root, ['md', 'txt'], () => false, (file) => {
+    found.push(file.path)
+  })
+  assert.equal(seen, 2)
+  assert.deepEqual(found.sort(), ['b.txt', 'notes/a.md'])
 })
 
 test('待办按分组放好', () => {
