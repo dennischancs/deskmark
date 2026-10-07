@@ -1022,7 +1022,10 @@
       "exportSuccessMessage": "¡Se exportó «{name}» correctamente!",
       "exportLinkedMediaMessage": "Se exportó \"{name}\". Este formato enlaza las imágenes en lugar de incrustarlas: mantén las imágenes junto al archivo y comparte la carpeta completa.",
       "fileRemovedOnDisk": "«{name}» ha sido eliminado del disco.",
-      "fileChangedOnDisk": "«{name}» ha cambiado en el disco. ¿Deseas recargarlo?"
+      "fileChangedOnDisk": "«{name}» ha cambiado en el disco.",
+      "keepEdits": "Conservar cambios",
+      "reloadFile": "Recargar",
+      "saveCopy": "Guardar como"
     }
   },
   "spellchecker": {

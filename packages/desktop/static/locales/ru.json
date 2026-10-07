@@ -1022,7 +1022,10 @@
       "exportSuccessMessage": "\"{name}\" успешно экспортирован!",
       "exportLinkedMediaMessage": "\"{name}\" экспортирован. Этот формат связывает изображения вместо их встраивания, поэтому держите изображения рядом с файлом и делитесь всей папкой.",
       "fileRemovedOnDisk": "\"{name}\" был удалён с диска.",
-      "fileChangedOnDisk": "\"{name}\" был изменён на диске. Перезагрузить его?"
+      "fileChangedOnDisk": "\"{name}\" изменён на диске.",
+      "keepEdits": "Оставить правки",
+      "reloadFile": "Перезагрузить",
+      "saveCopy": "Сохранить как"
     }
   },
   "spellchecker": {

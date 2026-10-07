@@ -1022,7 +1022,10 @@
       "exportSuccessMessage": "\"{name}\" başarıyla dışa aktarıldı!",
       "exportLinkedMediaMessage": "\"{name}\" dışa aktarıldı. Bu biçim görselleri gömmez, dosya bağlantısı olarak bırakır — görselleri dosyanın yanında tutun ve klasörün tamamını paylaşın.",
       "fileRemovedOnDisk": "\"{name}\" diskten kaldırıldı.",
-      "fileChangedOnDisk": "\"{name}\" dosyasında değişiklikler var, yeniden yüklensin mi?"
+      "fileChangedOnDisk": "\"{name}\" diskte değişti.",
+      "keepEdits": "Düzenlemeyi tut",
+      "reloadFile": "Yeniden yükle",
+      "saveCopy": "Farklı kaydet"
     }
   },
   "spellchecker": {

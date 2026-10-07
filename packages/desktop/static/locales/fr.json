@@ -1022,7 +1022,10 @@
       "exportSuccessMessage": "« {name} » a été exporté avec succès !",
       "exportLinkedMediaMessage": "« {name} » a été exporté. Ce format lie les images au lieu de les intégrer : gardez les images à côté du fichier et partagez le dossier entier.",
       "fileRemovedOnDisk": "« {name} » a été supprimé du disque.",
-      "fileChangedOnDisk": "« {name} » a été modifié sur le disque. Voulez-vous le recharger ?"
+      "fileChangedOnDisk": "« {name} » a été modifié sur le disque.",
+      "keepEdits": "Garder les modifications",
+      "reloadFile": "Recharger",
+      "saveCopy": "Enregistrer sous"
     }
   },
   "spellchecker": {

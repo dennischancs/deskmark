@@ -1022,7 +1022,10 @@
       "exportSuccessMessage": "已成功匯出「{name}」！",
       "exportLinkedMediaMessage": "已匯出“{name}”。此格式以連結方式引用圖片而不內嵌，請讓圖片與檔案放在一起，分享時一併帶上整個資料夾。",
       "fileRemovedOnDisk": "「{name}」已在磁碟上被刪除。",
-      "fileChangedOnDisk": "「{name}」已在磁碟上發生變更。是否重新載入？"
+      "fileChangedOnDisk": "「{name}」已在磁碟上發生變更。",
+      "keepEdits": "保留編輯",
+      "reloadFile": "重新載入",
+      "saveCopy": "另存"
     }
   },
   "spellchecker": {

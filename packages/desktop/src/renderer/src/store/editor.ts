@@ -23,6 +23,7 @@ import { useMainStore } from '.'
 import { t } from '../i18n'
 import { debouncedSendBufferedState, enableSessionCapture, sendBufferedState } from './bufferedState'
 import { prefersSourceMode } from 'common/sessionRules'
+import { diskChangeChoice } from 'common/diskChange'
 import type {
   IFileState,
   FileNotification,
@@ -1750,8 +1751,17 @@ export const useEditorStore = defineStore('editor', {
                 showConfirm: true,
                 exclusiveType: 'file_changed',
                 action: (status) => {
-                  if (status) {
+                  const choice = diskChangeChoice(status)
+                  if (choice === 'reload') {
                     this.loadChange(change as unknown as FileChangePayload)
+                    return
+                  }
+                  if (choice === 'save-as') {
+                    const target = this.tabs.find((item) => {
+                      return window.fileUtils.isSamePathSync(item.pathname, pathname)
+                    })
+                    if (target && this.currentFile?.id !== target.id) this.UPDATE_CURRENT_FILE(target)
+                    this.FILE_SAVE_AS()
                   }
                 }
               })

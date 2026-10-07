@@ -1022,7 +1022,10 @@
       "exportSuccessMessage": "„{name}“ wurde erfolgreich exportiert!",
       "exportLinkedMediaMessage": "\"{name}\" exportiert. Dieses Format verlinkt Bilder, statt sie einzubetten — legen Sie die Bilder zur Datei und geben Sie den ganzen Ordner weiter.",
       "fileRemovedOnDisk": "„{name}“ wurde auf dem Datenträger gelöscht.",
-      "fileChangedOnDisk": "„{name}“ wurde auf dem Datenträger geändert. Möchten Sie neu laden?"
+      "fileChangedOnDisk": "„{name}“ wurde auf dem Datenträger geändert.",
+      "keepEdits": "Bearbeitung behalten",
+      "reloadFile": "Neu laden",
+      "saveCopy": "Speichern unter"
     }
   },
   "spellchecker": {

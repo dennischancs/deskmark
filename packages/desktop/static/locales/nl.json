@@ -1022,7 +1022,10 @@
       "exportSuccessMessage": "\"{name}\" is succesvol geëxporteerd!",
       "exportLinkedMediaMessage": "\"{name}\" is geëxporteerd. Deze indeling verwijst naar afbeeldingen in plaats van ze in te sluiten — houd de afbeeldingen bij het bestand en deel de hele map.",
       "fileRemovedOnDisk": "\"{name}\" is verwijderd van schijf.",
-      "fileChangedOnDisk": "\"{name}\" is gewijzigd op schijf. Wil je het opnieuw laden?"
+      "fileChangedOnDisk": "\"{name}\" is gewijzigd op schijf.",
+      "keepEdits": "Bewerking houden",
+      "reloadFile": "Opnieuw laden",
+      "saveCopy": "Opslaan als"
     }
   },
   "spellchecker": {

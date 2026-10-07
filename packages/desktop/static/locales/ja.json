@@ -1022,7 +1022,10 @@
       "exportSuccessMessage": "「{name}」を正常にエクスポートしました！",
       "exportLinkedMediaMessage": "「{name}」をエクスポートしました。この形式は画像を埋め込まずファイル参照のままにするため、画像をファイルと同じ場所に置き、フォルダごと共有してください。",
       "fileRemovedOnDisk": "「{name}」はディスク上で削除されました。",
-      "fileChangedOnDisk": "「{name}」はディスク上で変更されました。再読み込みしますか？"
+      "fileChangedOnDisk": "「{name}」はディスク上で変更されました。",
+      "keepEdits": "編集を残す",
+      "reloadFile": "再読み込み",
+      "saveCopy": "別名で保存"
     }
   },
   "spellchecker": {

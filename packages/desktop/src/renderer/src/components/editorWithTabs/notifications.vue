@@ -10,24 +10,46 @@
     </div>
     <div class="controls">
       <div>
-        <span
-          v-if="currentNotification.showConfirm"
-          class="inline-button"
-          @click.stop="handleClick(true)"
-        >
-          {{ t('common.ok') }}
-        </span>
-        <span
-          class="inline-button"
-          @click.stop="handleClick(false)"
-        >
-          <el-icon
-            class="close-icon"
-            :size="12"
+        <template v-if="currentNotification.exclusiveType === 'file_changed'">
+          <span
+            class="inline-button text"
+            @click.stop="handleClick('keep')"
           >
-            <Close />
-          </el-icon>
-        </span>
+            {{ t('store.editor.keepEdits') }}
+          </span>
+          <span
+            class="inline-button text"
+            @click.stop="handleClick(true)"
+          >
+            {{ t('store.editor.reloadFile') }}
+          </span>
+          <span
+            class="inline-button text"
+            @click.stop="handleClick('save-as')"
+          >
+            {{ t('store.editor.saveCopy') }}
+          </span>
+        </template>
+        <template v-else>
+          <span
+            v-if="currentNotification.showConfirm"
+            class="inline-button"
+            @click.stop="handleClick(true)"
+          >
+            {{ t('common.ok') }}
+          </span>
+          <span
+            class="inline-button"
+            @click.stop="handleClick(false)"
+          >
+            <el-icon
+              class="close-icon"
+              :size="12"
+            >
+              <Close />
+            </el-icon>
+          </span>
+        </template>
       </div>
     </div>
   </div>
@@ -55,7 +77,7 @@ const currentNotification = computed(() => {
   return notifications[0]
 })
 
-const handleClick = (status: boolean) => {
+const handleClick = (status: boolean | string) => {
   const notifications = currentFile.value?.notifications
   if (!notifications || notifications.length === 0) {
     console.error(t('editor.notifications.notificationNotFound'))
@@ -115,6 +137,11 @@ const handleClick = (status: boolean) => {
     font-size: 12px;
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  & .inline-button.text {
+    width: auto;
+    padding: 0 8px;
+    white-space: nowrap;
   }
   & .inline-button:hover {
     background: rgba(255, 255, 255, 0.1);
