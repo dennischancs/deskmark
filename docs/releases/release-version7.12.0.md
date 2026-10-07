@@ -10,4 +10,4 @@
 - 它写在当前笔记文件夹的 `todos` 目录里，带待办标记，没有日期，所以出现在收件箱。
 - 还没有打开笔记文件夹时，这个命令不会新建文件。
 
-这次还没有打 Windows 安装包。macOS 和 Linux 也没有打包。
+Windows x64 安装包是 dist/marktext-win-x64-7.12.0-setup.exe。解包程序文件版本是 7.12.0。macOS 和 Linux 没有打包。
