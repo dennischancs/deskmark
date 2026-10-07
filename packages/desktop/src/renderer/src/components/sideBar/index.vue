@@ -46,8 +46,6 @@
       <plugin-panel
         v-else-if="pluginView"
         :title="t('plugin.words')"
-        :close-label="t('plugin.close')"
-        @close="closeWordCount"
       />
     </div>
     <div
@@ -135,11 +133,6 @@ try {
   })
 } catch (error) {
   console.error(error)
-}
-const closeWordCount = (): void => {
-  if (rightColumn.value.startsWith(sampleManifest.id + ':')) {
-    layoutStore.SET_LAYOUT({ rightColumn: 'files' })
-  }
 }
 const sideBarIcons = computed(() => [
   ...builtinSideBarIcons.filter((icon) => {

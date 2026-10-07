@@ -2,13 +2,6 @@
   <div class="plugin-panel deskmark-ui deskmark-side">
     <header class="head">
       <h2>{{ title }}</h2>
-      <button
-        type="button"
-        class="close"
-        @click="emit('close')"
-      >
-        {{ closeLabel }}
-      </button>
     </header>
     <section
       class="summary"
@@ -49,8 +42,7 @@ import { useProjectStore } from '@/store/project'
 import { noteInsideVault } from '../../../../../../deskmark-plugin/src/index.ts'
 import { presentNote } from '../../../../../../../plugins/sample-wordcount/measure.mjs'
 
-defineProps<{ closeLabel: string, title: string }>()
-const emit = defineEmits<{ close: [] }>()
+defineProps<{ title: string }>()
 const { locale } = useI18n()
 const editorStore = useEditorStore()
 const projectStore = useProjectStore()
