@@ -11,6 +11,33 @@ import { whenScanFinishes } from './scanner'
 
 let currentVault: string | null = null
 let tickFn: (() => void) | null = null
+// Windows keeps the toast after this function returns. If nothing retains the
+// Notification, the click listener can be collected before the user presses it.
+const shownNotices = new Set<Notification>()
+
+function showSystemNotice(note: Notification, open?: () => void): void {
+  shownNotices.add(note)
+  const drop = (): void => {
+    shownNotices.delete(note)
+  }
+  note.on('show', () => {
+    shownNotices.add(note)
+  })
+  note.on('failed', (_event, error) => {
+    log.warn('reminder toast failed', error)
+    drop()
+  })
+  note.on('close', drop)
+  note.on('click', () => {
+    drop()
+    open?.()
+  })
+  note.on('action', () => {
+    drop()
+    open?.()
+  })
+  note.show()
+}
 
 export function setReminderVault(vault: string | null): void {
   currentVault = vault || null
@@ -73,13 +100,10 @@ export function startReminderLoop(options: {
         if (system) {
           const note = new Notification({
             title: task.text,
-            body
+            body,
+            actions: [{ type: 'button', text: t('reminder.open') }]
           })
-          note.on('failed', (_event, error) => {
-            log.warn('reminder toast failed', error)
-          })
-          note.on('click', () => options.openNote(vault, task.path, task.line))
-          note.show()
+          showSystemNotice(note, () => options.openNote(vault, task.path, task.line))
         }
         options.announce?.({
           title: task.text,
@@ -93,10 +117,7 @@ export function startReminderLoop(options: {
         const title = t('reminder.missed', { count: plan.summary })
         if (system) {
           const summary = new Notification({ title, body: '' })
-          summary.on('failed', (_event, error) => {
-            log.warn('reminder toast failed', error)
-          })
-          summary.show()
+          showSystemNotice(summary)
         }
         options.announce?.({
           title,

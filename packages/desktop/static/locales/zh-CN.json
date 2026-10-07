@@ -1104,7 +1104,8 @@
     "finished": "这一天完成的"
   },
   "reminder": {
-    "missed": "还有 {count} 条提醒已经过了"
+    "missed": "还有 {count} 条提醒已经过了",
+    "open": "打开"
   },
   "plugin": {
     "close": "关闭",

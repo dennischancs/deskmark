@@ -1104,7 +1104,8 @@
     "finished": "Deze dag afgerond"
   },
   "reminder": {
-    "missed": "{count} herinneringen zijn al voorbij"
+    "missed": "{count} herinneringen zijn al voorbij",
+    "open": "Openen"
   },
   "plugin": {
     "close": "Sluiten",

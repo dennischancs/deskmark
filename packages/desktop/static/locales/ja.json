@@ -1104,7 +1104,8 @@
     "finished": "この日に終えた"
   },
   "reminder": {
-    "missed": "過ぎたリマインダーが {count} 件あります"
+    "missed": "過ぎたリマインダーが {count} 件あります",
+    "open": "開く"
   },
   "plugin": {
     "close": "閉じる",

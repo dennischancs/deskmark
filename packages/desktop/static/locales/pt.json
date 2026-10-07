@@ -1104,7 +1104,8 @@
     "finished": "Feito neste dia"
   },
   "reminder": {
-    "missed": "{count} lembretes já passaram"
+    "missed": "{count} lembretes já passaram",
+    "open": "Abrir"
   },
   "plugin": {
     "close": "Fechar",

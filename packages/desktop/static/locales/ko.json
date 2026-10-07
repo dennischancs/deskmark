@@ -1104,7 +1104,8 @@
     "finished": "이 날 끝낸 일"
   },
   "reminder": {
-    "missed": "이미 지난 알림이 {count}개 있습니다"
+    "missed": "이미 지난 알림이 {count}개 있습니다",
+    "open": "열기"
   },
   "plugin": {
     "close": "닫기",

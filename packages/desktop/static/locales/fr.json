@@ -1104,7 +1104,8 @@
     "finished": "Fini ce jour"
   },
   "reminder": {
-    "missed": "{count} rappels sont déjà passés"
+    "missed": "{count} rappels sont déjà passés",
+    "open": "Ouvrir"
   },
   "plugin": {
     "close": "Fermer",

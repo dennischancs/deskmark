@@ -1104,7 +1104,8 @@
     "finished": "這一天完成的"
   },
   "reminder": {
-    "missed": "還有 {count} 條提醒已經過了"
+    "missed": "還有 {count} 條提醒已經過了",
+    "open": "開啟"
   },
   "plugin": {
     "close": "關閉",

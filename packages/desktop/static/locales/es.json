@@ -1104,7 +1104,8 @@
     "finished": "Hecho este día"
   },
   "reminder": {
-    "missed": "{count} recordatorios ya pasaron"
+    "missed": "{count} recordatorios ya pasaron",
+    "open": "Abrir"
   },
   "plugin": {
     "close": "Cerrar",

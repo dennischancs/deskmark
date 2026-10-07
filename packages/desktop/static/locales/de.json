@@ -1104,7 +1104,8 @@
     "finished": "An diesem Tag erledigt"
   },
   "reminder": {
-    "missed": "{count} Erinnerungen sind schon vorbei"
+    "missed": "{count} Erinnerungen sind schon vorbei",
+    "open": "Öffnen"
   },
   "plugin": {
     "close": "Schließen",

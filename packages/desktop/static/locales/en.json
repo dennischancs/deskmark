@@ -1104,7 +1104,8 @@
     "finished": "Finished this day"
   },
   "reminder": {
-    "missed": "{count} reminders already passed"
+    "missed": "{count} reminders already passed",
+    "open": "Open"
   },
   "plugin": {
     "close": "Close",

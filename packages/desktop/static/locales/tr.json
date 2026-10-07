@@ -1104,7 +1104,8 @@
     "finished": "Bu gün biten"
   },
   "reminder": {
-    "missed": "{count} anımsatıcı çoktan geçti"
+    "missed": "{count} anımsatıcı çoktan geçti",
+    "open": "Aç"
   },
   "plugin": {
     "close": "Kapat",
