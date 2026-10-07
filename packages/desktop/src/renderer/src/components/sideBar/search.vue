@@ -120,6 +120,8 @@ import FindRegexIcon from '@/assets/icons/searchIcons/iconRegex.svg'
 import { VideoPause } from '@element-plus/icons-vue'
 import { useI18n } from 'vue-i18n'
 import type { SearchResult } from './types'
+import { matchesTaskSearch, parseTaskSearch, taskSearchActive } from '../../../../../../deskmark-core/src/agenda.ts'
+import type { DeskmarkTaskGroups } from '@shared/types/ipc'
 
 const { t } = useI18n()
 const layoutStore = useLayoutStore()
@@ -128,6 +130,7 @@ const editorStore = useEditorStore()
 const preferencesStore = usePreferencesStore()
 
 let searcherCancelCallback: (() => void) | null = null
+let taskSearchTicket = 0
 const ripgrepDirectorySearcher = new RipgrepDirectorySearcher()
 
 const keyword = ref('')
@@ -193,6 +196,18 @@ const search = (): void => {
     return
   }
 
+  const taskQuery = parseTaskSearch(keyword.value)
+  if (taskSearchActive(taskQuery)) {
+    const ticket = ++taskSearchTicket
+    searcherRunning.value = true
+    searchTasks(rootDirectoryPath, taskQuery, ticket).catch(() => {
+      if (ticket !== taskSearchTicket) return
+      searchResult.value = []
+      searcherRunning.value = false
+    })
+    return
+  }
+
   let canceled = false
   searcherRunning.value = true
   startShowSearchCancelAreaTimer()
@@ -248,6 +263,53 @@ const search = (): void => {
     })
 
   searcherCancelCallback = cancellable.cancel.bind(cancellable)
+}
+
+const searchTasks = async (
+  root: string,
+  query: ReturnType<typeof parseTaskSearch>,
+  ticket: number
+): Promise<void> => {
+  let groups: DeskmarkTaskGroups | null = null
+  try {
+    groups = await window.electron.ipcRenderer.invoke('mt::deskmark::tasks', root, {
+      extensions: preferencesStore.deskmarkScanExtensions,
+      taskLine: preferencesStore.deskmarkRuleTaskLine,
+      commentMeta: preferencesStore.deskmarkRuleComment,
+      frontMatter: preferencesStore.deskmarkRuleFrontMatter,
+      dateInText: preferencesStore.deskmarkRuleDateInText,
+      extraPrefixes: preferencesStore.deskmarkExtraPrefixes
+    })
+  } catch {
+    groups = null
+  }
+  if (ticket !== taskSearchTicket) return
+  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'
+  const now = new Date()
+  const tasks = groups
+    ? [groups.inbox, groups.today, groups.upcoming, groups.overdue, groups.done].flat()
+    : []
+  const byFile = new Map<string, SearchResult>()
+  for (const task of tasks) {
+    if (!matchesTaskSearch({
+      text: task.text,
+      path: task.notePath,
+      done: task.status === 'done',
+      due: task.due,
+      priority: task.priority
+    }, query, now, zone)) continue
+    const filePath = window.path.join(root, task.notePath)
+    const line = Math.max(0, (task.line ?? 1) - 1)
+    const match = {
+      lineText: task.text,
+      range: [[line, 0], [line, task.text.length]] as SearchResult['matches'][number]['range']
+    }
+    const existing = byFile.get(filePath)
+    if (existing) existing.matches.push(match)
+    else byFile.set(filePath, { filePath, matches: [match] })
+  }
+  searchResult.value = [...byFile.values()]
+  searcherRunning.value = false
 }
 
 const handleFindInFolder = (executeSearch: boolean | unknown = true): void => {

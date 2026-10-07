@@ -10,6 +10,8 @@ import {
   bridgeForDay,
   calendarGroup,
   DEADLINE_WARNING_DAYS,
+  matchesTaskSearch,
+  parseTaskSearch,
   tasksForAgenda,
   completeInlineTask,
   completeNote,
@@ -309,4 +311,20 @@ test('新待办笔记没有日期，标题进收件箱', () => {
   assert.equal(items[0].due, null)
   assert.equal(items[0].source, 'note')
   assert.equal(calendarGroup(items[0], new Date('2026-10-08T04:00:00.000Z'), 'Asia/Shanghai'), 'undated')
+})
+
+test('搜索可以只看待办、未完成、今天、逾期和高优先级', () => {
+  const query = parseTaskSearch('is:open due:today priority:high 牛奶')
+  assert.equal(query.onlyTasks, true)
+  assert.equal(query.openOnly, true)
+  assert.equal(query.due, 'today')
+  assert.equal(query.highPriority, true)
+  assert.equal(query.text, '牛奶')
+  const now = new Date('2026-10-08T02:00:00.000Z')
+  const zone = 'Asia/Shanghai'
+  const hit = { text: '买牛奶', path: 'a.md', done: false, due: '2026-10-08', priority: 'high' }
+  assert.equal(matchesTaskSearch(hit, query, now, zone), true)
+  assert.equal(matchesTaskSearch({ ...hit, done: true }, query, now, zone), false)
+  assert.equal(matchesTaskSearch({ ...hit, due: '2026-10-07' }, parseTaskSearch('due:overdue'), now, zone), true)
+  assert.equal(matchesTaskSearch(hit, parseTaskSearch('hello'), now, zone), false)
 })

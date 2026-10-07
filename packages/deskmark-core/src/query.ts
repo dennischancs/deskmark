@@ -10,9 +10,12 @@ export {
   filterTasks,
   isOverdue,
   markedDates,
+  matchesTaskSearch,
+  parseTaskSearch,
   previewTasks,
   smartList,
   sortTasks,
+  taskSearchActive,
   tasksForAgenda,
   tasksOnDate
 } from './agenda.ts'

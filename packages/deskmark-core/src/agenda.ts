@@ -99,6 +99,68 @@ export function filterTasks<T extends { text: string, notePath?: string }>(items
   return items.filter(item => `${item.text} ${item.notePath ?? ''}`.toLocaleLowerCase().includes(needle))
 }
 
+export interface TaskSearchQuery {
+  text: string
+  onlyTasks: boolean
+  openOnly: boolean
+  due: 'today' | 'overdue' | null
+  highPriority: boolean
+}
+
+export function parseTaskSearch(input: string): TaskSearchQuery {
+  const query: TaskSearchQuery = {
+    text: '',
+    onlyTasks: false,
+    openOnly: false,
+    due: null,
+    highPriority: false
+  }
+  const words: string[] = []
+  for (const token of input.split(/\s+/)) {
+    if (!token) continue
+    const lower = token.toLocaleLowerCase()
+    if (lower === 'is:task') query.onlyTasks = true
+    else if (lower === 'is:open') {
+      query.onlyTasks = true
+      query.openOnly = true
+    } else if (lower === 'due:today') {
+      query.onlyTasks = true
+      query.due = 'today'
+    } else if (lower === 'due:overdue') {
+      query.onlyTasks = true
+      query.due = 'overdue'
+    } else if (lower === 'priority:high') {
+      query.onlyTasks = true
+      query.highPriority = true
+    } else words.push(token)
+  }
+  query.text = words.join(' ')
+  return query
+}
+
+export function taskSearchActive(query: TaskSearchQuery): boolean {
+  return query.onlyTasks
+}
+
+export function matchesTaskSearch(
+  item: { text: string, path?: string, done: boolean, due: string | null, priority?: string | null },
+  query: TaskSearchQuery,
+  now: Date,
+  timeZone: string
+): boolean {
+  if (!query.onlyTasks) return false
+  if (query.openOnly && item.done) return false
+  if (query.highPriority && item.priority !== 'high') return false
+  const today = formatInZone(now, timeZone).slice(0, 10)
+  if (query.due === 'today' && item.due?.slice(0, 10) !== today) return false
+  if (query.due === 'overdue' && !isOverdue(item, now, timeZone)) return false
+  if (query.text) {
+    const haystack = `${item.text} ${item.path ?? ''}`.toLocaleLowerCase()
+    if (!haystack.includes(query.text.toLocaleLowerCase())) return false
+  }
+  return true
+}
+
 export function sortTasks<T extends AgendaSortable>(items: readonly T[], order: TaskOrder): T[] {
   const copy = [...items]
   if (order === 'title') {
