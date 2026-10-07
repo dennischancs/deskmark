@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import fs from 'fs'
 import path from 'path'
-import { launchWithMarkdown, typeIntoEditor } from './helpers'
+import { launchWithMarkdown, stopElectron, typeIntoEditor } from './helpers'
 
 // #3652 — MarkText open beside another editor. A tab the user never edited
 // discards nothing when it reloads, so it reloads silently; a tab holding
@@ -24,34 +24,59 @@ const reloadBannerText = (page: Page) =>
 test.describe('Issue #3652 — reloading a file changed on disk', () => {
   test('a tab with no local edits reloads without asking', async() => {
     const { app, page, filePath } = await launchWithMarkdown('from marktext\n')
-    await page.waitForTimeout(500)
+    try {
+      await page.waitForTimeout(500)
 
-    fs.writeFileSync(filePath, 'from another editor\n', 'utf-8')
-    await expect.poll(() => editorText(page), { timeout: 8000 }).toContain(
-      'from another editor'
-    )
+      fs.writeFileSync(filePath, 'from another editor\n', 'utf-8')
+      await expect.poll(() => editorText(page), { timeout: 8000 }).toContain(
+        'from another editor'
+      )
 
-    expect(await isDirty(page)).toBe(false)
-    expect(await reloadBannerText(page)).toBe('')
-
-    await app.close()
+      expect(await isDirty(page)).toBe(false)
+      expect(await reloadBannerText(page)).toBe('')
+    } finally {
+      stopElectron(app)
+    }
   })
 
   test('a tab with unsaved edits asks before discarding them', async() => {
     const { app, page, filePath } = await launchWithMarkdown('from marktext\n')
-    await page.waitForTimeout(500)
+    try {
+      await page.waitForTimeout(500)
 
-    await typeIntoEditor(page, ' edited here')
-    await expect.poll(() => isDirty(page), { timeout: 8000 }).toBe(true)
+      await typeIntoEditor(page, ' edited here')
+      await expect.poll(() => isDirty(page), { timeout: 8000 }).toBe(true)
 
-    // The banner text is localized, so match on the filename it interpolates.
-    fs.writeFileSync(filePath, 'from another editor\n', 'utf-8')
-    await expect.poll(() => reloadBannerText(page), { timeout: 8000 }).toContain(
-      path.basename(filePath)
-    )
+      // The banner text is localized, so match on the filename it interpolates.
+      fs.writeFileSync(filePath, 'from another editor\n', 'utf-8')
+      await expect.poll(() => reloadBannerText(page), { timeout: 8000 }).toContain(
+        path.basename(filePath)
+      )
 
-    expect(await editorText(page)).toContain('edited here')
+      expect(await editorText(page)).toContain('edited here')
+    } finally {
+      stopElectron(app)
+    }
+  })
 
-    await app.close()
+  test('keeping unsaved edits leaves both the buffer and the other editor file', async() => {
+    const { app, page, filePath } = await launchWithMarkdown('from marktext\n')
+    try {
+      await page.waitForTimeout(500)
+
+      await typeIntoEditor(page, ' edited here')
+      await expect.poll(() => isDirty(page), { timeout: 8000 }).toBe(true)
+
+      fs.writeFileSync(filePath, 'from another editor\n', 'utf-8')
+      const buttons = page.locator('.editor-notifications .inline-button')
+      await expect.poll(() => buttons.count(), { timeout: 8000 }).toBe(3)
+      await buttons.nth(0).click()
+
+      expect(await editorText(page)).toContain('edited here')
+      expect(fs.readFileSync(filePath, 'utf-8')).toContain('from another editor')
+      expect(await reloadBannerText(page)).toBe('')
+    } finally {
+      stopElectron(app)
+    }
   })
 })

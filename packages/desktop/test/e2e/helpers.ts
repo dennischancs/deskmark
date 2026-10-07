@@ -1,5 +1,6 @@
 import { expect } from '@playwright/test'
 import { _electron, type ElectronApplication, type Page } from 'playwright'
+import { execSync } from 'node:child_process'
 import * as fs from 'node:fs'
 import * as os from 'node:os'
 import * as path from 'node:path'
@@ -80,6 +81,24 @@ export const removeTree = (dir: string): void => {
         // The index keeps the folder locked until the killed process exits.
       }
     }
+  }
+}
+
+// Closing the window leaves the tray process running, so Playwright's
+// app.close() waits until the test timeout. Kill the tree instead.
+export const stopElectron = (app: ElectronApplication): void => {
+  let pid: number | undefined
+  try {
+    pid = app.process().pid
+  } catch {
+    return
+  }
+  if (!pid) return
+  try {
+    if (process.platform === 'win32') execSync(`taskkill /PID ${pid} /T /F`, { stdio: 'ignore' })
+    else process.kill(pid, 'SIGKILL')
+  } catch {
+    // The process already exited.
   }
 }
 
