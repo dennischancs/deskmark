@@ -1092,6 +1092,9 @@
     "emptyUndated": "No hay sin fecha",
     "finished": "Hecho este día"
   },
+  "reminder": {
+    "missed": "{count} recordatorios ya pasaron"
+  },
   "plugin": {
     "close": "Cerrar",
     "failed": "No se pudo abrir este complemento",

@@ -1092,6 +1092,9 @@
     "emptyUndated": "没有未定日期的待办",
     "finished": "这一天完成的"
   },
+  "reminder": {
+    "missed": "还有 {count} 条提醒已经过了"
+  },
   "plugin": {
     "close": "关闭",
     "failed": "这个小功能没能打开",

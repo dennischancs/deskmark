@@ -61,6 +61,14 @@ export interface DeskmarkTaskRef {
   completedAt?: string | null
 }
 
+export interface DeskmarkReminderNotice {
+  title: string
+  body: string
+  vault: string
+  notePath: string
+  line: number | null
+}
+
 export interface DeskmarkTaskGroups {
   inbox: DeskmarkTaskRef[]
   today: DeskmarkTaskRef[]
@@ -225,6 +233,7 @@ export interface IpcSendChannels {
   'mt::menu::popup': [template: MenuTemplate, position?: MenuPopupPosition]
   'mt::menu::popup-application': [position?: MenuPopupPosition]
   'mt::open-file': [filePath: string, options?: unknown]
+  'mt::deskmark::reminder-open': [notice: DeskmarkReminderNotice]
   'mt::open-file-by-window-id': [windowId: number, filePath: string, options?: unknown]
   'mt::open-keybindings-config': []
   'mt::open-setting-window': []
@@ -365,6 +374,7 @@ export interface IpcMainEventChannels {
   'mt::set-pathname': [payload: { id: string; pathname: string; filename: string }]
   'mt::set-view-layout': [layout: unknown]
   'mt::deskmark-show': [target: 'calendar' | 'tasks' | 'wordcount' | 'sticky']
+  'mt::deskmark-reminder': [notice: DeskmarkReminderNotice]
   'mt::show-command-palette': []
   'mt::show-export-dialog': [type: ExportType]
   'mt::show-notification': [payload: unknown]

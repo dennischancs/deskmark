@@ -1092,6 +1092,9 @@
     "emptyUndated": "Tarihsiz görev yok",
     "finished": "Bu gün biten"
   },
+  "reminder": {
+    "missed": "{count} anımsatıcı çoktan geçti"
+  },
   "plugin": {
     "close": "Kapat",
     "failed": "Bu ek açılmadı",

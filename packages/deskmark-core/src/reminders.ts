@@ -1,5 +1,9 @@
 import { formatInZone, toInstant } from './time.ts'
 
+// The loop looks once a minute. A reminder can be a little over a minute
+// old before the next look, so "just now" has to be longer than that gap.
+const FRESH_REMINDER_MS = 3 * 60_000
+
 export interface ReminderTask {
   id: string
   text: string
@@ -33,7 +37,7 @@ export function planReminders(input: {
     if (!instant || instant.getTime() > input.now.getTime()) continue
     fired.add(task.id)
     const age = input.now.getTime() - instant.getTime()
-    if (age <= 60_000) notify.push(task)
+    if (age <= FRESH_REMINDER_MS) notify.push(task)
     else missed += 1
   }
   const summary = missed > 0 && input.summaryDay !== today ? missed : null

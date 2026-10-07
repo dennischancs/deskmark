@@ -1092,6 +1092,9 @@
     "emptyUndated": "Geen zonder datum",
     "finished": "Deze dag afgerond"
   },
+  "reminder": {
+    "missed": "{count} herinneringen zijn al voorbij"
+  },
   "plugin": {
     "close": "Sluiten",
     "failed": "Deze extra functie kon niet worden geopend",

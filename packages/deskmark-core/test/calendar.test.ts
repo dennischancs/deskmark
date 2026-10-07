@@ -62,3 +62,13 @@ test('错过的提醒只汇总一次，刚到点的单独通知', () => {
   assert.deepEqual(second.notify, [])
   assert.equal(second.summary, null)
 })
+
+test('轮询晚了一分钟半，刚到的提醒仍然单独通知', () => {
+  const now = new Date('2026-10-06T01:01:30.000Z')
+  const tasks = [
+    { id: 'now', text: '刚到', remind: '2026-10-06T09:00:00+08:00', done: false, path: 'a.md', line: 1 }
+  ]
+  const plan = planReminders({ tasks, now, timeZone: 'Asia/Shanghai', fired: [], summaryDay: null })
+  assert.deepEqual(plan.notify.map(task => task.id), ['now'])
+  assert.equal(plan.summary, null)
+})

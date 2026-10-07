@@ -3,6 +3,8 @@ import { join } from 'node:path'
 import { Notification } from 'electron'
 import log from 'electron-log'
 import { planReminders, type ReminderTask } from '../../../../deskmark-core/src/reminders.ts'
+import type { DeskmarkReminderNotice } from '@shared/types/ipc'
+import { t } from '../i18n'
 import { reminderCaption } from './windowsToast'
 import { readTaskGroups } from './tasks'
 
@@ -22,6 +24,7 @@ export function startReminderLoop(options: {
   getVault?: () => string | null
   remindersEnabled?: () => boolean
   openNote: (vault: string, notePath: string, line: number | null) => void
+  announce?: (notice: DeskmarkReminderNotice) => void
 }): void {
   const file = join(options.userDataPath, 'reminder-state.json')
   const read = (): ReminderFile => {
@@ -63,22 +66,38 @@ export function startReminderLoop(options: {
       write({ fired: plan.fired, summaryDay: plan.summaryDay })
       if (!Notification.isSupported()) return
       for (const task of plan.notify) {
+        const body = reminderCaption(task.path, task.remind)
         const note = new Notification({
           title: task.text,
-          body: reminderCaption(task.path, task.remind)
+          body
         })
         note.on('failed', (_event, error) => {
           log.warn('reminder toast failed', error)
         })
         note.on('click', () => options.openNote(vault, task.path, task.line))
         note.show()
+        options.announce?.({
+          title: task.text,
+          body,
+          vault,
+          notePath: task.path,
+          line: task.line
+        })
       }
       if (plan.summary) {
-        const summary = new Notification({ title: String(plan.summary), body: '' })
+        const title = t('reminder.missed', { count: plan.summary })
+        const summary = new Notification({ title, body: '' })
         summary.on('failed', (_event, error) => {
           log.warn('reminder toast failed', error)
         })
         summary.show()
+        options.announce?.({
+          title,
+          body: '',
+          vault,
+          notePath: '',
+          line: null
+        })
       }
     } catch {
       // A bad vault should not stop the editor.

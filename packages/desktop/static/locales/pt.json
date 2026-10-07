@@ -1092,6 +1092,9 @@
     "emptyUndated": "Nenhuma sem data",
     "finished": "Feito neste dia"
   },
+  "reminder": {
+    "missed": "{count} lembretes já passaram"
+  },
   "plugin": {
     "close": "Fechar",
     "failed": "Não foi possível abrir este complemento",

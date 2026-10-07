@@ -1092,6 +1092,9 @@
     "emptyUndated": "Keine ohne Datum",
     "finished": "An diesem Tag erledigt"
   },
+  "reminder": {
+    "missed": "{count} Erinnerungen sind schon vorbei"
+  },
   "plugin": {
     "close": "Schließen",
     "failed": "Diese Ergänzung konnte nicht geöffnet werden",

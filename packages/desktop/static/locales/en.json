@@ -1092,6 +1092,9 @@
     "emptyUndated": "No undated tasks",
     "finished": "Finished this day"
   },
+  "reminder": {
+    "missed": "{count} reminders already passed"
+  },
   "plugin": {
     "close": "Close",
     "failed": "This add-on could not be opened",

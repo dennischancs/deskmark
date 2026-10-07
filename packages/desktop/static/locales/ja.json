@@ -1092,6 +1092,9 @@
     "emptyUndated": "日付のないやることはありません",
     "finished": "この日に終えた"
   },
+  "reminder": {
+    "missed": "過ぎたリマインダーが {count} 件あります"
+  },
   "plugin": {
     "close": "閉じる",
     "failed": "この追加機能を開けませんでした",

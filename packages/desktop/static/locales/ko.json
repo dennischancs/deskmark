@@ -1092,6 +1092,9 @@
     "emptyUndated": "날짜 없는 할 일이 없습니다",
     "finished": "이 날 끝낸 일"
   },
+  "reminder": {
+    "missed": "이미 지난 알림이 {count}개 있습니다"
+  },
   "plugin": {
     "close": "닫기",
     "failed": "이 추가 기능을 열지 못했습니다",

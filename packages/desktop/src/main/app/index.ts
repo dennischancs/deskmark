@@ -22,6 +22,7 @@ import { WindowType } from '../windows/base'
 import EditorWindow from '../windows/editor'
 import { StickyHost, markQuitting, setStickyHost } from '../deskmark/stickies'
 import { startReminderLoop } from '../deskmark/reminderLoop'
+import type { DeskmarkReminderNotice } from '@shared/types/ipc'
 import { DESKMARK_APP_USER_MODEL_ID, installedShortcutCandidates, shortcutHasModelId, toastShortcutPlan } from '../deskmark/windowsToast'
 import { retainPluginWebview } from '../deskmark/pluginGuest'
 import { join as pathJoin } from 'node:path'
@@ -454,17 +455,29 @@ class App {
     })
     setStickyHost(stickyHost)
     stickyHost.createTray(path.join(process.cwd(), 'static', 'logo-small.png'))
+    const openReminder = (vault: string, notePath: string, line: number | null): void => {
+      this.showMainWindow()
+      const editors = this._windowManager.getWindowsByType('editor')
+      const main = editors.find(entry => !(entry.win as EditorWindow).stickyPath)
+      const editor = main?.win as EditorWindow | undefined
+      if (!editor) return
+      editor.openTab(pathJoin(vault, notePath), line ? { deskmarkLine: line } : {}, true)
+    }
     startReminderLoop({
       userDataPath: this._accessor.paths.userDataPath,
       remindersEnabled: () => this._accessor.preferences.getItem('deskmarkReminders') !== false,
-      openNote: (vault, notePath, line) => {
-        this.showMainWindow()
-        const editors = this._windowManager.getWindowsByType('editor')
-        const main = editors.find(entry => !(entry.win as EditorWindow).stickyPath)
-        const editor = main?.win as EditorWindow | undefined
-        if (!editor) return
-        editor.openTab(pathJoin(vault, notePath), line ? { deskmarkLine: line } : {}, true)
+      openNote: openReminder,
+      announce: (notice) => {
+        for (const entry of this._windowManager.getWindowsByType('editor')) {
+          const browser = entry.win.browserWindow
+          if (!browser || browser.isDestroyed()) continue
+          browser.webContents.send('mt::deskmark-reminder', notice)
+        }
       }
+    })
+    ipcMain.on('mt::deskmark::reminder-open', (_event, notice: DeskmarkReminderNotice) => {
+      if (!notice.notePath) return
+      openReminder(notice.vault, notice.notePath, notice.line)
     })
 
     // this.shortcutCapture = new ShortcutCapture()

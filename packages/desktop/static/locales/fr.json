@@ -1092,6 +1092,9 @@
     "emptyUndated": "Aucune sans date",
     "finished": "Fini ce jour"
   },
+  "reminder": {
+    "missed": "{count} rappels sont déjà passés"
+  },
   "plugin": {
     "close": "Fermer",
     "failed": "Ce complément n'a pas pu s'ouvrir",

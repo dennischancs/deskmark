@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import notice, { type NotifyOptions } from '../services/notification'
 import { t } from '../i18n'
+import type { DeskmarkReminderNotice } from '@shared/types/ipc'
 
 export const useNotificationStore = defineStore('notification', () => {
   function listenForNotification(): void {
@@ -14,6 +15,18 @@ export const useNotificationStore = defineStore('notification', () => {
     window.electron.ipcRenderer.on('mt::show-notification', (_e, opts) => {
       const options = Object.assign({ ...DEFAULT_OPTS }, opts as Partial<NotifyOptions>)
       notice.notify(options)
+    })
+
+    window.electron.ipcRenderer.on('mt::deskmark-reminder', (_event, reminder: DeskmarkReminderNotice) => {
+      notice.notify({
+        title: reminder.title,
+        message: reminder.body,
+        type: 'primary',
+        time: 20000
+      }).then(() => {
+        if (!reminder.notePath) return
+        window.electron.ipcRenderer.send('mt::deskmark::reminder-open', reminder)
+      }).catch(() => {})
     })
 
     window.electron.ipcRenderer.on('mt::pandoc-not-exists', async(_e, opts) => {
