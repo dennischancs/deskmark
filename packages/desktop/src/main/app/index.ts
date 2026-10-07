@@ -23,7 +23,7 @@ import EditorWindow from '../windows/editor'
 import { StickyHost, markQuitting, setStickyHost } from '../deskmark/stickies'
 import { startReminderLoop } from '../deskmark/reminderLoop'
 import type { DeskmarkReminderNotice } from '@shared/types/ipc'
-import { DESKMARK_APP_USER_MODEL_ID, installedShortcutCandidates, sameExecutable, toastShortcutPlan } from '../deskmark/windowsToast'
+import { DESKMARK_APP_USER_MODEL_ID, installedShortcutCandidates, sameExecutable, shortcutWriteOperation, toastShortcutPlan } from '../deskmark/windowsToast'
 import { retainPluginWebview } from '../deskmark/pluginGuest'
 import { join as pathJoin } from 'node:path'
 import SettingWindow from '../windows/setting'
@@ -192,12 +192,14 @@ class App {
       })
     })
     if (!plan) return
-    const wrote = shell.writeShortcutLink(plan.path, 'replace', {
+    const operation = shortcutWriteOperation(existsSync(plan.path))
+    const wrote = shell.writeShortcutLink(plan.path, operation, {
       target: plan.target,
+      cwd: path.dirname(plan.target),
       appUserModelId: plan.appUserModelId,
       description: 'Deskmark'
     })
-    if (!wrote) log.warn('Could not register the Windows toast shortcut')
+    if (!wrote) log.warn('Could not register the Windows toast shortcut', plan.path, operation)
   }
 
   /**

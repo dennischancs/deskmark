@@ -4,6 +4,7 @@ import {
   reminderCaption,
   sameExecutable,
   shortcutHasModelId,
+  shortcutWriteOperation,
   toastShortcutPlan
 } from '../../../src/main/deskmark/windowsToast'
 
@@ -73,5 +74,10 @@ describe('windows toast shortcut', () => {
       'D:/deskmark/dist/win-unpacked/marktext.exe',
       'C:/Program Files/Deskmark/marktext.exe'
     )).toBe(false)
+  })
+
+  it('creates the shortcut on the first launch and replaces it later', () => {
+    expect(shortcutWriteOperation(false)).toBe('create')
+    expect(shortcutWriteOperation(true)).toBe('replace')
   })
 })

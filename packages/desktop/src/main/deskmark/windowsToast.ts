@@ -19,6 +19,12 @@ export function devShortcutPath(appData: string): string {
   return join(appData, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'Deskmark Dev.lnk')
 }
 
+// Electron's "replace" only updates a shortcut that already exists, and
+// "create" fails when one is already there. The first launch has no link.
+export function shortcutWriteOperation(exists: boolean): 'create' | 'replace' {
+  return exists ? 'replace' : 'create'
+}
+
 export interface ToastShortcutPlan {
   path: string
   appUserModelId: string
