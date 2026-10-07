@@ -113,6 +113,39 @@ test('the installed program keeps running after the main window closes', async()
   }
 })
 
+test('a sticky note uses the width of its window', async() => {
+  test.setTimeout(45000)
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'deskmark-sticky-'))
+  fs.writeFileSync(path.join(dir, 'milk.md'), '# Hello\n\nOne two three.\n', 'utf8')
+  const launched = await launchElectron([dir], { preferences: { language: 'zh-CN' } })
+  const { app, page } = launched
+  try {
+    await page.locator('.side-bar').waitFor({ state: 'visible', timeout: 15000 })
+    await page.evaluate((root) => {
+      return window.electron.ipcRenderer.invoke('mt::deskmark::sticky-open', root, root + '\\\\milk.md')
+    }, dir)
+    let sticky: Page | null = null
+    const deadline = Date.now() + 10000
+    while (!sticky && Date.now() < deadline) {
+      for (const candidate of app.windows()) {
+        if (candidate.url().includes('sticky=1')) sticky = candidate
+      }
+      if (!sticky) await new Promise((resolve) => setTimeout(resolve, 200))
+    }
+    if (!sticky) throw new Error('sticky window did not open')
+    await sticky.locator('.mu-container').waitFor({ state: 'visible', timeout: 10000 })
+    const ratio = await sticky.evaluate(() => {
+      const box = document.querySelector('.mu-container')?.getBoundingClientRect()
+      if (!box || window.innerWidth < 1) return 0
+      return box.width / window.innerWidth
+    })
+    expect(ratio).toBeGreaterThan(0.85)
+  } finally {
+    stopApp(app)
+    removeTree(dir)
+  }
+})
+
 test('dragging a calendar chip moves that task onto another day', async() => {
   test.setTimeout(45000)
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'deskmark-drag-'))
