@@ -70,6 +70,32 @@ test('typing slash on an empty line opens the insert menu on screen', async() =>
   }
 })
 
+test('editing a note, saving, and reopening keeps the new text', async() => {
+  test.setTimeout(60000)
+  const marker = 'DESKMARKSAVE'
+  const launched = await launchWithMarkdown('# Hello\n\nMilk.\n', {
+    preferences: { language: 'en' }
+  })
+  const { app, page, filePath } = launched
+  const before = fs.readFileSync(filePath, 'utf8')
+  try {
+    await page.locator('.mu-paragraph').first().click({ timeout: 8000 })
+    await page.keyboard.press('End')
+    await page.keyboard.type(` ${marker}`)
+    await sendIpcToRenderer(app, 'mt::editor-ask-file-save')
+    await expect.poll(() => fs.readFileSync(filePath, 'utf8'), { timeout: 8000 }).toContain(marker)
+    expect(fs.readFileSync(filePath, 'utf8')).not.toBe(before)
+  } finally {
+    stopApp(app)
+  }
+  const again = await launchElectron([filePath], { preferences: { language: 'en' } })
+  try {
+    await expect(again.page.locator('.mu-paragraph').first()).toContainText(marker, { timeout: 10000 })
+  } finally {
+    stopApp(again.app)
+  }
+})
+
 test('both tray buttons open a menu with a new file, tasks, the calendar, and a sticky note', async() => {
   test.setTimeout(45000)
   const launched = await launchElectron([], {
