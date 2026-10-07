@@ -1,4 +1,6 @@
 import arg from 'arg'
+import path from 'path'
+import { isSamePathSync } from 'common/filesystem/paths'
 
 /**
  * Parse the given arguments or the default program arguments.
@@ -30,6 +32,13 @@ const parseArgs = (argv: string[] | null = null, permissive: boolean = true) => 
     '--version': Boolean
   } satisfies arg.Spec
   return arg(spec, { argv, permissive })
+}
+
+// Electron puts the application directory on argv when launched as
+// `electron <app> <user paths>`. That directory is not a note folder.
+export function withoutApplicationDir(candidates: readonly string[], applicationDir: string): string[] {
+  const root = path.resolve(applicationDir)
+  return candidates.filter(item => !isSamePathSync(path.resolve(item), root))
 }
 
 export type ParsedArgs = ReturnType<typeof parseArgs>

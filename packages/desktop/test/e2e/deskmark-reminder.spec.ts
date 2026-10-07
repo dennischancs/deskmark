@@ -35,16 +35,27 @@ test('a due reminder shows inside the editor window', async() => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'deskmark-remind-'))
   const note = path.join(dir, 'milk.md')
   fs.writeFileSync(note, `- [ ] 买牛奶 <!-- deskmark: id=MILK; remind=${recentRemind()} -->\n`, 'utf8')
-  const launched = await launchElectron([dir], { preferences: { language: 'zh-CN' } })
+  const launched = await launchElectron([dir], {
+    preferences: { language: 'zh-CN', openedFilesInSidebar: true }
+  })
   const { app } = launched
+  let found = false
   try {
     const deadline = Date.now() + 20000
-    let found = false
     while (Date.now() < deadline) {
       for (const page of app.windows()) {
         const notice = page.locator('.mt-notification', { hasText: '买牛奶' })
         if (await notice.count() > 0) {
           found = true
+          await notice.locator('.left-text').click()
+          const opened = page.locator('.editor-tabs li[title*="milk.md"], .opened-file[title*="milk.md"]')
+          try {
+            await expect(opened.first()).toBeAttached({ timeout: 8000 })
+          } catch (error) {
+            const text = await page.locator('body').innerText({ timeout: 2000 }).catch((reason) => String(reason))
+            fs.writeFileSync(path.join(os.tmpdir(), 'deskmark-remind-debug.txt'), text)
+            throw error
+          }
           break
         }
       }
@@ -53,6 +64,13 @@ test('a due reminder shows inside the editor window', async() => {
     }
     expect(found).toBe(true)
   } finally {
+    if (!found) {
+      const bits: string[] = []
+      for (const page of app.windows()) {
+        bits.push(await page.locator('body').innerText({ timeout: 2000 }).catch((error) => String(error)))
+      }
+      fs.writeFileSync(path.join(os.tmpdir(), 'deskmark-remind-debug.txt'), bits.join('\n----\n'))
+    }
     stopApp(app)
     removeTree(dir)
   }

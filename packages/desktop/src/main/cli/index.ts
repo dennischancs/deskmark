@@ -2,7 +2,7 @@ import path from 'path'
 import { app } from 'electron'
 import os from 'os'
 import { isDirectory } from 'common/filesystem'
-import parseArgs, { type ParsedArgs } from './parser'
+import parseArgs, { withoutApplicationDir, type ParsedArgs } from './parser'
 import { getPath } from '../utils'
 
 const write = (s: string): boolean => process.stdout.write(s)
@@ -54,6 +54,7 @@ const cli = (): ParsedArgs => {
     args['--user-data-dir'] = path.resolve(args['--user-data-dir'])
   }
 
+  args._ = withoutApplicationDir(args._, app.getAppPath())
   return args
 }
 

@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 import log from 'electron-log'
 import { app, BrowserWindow, clipboard, dialog, nativeTheme, shell, ipcMain } from 'electron'
 import type { BrowserWindowConstructorOptions } from 'electron'
-import { isChildOfDirectory } from 'common/filesystem/paths'
+import { isChildOfDirectory, isSamePathSync } from 'common/filesystem/paths'
 import type { IUserPreferences } from '@shared/types/preferences'
 import { isLinux, isOsx, isWindows } from '../config'
 import parseArgs from '../cli/parser'
@@ -466,8 +466,12 @@ class App {
     const openReminder = (vault: string, notePath: string, line: number | null): void => {
       this.showMainWindow()
       const editors = this._windowManager.getWindowsByType('editor')
-      const main = editors.find(entry => !(entry.win as EditorWindow).stickyPath)
-      const editor = main?.win as EditorWindow | undefined
+      const usable = editors.filter(entry => !(entry.win as EditorWindow).stickyPath)
+      const matched = usable.find(entry => {
+        const root = (entry.win as EditorWindow).openedRootDirectory
+        return !!root && isSamePathSync(root, vault)
+      })
+      const editor = (matched ?? usable[0])?.win as EditorWindow | undefined
       if (!editor) return
       editor.openTab(pathJoin(vault, notePath), line ? { deskmarkLine: line } : {}, true)
     }
@@ -477,6 +481,10 @@ class App {
       openNote: openReminder,
       announce: (notice) => {
         for (const entry of this._windowManager.getWindowsByType('editor')) {
+          const win = entry.win as EditorWindow
+          if (win.stickyPath) continue
+          const root = win.openedRootDirectory
+          if (root && notice.vault && !isSamePathSync(root, notice.vault)) continue
           const browser = entry.win.browserWindow
           if (!browser || browser.isDestroyed()) continue
           browser.webContents.send('mt::deskmark-reminder', notice)
