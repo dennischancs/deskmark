@@ -1,6 +1,6 @@
 {
   "name": "marktext-monorepo",
-  "version": "7.7.11",
+  "version": "7.7.12",
   "description": "Deskmark monorepo root",
   "private": true,
   "homepage": "https://github.com/marktext/marktext",
@@ -32,7 +32,7 @@
     "test:unit": "pnpm --filter marktext test:unit",
     "test:e2e": "pnpm --filter marktext test:e2e",
     "test:deskmark-core": "node --experimental-strip-types --test packages/deskmark-core/test/core.test.ts",
-    "test:deskmark-index": "node --experimental-strip-types --test packages/deskmark-index/test/index.test.ts packages/deskmark-index/test/vault.test.ts packages/deskmark-index/test/editTask.test.ts",
+    "test:deskmark-index": "node --experimental-strip-types --test packages/deskmark-index/test/index.test.ts packages/deskmark-index/test/vault.test.ts packages/deskmark-index/test/editTask.test.ts packages/deskmark-index/test/scan.test.ts",
     "test:deskmark-plugin": "node --experimental-strip-types --test packages/deskmark-plugin/test/host.test.ts",
     "typecheck": "pnpm --filter marktext typecheck",
     "typecheck:watch": "pnpm --filter marktext typecheck:watch",

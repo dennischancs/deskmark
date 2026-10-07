@@ -35,7 +35,8 @@ vi.mock('ced', () => ({ default: () => 'UTF-8' }))
 import Watcher, {
   WATCHER_STABILITY_THRESHOLD,
   WATCHER_STABILITY_POLL_INTERVAL,
-  isUncPath
+  isUncPath,
+  isWatchSkipped
 } from 'main_renderer/filesystem/watcher'
 
 function optionsForLastWatch(): Record<string, unknown> {
@@ -76,5 +77,13 @@ describe('watcher awaitWriteFinish (#3955)', () => {
     expect(isUncPath('//server/share/project')).toBe(true)
     expect(isUncPath('C:\\project')).toBe(false)
     expect(isUncPath('/home/me/project')).toBe(false)
+  })
+
+  it('skips the index and git directories without hiding .github', () => {
+    expect(isWatchSkipped('D:\\notes\\.deskmark\\index.sqlite')).toBe(true)
+    expect(isWatchSkipped('/repo/.git/config')).toBe(true)
+    expect(isWatchSkipped('/repo/node_modules/left-pad/index.js')).toBe(true)
+    expect(isWatchSkipped('/repo/.github/workflows/ci.yml')).toBe(false)
+    expect(isWatchSkipped('/repo/notes/today.md')).toBe(false)
   })
 })

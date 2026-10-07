@@ -1,5 +1,5 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs'
-import { readdir, stat } from 'node:fs/promises'
+import { opendir, stat } from 'node:fs/promises'
 import { join, relative } from 'node:path'
 import { compareAgenda, smartList, type SmartList } from '../../deskmark-core/src/index.ts'
 import type { TaskRow, VaultFile } from './database.ts'
@@ -47,57 +47,65 @@ export interface ListedFile {
   size: number
 }
 
-// Yielding between directories keeps a huge folder from freezing the process.
-// One directory can also hold thousands of names that are not text. Those
-// checks are synchronous, so the walk pauses mid-list and lets the window
-// take a click.
-const ENTRY_TURN = 400
+// A single readdir of a directory with a hundred thousand names allocates
+// the whole list before anything else can run. opendir hands names over in
+// small groups, and the pause lets a stop request land.
+const ENTRY_TURN = 250
 
 export async function listTextFiles(
   root: string,
   extensions: readonly string[],
   shouldStop: () => boolean,
-  onFile: (file: ListedFile) => Promise<void> | void
+  onFile: (file: ListedFile) => Promise<void> | void,
+  onProgress?: (visited: number) => void
 ): Promise<number> {
   const queue = [root]
+  let visited = 0
   let seen = 0
   while (queue.length > 0) {
     if (shouldStop()) return seen
     const directory = queue.pop() as string
-    let entries: Awaited<ReturnType<typeof readdir>>
+    let dir: Awaited<ReturnType<typeof opendir>>
     try {
-      entries = await readdir(directory, { withFileTypes: true })
+      dir = await opendir(directory)
     } catch {
       continue
     }
     let stepped = 0
-    for (const entry of entries) {
-      if (++stepped % ENTRY_TURN === 0) {
-        await new Promise<void>(resolve => setImmediate(resolve))
+    try {
+      for await (const entry of dir) {
+        visited += 1
+        if (++stepped % ENTRY_TURN === 0) {
+          onProgress?.(visited)
+          await new Promise<void>(resolve => setImmediate(resolve))
+        }
+        if (shouldStop()) return seen
+        if (SKIP.has(entry.name) || entry.isSymbolicLink()) continue
+        const fullPath = join(directory, entry.name)
+        if (entry.isDirectory()) {
+          queue.push(fullPath)
+          continue
+        }
+        if (!entry.isFile() || !matchesExtension(entry.name, extensions)) continue
+        let info: Awaited<ReturnType<typeof stat>>
+        try {
+          info = await stat(fullPath)
+        } catch {
+          continue
+        }
+        seen += 1
+        await onFile({
+          path: relative(root, fullPath).split('\\').join('/'),
+          fullPath,
+          mtimeMs: info.mtimeMs,
+          size: info.size
+        })
       }
-      if (shouldStop()) return seen
-      if (SKIP.has(entry.name) || entry.isSymbolicLink()) continue
-      const fullPath = join(directory, entry.name)
-      if (entry.isDirectory()) {
-        queue.push(fullPath)
-        continue
-      }
-      if (!entry.isFile() || !matchesExtension(entry.name, extensions)) continue
-      let info: Awaited<ReturnType<typeof stat>>
-      try {
-        info = await stat(fullPath)
-      } catch {
-        continue
-      }
-      seen += 1
-      await onFile({
-        path: relative(root, fullPath).split('\\').join('/'),
-        fullPath,
-        mtimeMs: info.mtimeMs,
-        size: info.size
-      })
+    } finally {
+      await dir.close().catch(() => {})
     }
   }
+  onProgress?.(visited)
   return seen
 }
 

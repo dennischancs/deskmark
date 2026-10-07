@@ -22,6 +22,21 @@ const EVENT_NAME = {
 }
 
 type WatchType = 'dir' | 'file'
+type Deliver = (channel: string, payload: unknown) => void
+
+// `.git` and `.deskmark` are not notes. The index writes inside `.deskmark`,
+// and watching that folder would wake the window on every database flush.
+// `.github` must stay visible, so the name has to end at a path boundary.
+export const isWatchSkipped = (pathname: string): boolean =>
+  /(?:^|[/\\])(?:node_modules|(?:.+\.asar))|(?:^|[/\\])\.git(?:[/\\]|$)|(?:^|[/\\])\.deskmark(?:[/\\]|$)/.test(pathname)
+
+const deliverTo = (win: BrowserWindow, deliver: Deliver | undefined, channel: string, payload: unknown): void => {
+  if (deliver) {
+    deliver(channel, payload)
+    return
+  }
+  if (!win.isDestroyed()) win.webContents.send(channel, payload)
+}
 
 export const isUncPath = (pathname: string): boolean =>
   /^(?:\\\\|\/\/)[^\\/]+[\\/][^\\/]+/.test(pathname)
@@ -48,7 +63,9 @@ const add = async(
   endOfLine: LineEnding,
   autoGuessEncoding: boolean,
   trimTrailingNewline: number,
-  autoNormalizeLineEndings: boolean
+  autoNormalizeLineEndings: boolean,
+  loadContent = true,
+  deliver?: Deliver
 ): Promise<void> => {
   const stats = await fsPromises.stat(pathname)
   const birthTime = stats.birthtime
@@ -72,38 +89,41 @@ const add = async(
     mtimeMs,
     isMarkdown
   }
-  if (isMarkdown) {
-    // HACK: But this should be removed completely in #1034/#1035.
-    try {
-      const data = await loadMarkdownFile(
-        pathname,
-        endOfLine,
-        autoGuessEncoding,
-        trimTrailingNewline,
-        autoNormalizeLineEndings
-      )
-      file.data = data
-    } catch (err) {
-      // Only notify user about opened files.
-      if (type === 'file') {
-        win.webContents.send('mt::show-notification', {
-          title: 'Watcher I/O error',
-          type: 'error',
-          message: err instanceof Error ? err.message : String(err)
-        })
-        return
-      }
-    }
-    win.webContents.send(EVENT_NAME[type], {
-      type: 'add',
-      change: file
-    })
+  if (!isMarkdown) return
+  if (!loadContent) {
+    deliverTo(win, deliver, EVENT_NAME[type], { type: 'add', change: file })
+    return
   }
+  // HACK: But this should be removed completely in #1034/#1035.
+  try {
+    const data = await loadMarkdownFile(
+      pathname,
+      endOfLine,
+      autoGuessEncoding,
+      trimTrailingNewline,
+      autoNormalizeLineEndings
+    )
+    file.data = data
+  } catch (err) {
+    // Only notify user about opened files.
+    if (type === 'file') {
+      win.webContents.send('mt::show-notification', {
+        title: 'Watcher I/O error',
+        type: 'error',
+        message: err instanceof Error ? err.message : String(err)
+      })
+      return
+    }
+  }
+  deliverTo(win, deliver, EVENT_NAME[type], {
+    type: 'add',
+    change: file
+  })
 }
 
-const unlink = (win: BrowserWindow, pathname: string, type: WatchType): void => {
+const unlink = (win: BrowserWindow, pathname: string, type: WatchType, deliver?: Deliver): void => {
   const file = { pathname }
-  win.webContents.send(EVENT_NAME[type], {
+  deliverTo(win, deliver, EVENT_NAME[type], {
     type: 'unlink',
     change: file
   })
@@ -116,13 +136,14 @@ const change = async(
   endOfLine: LineEnding,
   autoGuessEncoding: boolean,
   trimTrailingNewline: number,
-  autoNormalizeLineEndings: boolean
+  autoNormalizeLineEndings: boolean,
+  deliver?: Deliver
 ): Promise<void> => {
   if (type === 'dir') {
     // Only send mtimeMs so the sidebar can re-sort; skip loading file content.
     try {
       const stats = await fsPromises.stat(pathname)
-      win.webContents.send('mt::update-object-tree', {
+      deliverTo(win, deliver, 'mt::update-object-tree', {
         type: 'change',
         change: { pathname, mtimeMs: stats.mtimeMs }
       })
@@ -140,7 +161,7 @@ const change = async(
         fsPromises.stat(pathname)
       ])
       const file = { pathname, data, mtimeMs: stats.mtimeMs }
-      win.webContents.send('mt::update-file', {
+      deliverTo(win, deliver, 'mt::update-file', {
         type: 'change',
         change: file
       })
@@ -156,7 +177,7 @@ const change = async(
   }
 }
 
-const addDir = (win: BrowserWindow, pathname: string, type: WatchType): void => {
+const addDir = (win: BrowserWindow, pathname: string, type: WatchType, deliver?: Deliver): void => {
   if (type === 'file') return
 
   const directory = {
@@ -170,17 +191,17 @@ const addDir = (win: BrowserWindow, pathname: string, type: WatchType): void => 
     files: []
   }
 
-  win.webContents.send('mt::update-object-tree', {
+  deliverTo(win, deliver, 'mt::update-object-tree', {
     type: 'addDir',
     change: directory
   })
 }
 
-const unlinkDir = (win: BrowserWindow, pathname: string, type: WatchType): void => {
+const unlinkDir = (win: BrowserWindow, pathname: string, type: WatchType, deliver?: Deliver): void => {
   if (type === 'file') return
 
   const directory = { pathname }
-  win.webContents.send('mt::update-object-tree', {
+  deliverTo(win, deliver, 'mt::update-object-tree', {
     type: 'unlinkDir',
     change: directory
   })
@@ -206,12 +227,8 @@ class Watcher {
 
     const watcher = chokidar.watch(watchPath, {
       ignored: (pathname: string, fileInfo?: { isDirectory: () => boolean }) => {
-        if (!fileInfo) {
-          return /(?:^|[/\\])(?:node_modules|(?:.+\.asar))/.test(pathname)
-        }
-
-        if (/(?:^|[/\\])(?:node_modules|(?:.+\.asar))/.test(pathname)) {
-          return true
+        if (!fileInfo || isWatchSkipped(pathname)) {
+          return isWatchSkipped(pathname)
         }
 
         if (
@@ -255,9 +272,39 @@ class Watcher {
     let disposed = false
     let enospcReached = false
     let renameTimer: NodeJS.Timeout | null = null
+    let initial = type === 'dir'
+    const queued: Array<{ channel: string, payload: unknown }> = []
+    let drain: NodeJS.Timeout | null = null
+    // A folder like Downloads can emit tens of thousands of tree events in
+    // one burst. Trickling them keeps the sidebar from rebuilding on every name.
+    const pump = (): void => {
+      if (drain || disposed) return
+      const wait = queued.length > 48 ? 32 : 16
+      drain = setTimeout(() => {
+        drain = null
+        if (disposed || win.isDestroyed()) {
+          queued.length = 0
+          return
+        }
+        const count = queued.length > 48 ? 24 : queued.length
+        for (let index = 0; index < count && queued.length > 0; index += 1) {
+          const item = queued.shift()
+          if (!item || win.isDestroyed()) continue
+          win.webContents.send(item.channel, item.payload)
+        }
+        if (queued.length > 0) pump()
+      }, wait)
+    }
+    const deliver: Deliver | undefined = type === 'dir'
+      ? (channel, payload) => {
+        queued.push({ channel, payload })
+        pump()
+      }
+      : undefined
 
     watcher
       .on('add', async(pathname: string) => {
+        const loadContent = !initial
         if (!(await this._shouldIgnoreEvent(win.id, pathname, type, usePolling))) {
           const { _preferences } = this
           const eol = _preferences.getPreferredEol() as LineEnding
@@ -273,7 +320,9 @@ class Watcher {
             eol,
             autoGuessEncoding,
             trimTrailingNewline,
-            autoNormalizeLineEndings
+            autoNormalizeLineEndings,
+            loadContent,
+            deliver
           )
         }
       })
@@ -293,13 +342,17 @@ class Watcher {
             eol,
             autoGuessEncoding,
             trimTrailingNewline,
-            autoNormalizeLineEndings
+            autoNormalizeLineEndings,
+            deliver
           )
         }
       })
-      .on('unlink', (pathname: string) => unlink(win, pathname, type))
-      .on('addDir', (pathname: string) => addDir(win, pathname, type))
-      .on('unlinkDir', (pathname: string) => unlinkDir(win, pathname, type))
+      .on('unlink', (pathname: string) => unlink(win, pathname, type, deliver))
+      .on('addDir', (pathname: string) => addDir(win, pathname, type, deliver))
+      .on('unlinkDir', (pathname: string) => unlinkDir(win, pathname, type, deliver))
+      .on('ready', () => {
+        initial = false
+      })
       .on('raw', (event: string, subpath: string, details: unknown) => {
         if (
           globalThis.MARKTEXT_DEBUG_VERBOSE >= 3
@@ -346,7 +399,13 @@ class Watcher {
       })
 
     const closeFn = (): void => {
+      if (disposed) return
       disposed = true
+      queued.length = 0
+      if (drain) {
+        clearTimeout(drain)
+        drain = null
+      }
       if (this.watchers[id]) {
         delete this.watchers[id]
       }
@@ -372,27 +431,21 @@ class Watcher {
     for (const id of Object.keys(this.watchers)) {
       const w = this.watchers[id]
       if (w.win === win && w.pathname === watchPath && w.type === type) {
-        w.watcher.close()
-        delete this.watchers[id]
+        w.close()
         break
       }
     }
   }
 
   unwatchByWindowId(windowId: number): void {
-    const watchers: FSWatcher[] = []
-    const watchIds: string[] = []
+    const closing: Array<() => void> = []
     for (const id of Object.keys(this.watchers)) {
       const w = this.watchers[id]
       if (w.win.id === windowId) {
-        watchers.push(w.watcher)
-        watchIds.push(id)
+        closing.push(w.close)
       }
     }
-    if (watchers.length) {
-      watchIds.forEach((id) => delete this.watchers[id])
-      watchers.forEach((watcher) => watcher.close())
-    }
+    closing.forEach((close) => close())
   }
 
   close(): void {

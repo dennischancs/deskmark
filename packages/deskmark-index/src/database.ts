@@ -1,9 +1,9 @@
-import { createHash } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
 import { join } from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
-import { agendaForIndex, DEFAULT_EXTRACT_RULES, parseNote, type AgendaItem, type ExtractRules } from '../../deskmark-core/src/index.ts'
+import { DEFAULT_EXTRACT_RULES, type ExtractRules } from '../../deskmark-core/src/index.ts'
 import { IndexLock } from './lock.ts'
+import { prepareVaultFile, type PreparedNote } from './prepare.ts'
 
 export const SCHEMA_VERSION = 1
 
@@ -89,15 +89,28 @@ export class VaultIndex {
   upsertFile(file: VaultFile, rules: ExtractRules = DEFAULT_EXTRACT_RULES): string | null {
     let error: string | null = null
     this.transaction(() => {
-      this.deletePath(file.path)
       error = this.insertFile(file, rules)
     })
     return error
   }
 
+  writePrepared(notes: readonly PreparedNote[]): void {
+    if (!notes.length) return
+    this.transaction(() => {
+      for (const note of notes) this.insertPrepared(note)
+    })
+  }
+
   removeFile(path: string): void {
     this.transaction(() => {
       this.deletePath(path)
+    })
+  }
+
+  removeFiles(paths: readonly string[]): void {
+    if (!paths.length) return
+    this.transaction(() => {
+      for (const path of paths) this.deletePath(path)
     })
   }
 
@@ -167,31 +180,24 @@ export class VaultIndex {
   }
 
   private insertFile(file: VaultFile, rules: ExtractRules): string | null {
-    let parsed: ReturnType<typeof parseNote>
-    let items: AgendaItem[]
-    try {
-      parsed = parseNote(file.content, file.path)
-      items = agendaForIndex(file.path, file.content, rules, parsed)
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error)
-      this.sql().prepare(`
-        INSERT INTO notes (path, note_id, kind, title, mtime_ms, content_hash, parse_error)
-        VALUES (?, ?, 'note', NULL, ?, ?, ?)
-      `).run(file.path, hashText(file.path), file.mtimeMs, hashText(file.content), message)
-      return message
-    }
-    const noteId = parsed.fields.id ?? hashText(file.path)
+    const prepared = prepareVaultFile(file, rules)
+    this.insertPrepared(prepared)
+    return prepared.failed ? prepared.parseError : null
+  }
+
+  private insertPrepared(note: PreparedNote): void {
+    this.deletePath(note.path)
     this.sql().prepare(`
       INSERT INTO notes (path, note_id, kind, title, mtime_ms, content_hash, parse_error)
       VALUES (?, ?, ?, ?, ?, ?, ?)
     `).run(
-      file.path,
-      noteId,
-      parsed.fields.kind,
-      parsed.title,
-      file.mtimeMs,
-      hashText(file.content),
-      parsed.frontMatterError
+      note.path,
+      note.noteId,
+      note.kind,
+      note.title,
+      note.mtimeMs,
+      note.contentHash,
+      note.parseError
     )
     const insertTask = this.sql().prepare(`
       INSERT INTO tasks (
@@ -199,27 +205,22 @@ export class VaultIndex {
         completed_at, raw, source
       ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `)
-    const seen = new Set<string>()
-    for (const item of items) {
-      let key = item.id ?? item.temporaryKey
-      while (seen.has(key)) key = `${key}#${item.line ?? 'note'}`
-      seen.add(key)
+    for (const task of note.tasks) {
       insertTask.run(
-        file.path,
-        key,
-        item.line,
-        item.text,
-        item.done ? 'done' : 'open',
-        item.due,
-        item.remind,
-        item.priority,
-        item.repeat,
-        item.done ? completedFrom(file.content, item.line) : null,
-        rawLine(file.content, item.line),
-        item.source
+        note.path,
+        task.taskKey,
+        task.line,
+        task.text,
+        task.status,
+        task.due,
+        task.remindAt,
+        task.priority,
+        task.repeat,
+        task.completedAt,
+        task.raw,
+        task.source
       )
     }
-    return null
   }
 
   private deletePath(path: string): void {
@@ -254,19 +255,4 @@ export function applyExternalChange(index: VaultIndex, file: VaultFile, dirty: R
   if (dirty.has(file.path)) return 'conflict'
   index.upsertFile(file)
   return 'updated'
-}
-
-function hashText(value: string): string {
-  return createHash('sha256').update(value).digest('hex')
-}
-
-function rawLine(content: string, line: number | null): string {
-  if (line == null) return ''
-  return content.split(/\r?\n/)[line - 1] ?? ''
-}
-
-function completedFrom(content: string, line: number | null): string | null {
-  const raw = rawLine(content, line)
-  const match = /completed=([^;]+)/.exec(raw)
-  return match ? match[1].trim() : null
 }

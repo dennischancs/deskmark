@@ -10,8 +10,26 @@ import { fileURLToPath } from 'url'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
+const bundleScanWorker = (): PluginOption => ({
+  name: 'deskmark-scan-worker',
+  apply: 'build',
+  async closeBundle() {
+    const esbuild = await import('esbuild')
+    await esbuild.build({
+      entryPoints: [resolve(__dirname, 'src/main/deskmark/scanWorker.ts')],
+      outfile: resolve(__dirname, 'out/main/scanWorker.js'),
+      bundle: true,
+      platform: 'node',
+      format: 'cjs',
+      target: 'node22',
+      logLevel: 'silent'
+    })
+  }
+})
+
 export default defineConfig({
   main: {
+    plugins: [bundleScanWorker()],
     // --> Bundled as CommonJS
     // externalizeDepsPlugin() basically externises all the dependencies from being bundled during build - treating them as runtime dependencies
     // electron-vite still builds the main and preload processes into commonJS

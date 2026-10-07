@@ -1,16 +1,13 @@
-import { readFile } from 'node:fs/promises'
+import { copyFileSync, existsSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { Worker } from 'node:worker_threads'
 import { BrowserWindow } from 'electron'
 import type { ExtractRules } from '../../../../deskmark-core/src/index.ts'
 import { normalizeExtensions } from '../../../../deskmark-core/src/extensions.ts'
-import { groupTasks, listTextFiles, VaultIndex } from '../../../../deskmark-index/src/index.ts'
+import { groupTasks, indexTextFiles, VaultIndex, type IndexEvent } from '../../../../deskmark-index/src/index.ts'
 import type { DeskmarkScanOptions, DeskmarkTaskGroups } from '@shared/types/ipc'
 
-// A folder such as Downloads can hold well over a hundred thousand files.
-// Reading all of them inside one request freezes the window, so the walk
-// yields. Files larger than this are left out; one giant text file should
-// not stall the rest of the index.
-const MAX_TEXT_BYTES = 2 * 1024 * 1024
 // The counter can move often. Reloading every task into the window cannot.
 const PUBLISH_GAP_MS = 400
 
@@ -34,6 +31,7 @@ interface OpenScan {
   seen: number
   index: VaultIndex
   options: DeskmarkScanOptions
+  stop: (() => void) | null
 }
 
 let open: OpenScan | null = null
@@ -63,10 +61,21 @@ const optionsKey = (options: DeskmarkScanOptions): string => JSON.stringify({
 
 const hold = (root: string): OpenScan => {
   if (open && open.root === root) return open
+  open?.stop?.()
   open?.index.close()
   const index = new VaultIndex(join(root, '.deskmark'))
   index.open()
-  open = { root, key: '', token: 0, running: false, dirty: false, seen: 0, index, options: DEFAULT_SCAN_OPTIONS }
+  open = {
+    root,
+    key: '',
+    token: 0,
+    running: false,
+    dirty: false,
+    seen: 0,
+    index,
+    options: DEFAULT_SCAN_OPTIONS,
+    stop: null
+  }
   return open
 }
 
@@ -94,54 +103,126 @@ const snapshot = (root: string, now: Date, timeZone: string): DeskmarkTaskGroups
   }
 }
 
-async function runScan(token: number, root: string, options: DeskmarkScanOptions, force: boolean): Promise<void> {
+function applyIndexEvent(token: number, event: IndexEvent, known: Map<string, number>): void {
+  const current = open
+  if (!current || current.token !== token) return
+  if (event.type === 'progress' || event.type === 'notes') {
+    current.seen = event.visited
+  }
+  if (event.type === 'notes') {
+    current.index.writePrepared(event.notes)
+    current.dirty = true
+  }
+  if (event.type === 'done') {
+    const live = new Set(event.paths)
+    const missing = [...known.keys()].filter(path => !live.has(path))
+    if (missing.length) {
+      current.index.removeFiles(missing)
+      current.dirty = true
+    }
+    current.seen = event.visited
+    current.running = false
+    current.stop = null
+  }
+}
+
+// A packaged app keeps this file inside app.asar. Worker threads can only
+// load a real path, so copy the single bundled script out once.
+let workerCopy: string | null = null
+
+function workerScript(): string | null {
+  const bundled = join(__dirname, 'scanWorker.js')
+  if (!existsSync(bundled)) return null
+  if (!bundled.includes('app.asar')) return bundled
+  if (workerCopy && existsSync(workerCopy)) return workerCopy
+  workerCopy = join(tmpdir(), `deskmark-scan-worker-${process.pid}.js`)
+  copyFileSync(bundled, workerCopy)
+  return workerCopy
+}
+
+function startScan(token: number, root: string, options: DeskmarkScanOptions, force: boolean): void {
   const current = hold(root)
   const rules = rulesFrom(options)
   const extensions = normalizeExtensions(options.extensions)
   const times = current.index.noteTimes()
-  const seenPaths = new Set<string>()
-  const stop = (): boolean => !open || open.token !== token
-  try {
-    await listTextFiles(root, extensions.length ? extensions : ['md'], stop, async(file) => {
+  const request = {
+    root,
+    extensions: extensions.length ? extensions : ['md'],
+    rules,
+    times: [...times.entries()],
+    force
+  }
+  const script = workerScript()
+  if (!script) {
+    const stop = (): boolean => !open || open.token !== token
+    current.stop = () => {
+      current.token += 1
+    }
+    indexTextFiles(request, async(event) => {
       if (stop()) return
-      seenPaths.add(file.path)
-      current.seen += 1
-      if (file.size > MAX_TEXT_BYTES) {
-        publish()
-        return
-      }
-      if (!force && times.get(file.path) === file.mtimeMs) {
-        publish()
-        return
-      }
-      try {
-        const content = await readFile(file.fullPath, 'utf8')
-        if (stop()) return
-        current.index.upsertFile({ path: file.path, content, mtimeMs: file.mtimeMs }, rules)
-        current.dirty = true
-      } catch {
-        return
-      }
-      publish()
-      await new Promise<void>(resolve => setImmediate(resolve))
+      applyIndexEvent(token, event, times)
+      publish(event.type === 'done')
+      if (event.type === 'done') onFinished?.()
+      if (event.type === 'notes') await new Promise<void>(resolve => setImmediate(resolve))
+    }, stop).catch(() => {
+      if (!open || open.token !== token) return
+      open.running = false
+      publish(true)
     })
-  } catch {
-    // A bad directory should not stop the editor.
+    return
   }
-  if (stop()) return
-  let removed = 0
-  for (const path of times.keys()) {
-    if (seenPaths.has(path)) continue
-    current.index.removeFile(path)
-    current.dirty = true
-    removed += 1
-    if (removed % 40 === 0) await new Promise<void>(resolve => setImmediate(resolve))
-    if (stop()) return
+  const worker = new Worker(script, { workerData: request })
+  let settled = false
+  const finish = (): void => {
+    if (settled) return
+    settled = true
+    if (open?.stop === stop) open.stop = null
   }
-  if (stop()) return
-  current.running = false
-  publish(true)
-  onFinished?.()
+  const stop = (): void => {
+    finish()
+    worker.postMessage('stop')
+    worker.terminate().catch(() => {})
+  }
+  current.stop = stop
+  worker.on('message', (event: IndexEvent | { type: 'failed', message: string }) => {
+    if (!open || open.token !== token) {
+      if (event.type === 'notes') worker.postMessage('ack')
+      return
+    }
+    if (event.type === 'failed') {
+      open.running = false
+      publish(true)
+      finish()
+      return
+    }
+    try {
+      applyIndexEvent(token, event, times)
+      publish(event.type === 'done')
+      if (event.type === 'done') {
+        onFinished?.()
+        finish()
+      }
+    } catch {
+      if (open && open.token === token) {
+        open.running = false
+        publish(true)
+      }
+    } finally {
+      if (event.type === 'notes') worker.postMessage('ack')
+    }
+  })
+  worker.on('error', () => {
+    if (!open || open.token !== token) return
+    open.running = false
+    publish(true)
+    finish()
+  })
+  worker.on('exit', () => {
+    if (!open || open.token !== token || !open.running) return
+    open.running = false
+    publish(true)
+    finish()
+  })
 }
 
 export function ensureScan(root: string, options: DeskmarkScanOptions | null | undefined, now: Date, timeZone: string): DeskmarkTaskGroups {
@@ -150,6 +231,7 @@ export function ensureScan(root: string, options: DeskmarkScanOptions | null | u
   const key = optionsKey(chosen)
   if (current.key !== key) {
     const force = current.key !== ''
+    current.stop?.()
     current.token += 1
     current.key = key
     current.running = true
@@ -158,7 +240,7 @@ export function ensureScan(root: string, options: DeskmarkScanOptions | null | u
     lastPublish = 0
     current.options = chosen
     const token = current.token
-    runScan(token, root, chosen, force).catch(() => {})
+    startScan(token, root, chosen, force)
   }
   return snapshot(root, now, timeZone)
 }
