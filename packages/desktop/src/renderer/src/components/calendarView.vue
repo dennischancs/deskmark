@@ -247,6 +247,7 @@ import { useProjectStore } from '@/store/project'
 import { useDeskmarkStore } from '@/store/deskmark'
 import { usePreferencesStore } from '@/store/preferences'
 import { editDeskmarkTask } from '@/util/deskmarkEdit'
+import { watchDeskmarkIndex } from '@/util/deskmarkIndex'
 import TaskLine from '@/components/taskLine.vue'
 import { agendaCounts, bridgeForDay, calendarGroup, DEADLINE_WARNING_DAYS, previewTasks, tasksForAgenda, type CalendarGroup } from '../../../../../deskmark-core/src/agenda.ts'
 import { buildMonth, weekdayLabels } from '../../../../../deskmark-core/src/calendar.ts'
@@ -371,7 +372,7 @@ watch([root, revision], () => {
   load().catch((error) => console.error(error))
 }, { immediate: true })
 
-const stopIndexTick = window.electron.ipcRenderer.on('mt::deskmark-index-tick', () => {
+const stopIndexTick = watchDeskmarkIndex(() => {
   load().catch((error) => console.error(error))
 })
 

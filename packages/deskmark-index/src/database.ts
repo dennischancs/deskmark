@@ -59,6 +59,10 @@ export class VaultIndex {
     mkdirSync(this.directory, { recursive: true })
     this.db = new DatabaseSync(join(this.directory, 'index.sqlite'))
     this.db.exec('PRAGMA journal_mode = WAL')
+    // The index is rebuilt from the notes, so losing the last commit on a
+    // power cut is acceptable. FULL would flush every file and stall a folder
+    // that holds thousands of text files.
+    this.db.exec('PRAGMA synchronous = NORMAL')
     this.migrate()
   }
 
@@ -167,7 +171,7 @@ export class VaultIndex {
     let items: AgendaItem[]
     try {
       parsed = parseNote(file.content, file.path)
-      items = agendaForIndex(file.path, file.content, rules)
+      items = agendaForIndex(file.path, file.content, rules, parsed)
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       this.sql().prepare(`

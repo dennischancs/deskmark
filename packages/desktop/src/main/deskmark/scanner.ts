@@ -11,6 +11,8 @@ import type { DeskmarkScanOptions, DeskmarkTaskGroups } from '@shared/types/ipc'
 // yields. Files larger than this are left out; one giant text file should
 // not stall the rest of the index.
 const MAX_TEXT_BYTES = 2 * 1024 * 1024
+// The counter can move often. Reloading every task into the window cannot.
+const PUBLISH_GAP_MS = 400
 
 export const DEFAULT_SCAN_EXTENSIONS = 'markdown,mdown,mkdn,md,mkd,mdwn,mdtxt,mdtext,mdx,text,txt'
 
@@ -28,12 +30,14 @@ interface OpenScan {
   key: string
   token: number
   running: boolean
+  dirty: boolean
   seen: number
   index: VaultIndex
   options: DeskmarkScanOptions
 }
 
 let open: OpenScan | null = null
+let lastPublish = 0
 let onFinished: (() => void) | null = null
 
 export function whenScanFinishes(fn: () => void): void {
@@ -62,16 +66,21 @@ const hold = (root: string): OpenScan => {
   open?.index.close()
   const index = new VaultIndex(join(root, '.deskmark'))
   index.open()
-  open = { root, key: '', token: 0, running: false, seen: 0, index, options: DEFAULT_SCAN_OPTIONS }
+  open = { root, key: '', token: 0, running: false, dirty: false, seen: 0, index, options: DEFAULT_SCAN_OPTIONS }
   return open
 }
 
-const publish = (): void => {
+const publish = (force = false): void => {
   if (!open) return
+  const now = Date.now()
+  if (!force && now - lastPublish < PUBLISH_GAP_MS) return
+  lastPublish = now
   const payload = { seen: open.seen, scanning: open.running }
+  const changed = open.dirty
+  open.dirty = false
   for (const win of BrowserWindow.getAllWindows()) {
     if (win.isDestroyed()) continue
-    win.webContents.send('mt::deskmark-index-tick', payload)
+    win.webContents.send('mt::deskmark-index-tick', { ...payload, changed })
   }
 }
 
@@ -98,31 +107,40 @@ async function runScan(token: number, root: string, options: DeskmarkScanOptions
       seenPaths.add(file.path)
       current.seen += 1
       if (file.size > MAX_TEXT_BYTES) {
-        if (current.seen % 40 === 0) publish()
+        publish()
         return
       }
       if (!force && times.get(file.path) === file.mtimeMs) {
-        if (current.seen % 40 === 0) publish()
+        publish()
         return
       }
       try {
         const content = await readFile(file.fullPath, 'utf8')
         if (stop()) return
         current.index.upsertFile({ path: file.path, content, mtimeMs: file.mtimeMs }, rules)
+        current.dirty = true
       } catch {
         return
       }
-      if (current.seen % 40 === 0) publish()
+      publish()
+      await new Promise<void>(resolve => setImmediate(resolve))
     })
   } catch {
     // A bad directory should not stop the editor.
   }
   if (stop()) return
+  let removed = 0
   for (const path of times.keys()) {
-    if (!seenPaths.has(path)) current.index.removeFile(path)
+    if (seenPaths.has(path)) continue
+    current.index.removeFile(path)
+    current.dirty = true
+    removed += 1
+    if (removed % 40 === 0) await new Promise<void>(resolve => setImmediate(resolve))
+    if (stop()) return
   }
+  if (stop()) return
   current.running = false
-  publish()
+  publish(true)
   onFinished?.()
 }
 
@@ -136,6 +154,8 @@ export function ensureScan(root: string, options: DeskmarkScanOptions | null | u
     current.key = key
     current.running = true
     current.seen = 0
+    current.dirty = false
+    lastPublish = 0
     current.options = chosen
     const token = current.token
     runScan(token, root, chosen, force).catch(() => {})

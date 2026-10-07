@@ -385,7 +385,7 @@ export interface IpcMainEventChannels {
   'mt::set-pathname': [payload: { id: string; pathname: string; filename: string }]
   'mt::set-view-layout': [layout: unknown]
   'mt::deskmark-show': [target: 'calendar' | 'tasks' | 'wordcount' | 'sticky']
-  'mt::deskmark-index-tick': [payload: { seen: number, scanning: boolean }]
+  'mt::deskmark-index-tick': [payload: { seen: number, scanning: boolean, changed: boolean }]
   'mt::deskmark-reminder': [notice: DeskmarkReminderNotice]
   'mt::show-command-palette': []
   'mt::show-export-dialog': [type: ExportType]

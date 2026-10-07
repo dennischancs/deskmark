@@ -157,6 +157,7 @@ import { useDeskmarkStore } from '@/store/deskmark'
 import { usePreferencesStore } from '@/store/preferences'
 import { editDeskmarkTask } from '@/util/deskmarkEdit'
 import { showDeskmarkTarget } from '@/util/deskmarkView'
+import { watchDeskmarkIndex } from '@/util/deskmarkIndex'
 import TaskLine from '@/components/taskLine.vue'
 import { calendarGroup, filterTasks, sortTasks, type TaskOrder } from '../../../../../../deskmark-core/src/agenda.ts'
 import { localDateTimeToIso } from '../../../../../../deskmark-core/src/time.ts'
@@ -179,9 +180,10 @@ const {
   deskmarkExtraPrefixes
 } = storeToRefs(preferenceStore)
 const groups = ref<DeskmarkTaskGroups | null>(null)
+const progress = ref<{ seen: number, scanning: boolean } | null>(null)
 let loadTicket = 0
-const scanning = computed(() => groups.value?.scanning === true)
-const seen = computed(() => groups.value?.seen ?? 0)
+const scanning = computed(() => progress.value ? progress.value.scanning : groups.value?.scanning === true)
+const seen = computed(() => progress.value?.seen ?? groups.value?.seen ?? 0)
 const query = ref('')
 const order = ref<TaskOrder>('priority')
 const orders: TaskOrder[] = ['priority', 'due', 'title']
@@ -220,7 +222,8 @@ const visibleGroups = computed(() => {
   })).filter(group => group.items.length > 0)
 })
 
-const load = async (): Promise<void> => {
+const load = async (resetProgress = false): Promise<void> => {
+  if (resetProgress) progress.value = null
   const ticket = ++loadTicket
   if (!root.value) {
     groups.value = null
@@ -236,6 +239,9 @@ const load = async (): Promise<void> => {
   })
   if (ticket !== loadTicket) return
   groups.value = next
+  if (next && !progress.value) {
+    progress.value = { seen: next.seen ?? 0, scanning: next.scanning === true }
+  }
   const names = new Map<string, string>()
   const lists = [next?.inbox, next?.today, next?.upcoming, next?.overdue, next?.done]
   for (const group of lists) {
@@ -246,7 +252,7 @@ const load = async (): Promise<void> => {
 }
 
 watch(root, () => {
-  load().catch((error) => {
+  load(true).catch((error) => {
     console.error(error)
   })
 }, { immediate: true })
@@ -265,15 +271,17 @@ watch([
   deskmarkRuleDateInText,
   deskmarkExtraPrefixes
 ], () => {
-  load().catch((error) => {
+  load(true).catch((error) => {
     console.error(error)
   })
 })
 
-const stopIndexTick = window.electron.ipcRenderer.on('mt::deskmark-index-tick', () => {
+const stopIndexTick = watchDeskmarkIndex(() => {
   load().catch((error) => {
     console.error(error)
   })
+}, (tick) => {
+  progress.value = { seen: tick.seen, scanning: tick.scanning }
 })
 onBeforeUnmount(stopIndexTick)
 

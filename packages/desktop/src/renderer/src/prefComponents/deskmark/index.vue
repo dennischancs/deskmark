@@ -179,10 +179,19 @@ const setLogin = (enabled: boolean): void => {
   display: flex;
   align-items: center;
   gap: 6px;
+  color: var(--editorColor);
 }
 .scan-text {
   width: 100%;
   margin: 6px 0 10px;
   box-sizing: border-box;
+  color: var(--editorColor);
+  background: var(--editorBgColor);
+  border: 1px solid var(--editorColor30, var(--tableBorderColor));
+  border-radius: 4px;
+  padding: 4px 8px;
+}
+.ext-list input[type='checkbox'] {
+  accent-color: var(--themeColor);
 }
 </style>

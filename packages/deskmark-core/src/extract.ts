@@ -1,6 +1,7 @@
-import { agendaFromMarkdown } from './query.ts'
+import { parseNote } from './note.ts'
+import { agendaFromParsed } from './query.ts'
 import { parseDue } from './time.ts'
-import type { AgendaItem } from './types.ts'
+import type { AgendaItem, ParsedNote } from './types.ts'
 
 export interface ExtractRules {
   taskLine: boolean
@@ -20,10 +21,10 @@ export const DEFAULT_EXTRACT_RULES: ExtractRules = {
 
 const DATE_IN_TEXT = /(?:^|[^\d])(\d{4}-\d{2}-\d{2})(?!\d)/
 
-export function agendaForIndex(path: string, markdown: string, rules: ExtractRules = DEFAULT_EXTRACT_RULES): AgendaItem[] {
-  const parsed = agendaFromMarkdown(path, markdown)
+export function agendaForIndex(path: string, markdown: string, rules: ExtractRules = DEFAULT_EXTRACT_RULES, parsed?: ParsedNote): AgendaItem[] {
+  const fromNote = agendaFromParsed(path, parsed ?? parseNote(markdown, path))
   const items: AgendaItem[] = []
-  for (const item of parsed) {
+  for (const item of fromNote) {
     if (item.source === 'note' && !rules.frontMatter) continue
     if (item.source === 'inline' && !rules.taskLine) continue
     items.push(rules.commentMeta || item.source === 'note' ? item : withoutCommentMeta(item))

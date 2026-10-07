@@ -32,6 +32,21 @@ test('按扩展名往下找，并跳过 node_modules', async() => {
   assert.deepEqual(found.sort(), ['b.txt', 'notes/a.md'])
 })
 
+test('一个目录里有很多别的文件时，仍然能找到纯文本', async() => {
+  const root = join(tmpdir(), `deskmark-wide-${Date.now()}`)
+  mkdirSync(root)
+  for (let index = 0; index < 450; index += 1) {
+    writeFileSync(join(root, `bin-${index}.png`), 'x')
+  }
+  writeFileSync(join(root, 'note.md'), '- [ ] 甲\n', 'utf8')
+  const found: string[] = []
+  const seen = await listTextFiles(root, ['md'], () => false, (file) => {
+    found.push(file.path)
+  })
+  assert.equal(seen, 1)
+  assert.deepEqual(found, ['note.md'])
+})
+
 test('待办按分组放好', () => {
   const now = new Date('2026-10-06T01:00:00.000Z')
   const row = (text: string, due: string | null, status: 'open' | 'done'): TaskRow => ({

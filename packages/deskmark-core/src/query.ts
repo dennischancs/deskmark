@@ -1,5 +1,5 @@
 import { parseNote, temporaryKey } from './note.ts'
-import type { AgendaItem } from './types.ts'
+import type { AgendaItem, ParsedNote } from './types.ts'
 
 export {
   agendaCounts,
@@ -17,8 +17,7 @@ export {
   tasksOnDate
 } from './agenda.ts'
 
-export function agendaFromMarkdown(path: string, markdown: string): AgendaItem[] {
-  const parsed = parseNote(markdown, path)
+export function agendaFromParsed(path: string, parsed: ParsedNote): AgendaItem[] {
   const items: AgendaItem[] = []
   if (parsed.fields.kind === 'todo') {
     const text = parsed.title ?? fileName(path)
@@ -54,6 +53,10 @@ export function agendaFromMarkdown(path: string, markdown: string): AgendaItem[]
     })
   }
   return items
+}
+
+export function agendaFromMarkdown(path: string, markdown: string): AgendaItem[] {
+  return agendaFromParsed(path, parseNote(markdown, path))
 }
 
 function fileName(path: string): string {

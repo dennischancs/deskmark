@@ -48,6 +48,11 @@ export interface ListedFile {
 }
 
 // Yielding between directories keeps a huge folder from freezing the process.
+// One directory can also hold thousands of names that are not text. Those
+// checks are synchronous, so the walk pauses mid-list and lets the window
+// take a click.
+const ENTRY_TURN = 400
+
 export async function listTextFiles(
   root: string,
   extensions: readonly string[],
@@ -65,7 +70,11 @@ export async function listTextFiles(
     } catch {
       continue
     }
+    let stepped = 0
     for (const entry of entries) {
+      if (++stepped % ENTRY_TURN === 0) {
+        await new Promise<void>(resolve => setImmediate(resolve))
+      }
       if (shouldStop()) return seen
       if (SKIP.has(entry.name) || entry.isSymbolicLink()) continue
       const fullPath = join(directory, entry.name)
@@ -87,7 +96,6 @@ export async function listTextFiles(
         mtimeMs: info.mtimeMs,
         size: info.size
       })
-      if (seen % 40 === 0) await new Promise<void>(resolve => setImmediate(resolve))
     }
   }
   return seen
