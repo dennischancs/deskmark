@@ -1,7 +1,10 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from 'playwright'
 import { execSync } from 'node:child_process'
-import { launchWithMarkdown } from './helpers'
+import * as fs from 'node:fs'
+import * as os from 'node:os'
+import * as path from 'node:path'
+import { launchElectron, launchWithMarkdown, sendIpcToRenderer } from './helpers'
 
 const stopApp = (app: { process(): { pid?: number } }): void => {
   const pid = app.process().pid
@@ -41,6 +44,41 @@ test('typing slash on an empty line opens the insert menu on screen', async() =>
     await menuOnScreen(page)
   } finally {
     stopApp(app)
+  }
+})
+
+test('dragging a calendar chip moves that task onto another day', async() => {
+  test.setTimeout(45000)
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'deskmark-drag-'))
+  const note = path.join(dir, 'milk.md')
+  fs.writeFileSync(note, '- [ ] 买牛奶 <!-- deskmark: id=MILK; due=2026-10-07 -->\n', 'utf8')
+  const launched = await launchElectron([dir], { preferences: { language: 'en' } })
+  const { app, page } = launched
+  try {
+    await sendIpcToRenderer(app, 'mt::deskmark-show', 'calendar')
+    const chip = page.locator('.calendar-view .chip', { hasText: '买牛奶' })
+    await chip.waitFor({ state: 'visible', timeout: 10000 })
+    const from = await chip.evaluate((element) => element.closest('[data-day]')?.getAttribute('data-day'))
+    expect(from).toBeTruthy()
+    const target = page.locator('.calendar-view [data-day]').filter({ hasNotText: '买牛奶' }).first()
+    const targetDay = await target.getAttribute('data-day')
+    expect(targetDay).toBeTruthy()
+    expect(targetDay).not.toBe(from)
+    const start = await chip.boundingBox()
+    const end = await target.boundingBox()
+    expect(start).toBeTruthy()
+    expect(end).toBeTruthy()
+    if (!start || !end) return
+    await page.mouse.move(start.x + start.width / 2, start.y + start.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(end.x + end.width / 2, end.y + 8, { steps: 16 })
+    await page.mouse.up()
+    await expect.poll(() => fs.readFileSync(note, 'utf8'), { timeout: 8000 }).toContain(`due=${targetDay}`)
+    const saved = fs.readFileSync(note, 'utf8')
+    expect(saved.match(/买牛奶/g)?.length).toBe(1)
+  } finally {
+    stopApp(app)
+    fs.rmSync(dir, { recursive: true, force: true })
   }
 })
 
