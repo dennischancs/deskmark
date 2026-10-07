@@ -54,6 +54,11 @@ export function shortcutHasModelId(bytes: Uint8Array, id: string): boolean {
   return haystack.includes(needle)
 }
 
+export function sameExecutable(left: string, right: string): boolean {
+  const normalize = (value: string): string => value.replaceAll('/', '\\').replace(/\\+$/, '').toLowerCase()
+  return normalize(left) === normalize(right)
+}
+
 export function reminderCaption(notePath: string, remind: string | null): string {
   const file = notePath.split('/').pop() || notePath
   const clock = remind?.match(/T(\d{2}:\d{2})/)?.[1] || ''

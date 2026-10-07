@@ -23,7 +23,7 @@ import EditorWindow from '../windows/editor'
 import { StickyHost, markQuitting, setStickyHost } from '../deskmark/stickies'
 import { startReminderLoop } from '../deskmark/reminderLoop'
 import type { DeskmarkReminderNotice } from '@shared/types/ipc'
-import { DESKMARK_APP_USER_MODEL_ID, installedShortcutCandidates, shortcutHasModelId, toastShortcutPlan } from '../deskmark/windowsToast'
+import { DESKMARK_APP_USER_MODEL_ID, installedShortcutCandidates, sameExecutable, toastShortcutPlan } from '../deskmark/windowsToast'
 import { retainPluginWebview } from '../deskmark/pluginGuest'
 import { join as pathJoin } from 'node:path'
 import SettingWindow from '../windows/setting'
@@ -182,7 +182,13 @@ class App {
       execPath: process.execPath,
       installedShortcutReady: installedShortcutCandidates(appData).some(candidate => {
         if (!existsSync(candidate)) return false
-        return shortcutHasModelId(readFileSync(candidate), DESKMARK_APP_USER_MODEL_ID)
+        try {
+          const link = shell.readShortcutLink(candidate)
+          return link.appUserModelId === DESKMARK_APP_USER_MODEL_ID &&
+            sameExecutable(link.target, process.execPath)
+        } catch {
+          return false
+        }
       })
     })
     if (!plan) return

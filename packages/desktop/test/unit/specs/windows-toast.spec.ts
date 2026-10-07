@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   appUserModelId,
   reminderCaption,
+  sameExecutable,
   shortcutHasModelId,
   toastShortcutPlan
 } from '../../../src/main/deskmark/windowsToast'
@@ -61,5 +62,16 @@ describe('windows toast shortcut', () => {
       execPath: 'D:/deskmark/dist/win-unpacked/marktext.exe',
       installedShortcutReady: false
     })?.appUserModelId).toBe(id)
+  })
+
+  it('treats a different program path as a different shortcut target', () => {
+    expect(sameExecutable(
+      'D:/deskmark/dist/win-unpacked/marktext.exe',
+      'D:\\deskmark\\dist\\win-unpacked\\marktext.exe'
+    )).toBe(true)
+    expect(sameExecutable(
+      'D:/deskmark/dist/win-unpacked/marktext.exe',
+      'C:/Program Files/Deskmark/marktext.exe'
+    )).toBe(false)
   })
 })
