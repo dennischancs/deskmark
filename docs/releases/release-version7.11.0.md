@@ -9,4 +9,4 @@
 - 没有「设置」这项允许，就不能登记设置页。
 - 「设置 - 桌笺」里列出已经登记的小功能。字数统计出现在这里。
 
-这次还没有打 Windows 安装包。macOS 和 Linux 也没有打包。
+Windows x64 安装包是 dist/marktext-win-x64-7.11.0-setup.exe。解包程序文件版本是 7.11.0。macOS 和 Linux 没有打包。
