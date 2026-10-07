@@ -11,7 +11,6 @@
       </button>
     </header>
     <section
-      v-if="!guestReady"
       class="summary"
     >
       <p class="value">
@@ -38,41 +37,25 @@
         {{ reading.hint }}
       </p>
     </section>
-    <p v-if="error">
-      {{ error }}
-    </p>
-    <div
-      v-else
-      ref="host"
-      class="guest"
-      :class="{ pending: !guestReady }"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useEditorStore } from '@/store/editor'
 import { useProjectStore } from '@/store/project'
-import { usePreferencesStore } from '@/store/preferences'
 import { noteInsideVault } from '../../../../../../deskmark-plugin/src/index.ts'
 import { presentNote } from '../../../../../../../plugins/sample-wordcount/measure.mjs'
 
 defineProps<{ closeLabel: string, title: string }>()
 const emit = defineEmits<{ close: [] }>()
-const { t, locale } = useI18n()
+const { locale } = useI18n()
 const editorStore = useEditorStore()
 const projectStore = useProjectStore()
-const preferencesStore = usePreferencesStore()
 const { currentFile } = storeToRefs(editorStore)
 const { projectTree } = storeToRefs(projectStore)
-const { theme } = storeToRefs(preferencesStore)
-const host = ref<HTMLDivElement | null>(null)
-const error = ref('')
-const guestReady = ref(false)
-let guestView: (HTMLElement & { insertCSS?: (css: string) => Promise<string> }) | null = null
 
 const reading = computed(() => {
   const lang = String(locale.value || 'en')
@@ -87,90 +70,6 @@ const reading = computed(() => {
     lang,
     state: 'ready'
   })
-})
-
-const safeColor = (value: string): string => {
-  const trimmed = value.trim()
-  return /^(#[0-9a-fA-F]{3,8}|rgba?\([^)]+\)|hsla?\([^)]+\))$/.test(trimmed) ? trimmed : ''
-}
-
-const paintGuest = (): void => {
-  if (!guestView?.insertCSS) return
-  const style = getComputedStyle(document.documentElement)
-  const foreground = safeColor(style.getPropertyValue('--sideBarColor')) ||
-    safeColor(style.getPropertyValue('--editorColor'))
-  const scheme = document.documentElement.style.colorScheme === 'dark' ? 'dark' : 'light'
-  const color = foreground ? `--deskmark-fg:${foreground};color:${foreground} !important;` : ''
-  guestView.insertCSS(`:root{color-scheme:${scheme};${color}}html,body{background:transparent !important;${color}}`).catch(() => {})
-}
-
-const publish = (): void => {
-  const root = projectTree.value?.pathname || ''
-  const file = currentFile.value
-  if (!root || !file?.pathname) {
-    window.electron.ipcRenderer.invoke('mt::deskmark::plugin-note', null).catch(() => {})
-    return
-  }
-  const href = window.path.relative(root, file.pathname).replaceAll('\\', '/')
-  if (!noteInsideVault(href)) {
-    window.electron.ipcRenderer.invoke('mt::deskmark::plugin-note', null).catch(() => {})
-    return
-  }
-  window.electron.ipcRenderer.invoke('mt::deskmark::plugin-note', {
-    vault: root,
-    path: href,
-    markdown: file.markdown || ''
-  }).catch(() => {})
-}
-
-const guestSource = (src: string): string => {
-  const url = new URL(src)
-  url.searchParams.set('lang', String(locale.value || 'en'))
-  const foreground = foregroundColor()
-  if (foreground) url.searchParams.set('fg', foreground)
-  return url.href
-}
-
-const foregroundColor = (): string => {
-  const style = getComputedStyle(document.documentElement)
-  return safeColor(style.getPropertyValue('--sideBarColor')) ||
-    safeColor(style.getPropertyValue('--editorColor'))
-}
-
-onMounted(async () => {
-  try {
-    const info = await window.electron.ipcRenderer.invoke('mt::deskmark::plugin-info')
-    if (!info || !host.value) {
-      error.value = t('plugin.failed')
-      return
-    }
-    const guest = document.createElement('webview')
-    guestView = guest as HTMLElement & { insertCSS?: (css: string) => Promise<string> }
-    guest.setAttribute('src', guestSource(info.src))
-    guest.setAttribute('preload', info.preload)
-    guest.setAttribute('partition', 'persist:deskmark-plugin')
-    guest.addEventListener('dom-ready', () => {
-      guestReady.value = true
-      paintGuest()
-      publish()
-    })
-    guest.addEventListener('did-fail-load', () => {
-      guestReady.value = false
-    })
-    host.value.appendChild(guest)
-    publish()
-  } catch (caught) {
-    error.value = caught instanceof Error ? caught.message : t('plugin.failed')
-  }
-})
-
-onBeforeUnmount(() => {
-  window.electron.ipcRenderer.invoke('mt::deskmark::plugin-note', null).catch(() => {})
-})
-
-watch([currentFile, projectTree], publish)
-watch(theme, () => {
-  paintGuest()
 })
 </script>
 
@@ -220,19 +119,5 @@ watch(theme, () => {
 .hint {
   margin: 10px 0 0;
   word-break: break-all;
-}
-.guest,
-.guest webview {
-  flex: 1;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-.guest.pending {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  opacity: 0;
 }
 </style>

@@ -47,7 +47,7 @@
         v-else-if="pluginView"
         :title="t('plugin.words')"
         :close-label="t('plugin.close')"
-        @close="unloadSample"
+        @close="closeWordCount"
       />
     </div>
     <div
@@ -68,7 +68,7 @@ import { usePreferencesStore } from '@/store/preferences'
 import { showDeskmarkTarget } from '@/util/deskmarkView'
 
 import { sideBarIcons as builtinSideBarIcons, sideBarBottomIcons } from './help'
-import { Document as WordsIcon } from '@element-plus/icons-vue'
+import { Histogram as WordsIcon } from '@element-plus/icons-vue'
 import Tree from './tree.vue'
 import SideBarSearch from './search.vue'
 import Toc from './toc.vue'
@@ -136,11 +136,7 @@ try {
 } catch (error) {
   console.error(error)
 }
-const unloadSample = (): void => {
-  pluginHost.unload(sampleManifest.id)
-  pluginLoaded.value = false
-  const commandCenter = useCommandCenterStore()
-  commandCenter.rootCommand.subcommands = commandCenter.rootCommand.subcommands.filter(command => !String(command.id).startsWith(sampleManifest.id + ':'))
+const closeWordCount = (): void => {
   if (rightColumn.value.startsWith(sampleManifest.id + ':')) {
     layoutStore.SET_LAYOUT({ rightColumn: 'files' })
   }
