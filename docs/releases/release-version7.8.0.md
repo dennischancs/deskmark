@@ -10,4 +10,4 @@
 - 有未保存的修改时，提示给出三条：保留编辑、重新加载、另存。
 - 另存写的是当前编辑，不覆盖外面刚刚改过的原文件。
 
-这次没有打 Windows 安装包。macOS 和 Linux 也没有打包。
+Windows x64 安装包是 dist/marktext-win-x64-7.8.0-setup.exe。解包程序文件版本是 7.8.0。macOS 和 Linux 没有打包。

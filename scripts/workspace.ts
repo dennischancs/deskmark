@@ -93,10 +93,12 @@ function runRelease(unpack: boolean): number {
   }
   const script = releaseScriptName(target, process.arch, unpack)
   console.log(`Running pnpm --filter marktext run ${script}`)
-  const result = spawnSync('pnpm', ['--filter', 'marktext', 'run', script], {
+  // One shell string. Passing an argument array with shell:true warns on
+  // Windows, and pnpm is a .cmd shim that does not spawn without a shell.
+  const result = spawnSync(`pnpm --filter marktext run ${script}`, {
     cwd: repoRoot,
     stdio: 'inherit',
-    shell: process.platform === 'win32'
+    shell: true
   })
   return result.status ?? 1
 }
