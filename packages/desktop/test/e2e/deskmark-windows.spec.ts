@@ -66,6 +66,27 @@ test('typing slash on an empty line opens the insert menu on screen', async() =>
   }
 })
 
+test('closing the main window keeps the tray process', async() => {
+  test.setTimeout(45000)
+  const launched = await launchElectron([], { preferences: { language: 'zh-CN' } })
+  const { app } = launched
+  try {
+    await expect.poll(async() => app.evaluate(({ BrowserWindow }) => {
+      return BrowserWindow.getAllWindows().some(win => win.isVisible())
+    }), { timeout: 10000 }).toBe(true)
+    await app.evaluate(({ BrowserWindow }) => {
+      const win = BrowserWindow.getAllWindows().find(item => item.isVisible())
+      win?.close()
+    })
+    await expect.poll(async() => app.evaluate(({ BrowserWindow }) => {
+      const windows = BrowserWindow.getAllWindows()
+      return windows.length > 0 && windows.every(win => !win.isVisible())
+    }), { timeout: 8000 }).toBe(true)
+  } finally {
+    stopApp(app)
+  }
+})
+
 test('dragging a calendar chip moves that task onto another day', async() => {
   test.setTimeout(45000)
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'deskmark-drag-'))
