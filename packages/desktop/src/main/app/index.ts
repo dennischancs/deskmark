@@ -22,7 +22,7 @@ import { WindowType } from '../windows/base'
 import EditorWindow from '../windows/editor'
 import { StickyHost, markQuitting, setStickyHost } from '../deskmark/stickies'
 import { startReminderLoop } from '../deskmark/reminderLoop'
-import { installedShortcutCandidates, toastShortcutPlan } from '../deskmark/windowsToast'
+import { DESKMARK_APP_USER_MODEL_ID, installedShortcutCandidates, shortcutHasModelId, toastShortcutPlan } from '../deskmark/windowsToast'
 import { retainPluginWebview } from '../deskmark/pluginGuest'
 import { join as pathJoin } from 'node:path'
 import SettingWindow from '../windows/setting'
@@ -179,7 +179,10 @@ class App {
       appData,
       packaged: app.isPackaged,
       execPath: process.execPath,
-      installedShortcutExists: installedShortcutCandidates(appData).some(candidate => existsSync(candidate))
+      installedShortcutReady: installedShortcutCandidates(appData).some(candidate => {
+        if (!existsSync(candidate)) return false
+        return shortcutHasModelId(readFileSync(candidate), DESKMARK_APP_USER_MODEL_ID)
+      })
     })
     if (!plan) return
     const wrote = shell.writeShortcutLink(plan.path, 'replace', {

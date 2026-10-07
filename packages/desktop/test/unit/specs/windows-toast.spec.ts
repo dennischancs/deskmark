@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   appUserModelId,
   reminderCaption,
+  shortcutHasModelId,
   toastShortcutPlan
 } from '../../../src/main/deskmark/windowsToast'
 
@@ -18,7 +19,7 @@ describe('windows toast shortcut', () => {
       appData,
       packaged: true,
       execPath: 'C:/Program Files/Deskmark/marktext.exe',
-      installedShortcutExists: true
+      installedShortcutReady: true
     })).toBeNull()
   })
 
@@ -27,7 +28,7 @@ describe('windows toast shortcut', () => {
       appData,
       packaged: true,
       execPath: 'D:/deskmark/dist/win-unpacked/marktext.exe',
-      installedShortcutExists: false
+      installedShortcutReady: false
     })
     expect(plan?.path.endsWith('Programs\\Deskmark.lnk') || plan?.path.endsWith('Programs/Deskmark.lnk')).toBe(true)
     expect(plan?.appUserModelId).toBe('app.deskmark.desktop')
@@ -39,7 +40,7 @@ describe('windows toast shortcut', () => {
       appData,
       packaged: false,
       execPath: 'C:/electron.exe',
-      installedShortcutExists: true
+      installedShortcutReady: true
     })
     expect(plan?.path.endsWith('Deskmark Dev.lnk')).toBe(true)
     expect(plan?.appUserModelId).toBe('app.deskmark.desktop.dev')
@@ -48,5 +49,17 @@ describe('windows toast shortcut', () => {
   it('puts the note name and clock in the toast', () => {
     expect(reminderCaption('notes/milk.md', '2026-10-07T09:05:00+08:00')).toBe('milk.md / 09:05')
     expect(reminderCaption('notes/milk.md', null)).toBe('milk.md')
+  })
+
+  it('treats a shortcut without the model id as not ready', () => {
+    const id = 'app.deskmark.desktop'
+    expect(shortcutHasModelId(Buffer.from('plain shortcut'), id)).toBe(false)
+    expect(shortcutHasModelId(Buffer.from(id, 'utf16le'), id)).toBe(true)
+    expect(toastShortcutPlan({
+      appData,
+      packaged: true,
+      execPath: 'D:/deskmark/dist/win-unpacked/marktext.exe',
+      installedShortcutReady: false
+    })?.appUserModelId).toBe(id)
   })
 })

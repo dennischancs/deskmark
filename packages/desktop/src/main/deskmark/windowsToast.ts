@@ -31,10 +31,10 @@ export function toastShortcutPlan(input: {
   appData: string
   packaged: boolean
   execPath: string
-  installedShortcutExists: boolean
+  installedShortcutReady: boolean
 }): ToastShortcutPlan | null {
   if (input.packaged) {
-    if (input.installedShortcutExists) return null
+    if (input.installedShortcutReady) return null
     return {
       path: installedShortcutCandidates(input.appData)[0],
       appUserModelId: DESKMARK_APP_USER_MODEL_ID,
@@ -46,6 +46,12 @@ export function toastShortcutPlan(input: {
     appUserModelId: DESKMARK_DEV_APP_USER_MODEL_ID,
     target: input.execPath
   }
+}
+
+export function shortcutHasModelId(bytes: Uint8Array, id: string): boolean {
+  const needle = Buffer.from(id, 'utf16le')
+  const haystack = Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength)
+  return haystack.includes(needle)
 }
 
 export function reminderCaption(notePath: string, remind: string | null): string {
