@@ -1021,6 +1021,8 @@
       "errorLoadingTabTitle": "載入標籤頁發生錯誤",
       "errorLoadingTabMessage": "載入檔案變更時發生錯誤，因為找不到該標籤頁。",
       "mixedLineEndingsNormalized": "「{name}」含有混合換行字元，已自動正規化為 {lineEnding}。",
+      "largeFileSuggestSource": "「{name}」比較大。要改用原始碼模式嗎？",
+      "largeFileSourceOnly": "「{name}」太大，已改用原始碼模式。",
       "imageDeletionUrlTitle": "圖片刪除連結",
       "imageDeletionUrlMessage": "點擊將已上傳圖片的刪除連結複製到剪貼簿（{url}）。",
       "errorWhileSaving": "儲存時發生錯誤：{msg}",

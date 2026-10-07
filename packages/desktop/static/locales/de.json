@@ -1021,6 +1021,8 @@
       "errorLoadingTabTitle": "Fehler beim Laden des Tabs",
       "errorLoadingTabMessage": "Beim Laden der Dateiänderung ist ein Fehler aufgetreten, da der Tab nicht gefunden werden kann.",
       "mixedLineEndingsNormalized": "„{name}“ enthält gemischte Zeilenenden, die automatisch zu {lineEnding} normalisiert wurden.",
+      "largeFileSuggestSource": "„{name}“ ist groß. Zum Quelltextmodus wechseln?",
+      "largeFileSourceOnly": "„{name}“ ist zu groß für die Ansicht. Der Quelltextmodus ist an.",
       "imageDeletionUrlTitle": "Bild‑Lösch‑URL",
       "imageDeletionUrlMessage": "Klicken, um die Lösch-URL des hochgeladenen Bildes in die Zwischenablage zu kopieren ({url}).",
       "errorWhileSaving": "Beim Speichern ist ein Fehler aufgetreten: {msg}",

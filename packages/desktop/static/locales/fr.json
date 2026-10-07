@@ -1021,6 +1021,8 @@
       "errorLoadingTabTitle": "Erreur lors du chargement de l’onglet",
       "errorLoadingTabMessage": "Une erreur s’est produite lors du chargement de la modification du fichier car l’onglet est introuvable.",
       "mixedLineEndingsNormalized": "« {name} » contient des fins de ligne mixtes qui ont été automatiquement normalisées en {lineEnding}.",
+      "largeFileSuggestSource": "« {name} » est volumineux. Passer en mode source ?",
+      "largeFileSourceOnly": "« {name} » est trop volumineux pour l’aperçu. Le mode source est activé.",
       "imageDeletionUrlTitle": "URL de suppression de l’image",
       "imageDeletionUrlMessage": "Cliquez pour copier dans le presse‑papiers l’URL de suppression de l’image téléversée ({url}).",
       "errorWhileSaving": "Une erreur s'est produite lors de l'enregistrement : {msg}",

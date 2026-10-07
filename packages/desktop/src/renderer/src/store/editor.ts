@@ -22,7 +22,7 @@ import { useLayoutStore } from './layout'
 import { useMainStore } from '.'
 import { t } from '../i18n'
 import { debouncedSendBufferedState, enableSessionCapture, sendBufferedState } from './bufferedState'
-import { prefersSourceMode } from 'common/sessionRules'
+import { largeFileMode, prefersSourceMode, utf8Bytes } from 'common/sessionRules'
 import { diskChangeChoice } from 'common/diskChange'
 import type {
   IFileState,
@@ -1378,6 +1378,38 @@ export const useEditorStore = defineStore('editor', {
           })
         }
       }
+      this.noticeLargeFile(id, markdownDocument.filename, markdown)
+    },
+
+    noticeLargeFile(tabId: string, filename: string, markdown: string): void {
+      const mode = largeFileMode(utf8Bytes(markdown))
+      if (mode === 'normal') return
+      const preferencesStore = usePreferencesStore()
+      if (mode === 'source-only') {
+        if (!preferencesStore.sourceCode) {
+          preferencesStore.sourceCode = true
+          preferencesStore.DISPATCH_EDITOR_VIEW_STATE({ sourceCode: true })
+        }
+        this.pushTabNotification({
+          tabId,
+          msg: t('store.editor.largeFileSourceOnly', { name: filename }),
+          showConfirm: false,
+          style: 'warn'
+        })
+        return
+      }
+      if (preferencesStore.sourceCode) return
+      this.pushTabNotification({
+        tabId,
+        msg: t('store.editor.largeFileSuggestSource', { name: filename }),
+        showConfirm: true,
+        style: 'warn',
+        action: (status) => {
+          if (status !== true) return
+          preferencesStore.sourceCode = true
+          preferencesStore.DISPATCH_EDITOR_VIEW_STATE({ sourceCode: true })
+        }
+      })
     },
 
     SHOW_TAB_VIEW(always: boolean): void {

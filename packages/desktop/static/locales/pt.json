@@ -1021,6 +1021,8 @@
       "errorLoadingTabTitle": "Erro ao carregar a aba",
       "errorLoadingTabMessage": "Ocorreu um erro ao carregar a alteração do arquivo porque a aba não pôde ser encontrada.",
       "mixedLineEndingsNormalized": "“{name}” possui finais de linha mistos que foram normalizados automaticamente para {lineEnding}.",
+      "largeFileSuggestSource": "“{name}” é grande. Mudar para o modo de código?",
+      "largeFileSourceOnly": "“{name}” é demasiado grande para a vista. O modo de código está ligado.",
       "imageDeletionUrlTitle": "URL de exclusão da imagem",
       "imageDeletionUrlMessage": "Clique para copiar para a área de transferência a URL de exclusão da imagem enviada ({url}).",
       "errorWhileSaving": "Ocorreu um erro ao salvar: {msg}",

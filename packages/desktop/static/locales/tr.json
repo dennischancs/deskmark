@@ -1021,6 +1021,8 @@
       "errorLoadingTabTitle": "Sekme yüklenirken hata",
       "errorLoadingTabMessage": "Sekme bulunamadığı için dosya değişikliği yüklenirken bir hata oluştu.",
       "mixedLineEndingsNormalized": "\"{name}\" karışık satır sonları içeriyor; otomatik olarak {lineEnding} biçimine normalleştirildi.",
+      "largeFileSuggestSource": "\"{name}\" büyük. Kaynak moduna geçilsin mi?",
+      "largeFileSourceOnly": "\"{name}\" görünüm için çok büyük. Kaynak modu açık.",
       "imageDeletionUrlTitle": "Görsel silme URL'si",
       "imageDeletionUrlMessage": "Yüklenen görselin silme URL'sini panoya kopyalamak için tıklayın {url}",
       "errorWhileSaving": "Kaydedilirken bir hata oluştu: {msg}",

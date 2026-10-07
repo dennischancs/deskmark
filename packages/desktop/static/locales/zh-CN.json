@@ -1021,6 +1021,8 @@
       "errorLoadingTabTitle": "加载标签页出错",
       "errorLoadingTabMessage": "加载文件变更时发生错误，因为找不到该标签页。",
       "mixedLineEndingsNormalized": "“{name}” 含有混合换行符，已自动规范化为 {lineEnding}。",
+      "largeFileSuggestSource": "“{name}” 比较大。要改用源码模式吗？",
+      "largeFileSourceOnly": "“{name}” 太大，已改用源码模式。",
       "imageDeletionUrlTitle": "图片删除链接",
       "imageDeletionUrlMessage": "点击将已上传图片的删除链接复制到剪贴板 ({url})。",
       "errorWhileSaving": "保存时发生错误：{msg}",

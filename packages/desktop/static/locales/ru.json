@@ -1021,6 +1021,8 @@
       "errorLoadingTabTitle": "Ошибка загрузки вкладки",
       "errorLoadingTabMessage": "Произошла ошибка при загрузке изменений файла, так как вкладка не найдена.",
       "mixedLineEndingsNormalized": "В файле \"{name}\" смешанные концы строк, которые автоматически нормализованы в {lineEnding}.",
+      "largeFileSuggestSource": "«{name}» большой. Перейти в режим исходного текста?",
+      "largeFileSourceOnly": "«{name}» слишком большой для просмотра. Включён режим исходного текста.",
       "imageDeletionUrlTitle": "URL удаления изображения",
       "imageDeletionUrlMessage": "Нажмите, чтобы скопировать URL удаления загруженного изображения в буфер обмена {url}",
       "errorWhileSaving": "Произошла ошибка при сохранении: {msg}",

@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { OpenSession, shouldPreserveOpenSession } from '../../../src/common/openSession'
-import { prefersSourceMode } from '../../../src/common/sessionRules'
+import { largeFileMode, prefersSourceMode, SOURCE_ONLY_BYTES, SUGGEST_SOURCE_BYTES } from '../../../src/common/sessionRules'
 
 describe('open file session', () => {
   it('keeps order and unsaved text without writing the original file', () => {
@@ -43,6 +43,13 @@ describe('open file session', () => {
   it('treats txt as source mode and markdown as the formatted mode', () => {
     expect(prefersSourceMode('notes.txt')).toBe(true)
     expect(prefersSourceMode('Notes.MD')).toBe(false)
+  })
+
+  it('keeps a 1 MB note editable and refuses the visual editor at 10 MB', () => {
+    expect(largeFileMode(SUGGEST_SOURCE_BYTES - 1)).toBe('normal')
+    expect(largeFileMode(SUGGEST_SOURCE_BYTES)).toBe('suggest-source')
+    expect(largeFileMode(SOURCE_ONLY_BYTES - 1)).toBe('suggest-source')
+    expect(largeFileMode(SOURCE_ONLY_BYTES)).toBe('source-only')
   })
 
   it('does not let a window that never had tabs erase the previous session', () => {
