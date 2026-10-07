@@ -17,6 +17,13 @@ test-results/
 playwright-report/
 .playwright-mcp/
 *.min.json
+.build-*
+.e2e-*
+.hand-*
+.ver-*
+.vitest-*
+.deskmark/
+qa/hand-*/
 .claude/settings.local.json
 .claude/
 .codex/
