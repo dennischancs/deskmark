@@ -97,6 +97,12 @@ export const newTodoNote = (win: Win): void => {
   }
 }
 
+export const exportCalendar = (win: Win): void => {
+  if (win && win.webContents) {
+    win.webContents.send('mt::deskmark-export-ics')
+  }
+}
+
 export const openDeskmarkSettings = (): void => {
   ipcMain.emit('app-create-settings-window', 'deskmark')
 }

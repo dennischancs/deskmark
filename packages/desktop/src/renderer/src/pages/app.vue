@@ -93,6 +93,7 @@ import { usePreferencesStore } from '@/store/preferences'
 import { useEditorStore } from '@/store/editor'
 import { useCommandCenterStore } from '@/store/commandCenter'
 import { createTodoNote } from '@/util/createTodoNote'
+import { exportCalendar } from '@/util/exportIcs'
 import { useProjectStore } from '@/store/project'
 import { useAutoUpdatesStore } from '@/store/autoUpdates'
 import { useNotificationStore } from '@/store/notification'
@@ -261,9 +262,13 @@ onMounted(async () => {
   const stopNewTodo = window.electron.ipcRenderer.on('mt::deskmark-new-todo', () => {
     createTodoNote().catch(() => {})
   })
+  const stopExportIcs = window.electron.ipcRenderer.on('mt::deskmark-export-ics', () => {
+    exportCalendar().catch(() => {})
+  })
   onBeforeUnmount(() => {
     stopDeskmarkShow()
     stopNewTodo()
+    stopExportIcs()
   })
 
   // module: notification

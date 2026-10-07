@@ -28,6 +28,7 @@ import {
   tasksOnDate,
   updateInlineTask
 } from '../src/index.ts'
+import { tasksToIcs } from '../src/ics.ts'
 
 const weekly = [
   '---',
@@ -327,4 +328,20 @@ test('搜索可以只看待办、未完成、今天、逾期和高优先级', ()
   assert.equal(matchesTaskSearch({ ...hit, done: true }, query, now, zone), false)
   assert.equal(matchesTaskSearch({ ...hit, due: '2026-10-07' }, parseTaskSearch('due:overdue'), now, zone), true)
   assert.equal(matchesTaskSearch(hit, parseTaskSearch('hello'), now, zone), false)
+})
+
+test('有截止日期的待办写成日历文件，没有日期的不写进去', () => {
+  const ics = tasksToIcs([
+    { path: 'notes/a.md', line: 3, id: '01ABC', text: '买牛奶, 两瓶', due: '2026-10-07', done: false },
+    { path: 'notes/b.md', line: 1, id: null, text: '无日期', due: null, done: false },
+    { path: 'notes/c.md', line: 2, id: null, text: 'a'.repeat(80), due: '2026-10-08', done: true }
+  ], new Date('2026-10-06T01:02:03.000Z'))
+  assert.match(ics, /^BEGIN:VCALENDAR\r\n/)
+  assert.match(ics, /DTSTART;VALUE=DATE:20261007/)
+  assert.match(ics, /SUMMARY:买牛奶\\, 两瓶/)
+  assert.equal(ics.includes('无日期'), false)
+  assert.match(ics, /UID:01ABC/)
+  assert.match(ics, /DESCRIPTION:notes\/a.md/)
+  assert.match(ics, new RegExp(`SUMMARY:${'a'.repeat(67)}\r\n ${'a'.repeat(13)}`))
+  assert.match(ics, /END:VCALENDAR\r\n$/)
 })

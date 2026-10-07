@@ -2,6 +2,7 @@
 import bus from '../bus'
 import { delay, isOsx } from '@/util'
 import { createTodoNote } from '@/util/createTodoNote'
+import { exportCalendar } from '@/util/exportIcs'
 import { isUpdatable } from './utils'
 import getCommandDescriptionById from './descriptions'
 import { t } from '../i18n'
@@ -73,6 +74,12 @@ const commands: CommandDescriptor[] = [
     id: 'file.new-todo-note',
     execute: async() => {
       await createTodoNote()
+    }
+  },
+  {
+    id: 'file.export-calendar',
+    execute: async() => {
+      await exportCalendar()
     }
   },
   {

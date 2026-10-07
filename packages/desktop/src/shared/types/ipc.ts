@@ -396,6 +396,7 @@ export interface IpcMainEventChannels {
   'mt::set-view-layout': [layout: unknown]
   'mt::deskmark-show': [target: 'calendar' | 'tasks' | 'wordcount' | 'sticky']
   'mt::deskmark-new-todo': []
+  'mt::deskmark-export-ics': []
   'mt::deskmark-index-tick': [payload: { seen: number, scanning: boolean, changed: boolean }]
   'mt::deskmark-reminder': [notice: DeskmarkReminderNotice]
   'mt::show-command-palette': []

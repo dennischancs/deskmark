@@ -20,6 +20,13 @@
         <button
           type="button"
           class="deskmark-hover"
+          @click="exportCalendarFile"
+        >
+          {{ t('calendar.export') }}
+        </button>
+        <button
+          type="button"
+          class="deskmark-hover"
           @click="shift(1)"
         >
           ›
@@ -252,6 +259,7 @@ import TaskLine from '@/components/taskLine.vue'
 import { agendaCounts, bridgeForDay, calendarGroup, DEADLINE_WARNING_DAYS, previewTasks, tasksForAgenda, type CalendarGroup } from '../../../../../deskmark-core/src/agenda.ts'
 import { buildMonth, weekdayLabels } from '../../../../../deskmark-core/src/calendar.ts'
 import { formatInZone, moveDueToDay } from '../../../../../deskmark-core/src/time.ts'
+import { exportCalendar } from '@/util/exportIcs'
 import { endTaskDrag, readTaskDrag } from '@/util/taskDrag'
 import type { DeskmarkTaskGroups, DeskmarkTaskRef } from '@shared/types/ipc'
 
@@ -388,6 +396,12 @@ const goToday = (): void => {
   month.value = Number(day.slice(5, 7))
   selected.value = day
   mode.value = 'day'
+}
+
+const exportCalendarFile = (): void => {
+  exportCalendar().catch((error) => {
+    console.error(error)
+  })
 }
 
 const pickDay = (day: string | null): void => {

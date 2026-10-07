@@ -120,6 +120,12 @@ export default function(
           }
         },
         {
+          label: t('menu.view.exportCalendar'),
+          click(_item, focusedWindow) {
+            actions.exportCalendar(focusedWindow as BrowserWindow | undefined)
+          }
+        },
+        {
           label: t('menu.view.openWordCount'),
           click(_item, focusedWindow) {
             actions.showDeskmark(focusedWindow as BrowserWindow | undefined, 'wordcount')
