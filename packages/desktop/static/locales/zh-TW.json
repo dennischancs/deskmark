@@ -807,6 +807,8 @@
       "reminderLimit": "提醒只在這個程式還開著的時候發出。關掉之後，到點不會響。",
       "reminderSeconds": "提醒留在畫面上的秒數",
       "reminderSecondsHint": "不點的話，到了就藏起來。",
+      "captureShortcut": "新增便條的快捷鍵",
+      "captureShortcutHint": "留空就關掉。預設是 Ctrl+Alt+N。",
       "openAtLogin": "登入後自動打開",
       "extensions": "純文字副檔名",
       "extensionsHint": "用逗號分開。勾選的是這個編輯器本來就能打開的幾種。",

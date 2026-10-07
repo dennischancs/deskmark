@@ -807,6 +807,8 @@
       "reminderLimit": "提醒只在这个程序还开着的时候发出。关掉之后，到点不会响。",
       "reminderSeconds": "提醒留在屏幕上的秒数",
       "reminderSecondsHint": "不点的话，到了就藏起来。",
+      "captureShortcut": "新建便签的快捷键",
+      "captureShortcutHint": "留空就关掉。默认是 Ctrl+Alt+N。",
       "openAtLogin": "登录后自动打开",
       "extensions": "纯文本扩展名",
       "extensionsHint": "用逗号分开。勾选的是这个编辑器本来就能打开的几种。",

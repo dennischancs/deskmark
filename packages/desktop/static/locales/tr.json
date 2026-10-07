@@ -807,6 +807,8 @@
       "reminderLimit": "Anımsatmalar yalnızca Masa notu açıkken gelir. Kapanınca saat çalmaz.",
       "reminderSeconds": "Anımsatmanın ekranda kalacağı saniye",
       "reminderSecondsHint": "Açılmazsa süre dolunca gizlenir.",
+      "captureShortcut": "Yeni not kısayolu",
+      "captureShortcutHint": "Kapatmak için boş bırakın. Varsayılan Ctrl+Alt+N.",
       "openAtLogin": "Oturum açılınca aç",
       "extensions": "Metin uzantıları",
       "extensionsHint": "Virgülle ayırın. Kutular, bu düzenleyicinin zaten açtığı türlerdir.",

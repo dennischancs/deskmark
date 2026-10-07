@@ -233,6 +233,11 @@
     "maximum": 600,
     "default": 30
   },
+  "deskmarkCaptureAccelerator": {
+    "description": "Deskmark--Global shortcut that creates a sticky note. Empty disables it.",
+    "type": "string",
+    "default": "CommandOrControl+Alt+N"
+  },
   "deskmarkWordCount": {
     "description": "Deskmark--Word count",
     "type": "boolean",

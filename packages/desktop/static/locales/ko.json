@@ -807,6 +807,8 @@
       "reminderLimit": "알림은 책상메모가 열려 있을 때만 옵니다. 종료하면 시간이 되어도 울리지 않습니다.",
       "reminderSeconds": "알림이 화면에 남는 초",
       "reminderSecondsHint": "열지 않으면 그 시간이 지나 숨습니다.",
+      "captureShortcut": "새 메모 단축키",
+      "captureShortcutHint": "비우면 꺼집니다. 기본값은 Ctrl+Alt+N입니다.",
       "openAtLogin": "로그인할 때 열기",
       "extensions": "텍스트 확장자",
       "extensionsHint": "쉼표로 구분합니다. 체크는 이 편집기가 원래 여는 종류입니다.",

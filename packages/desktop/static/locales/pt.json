@@ -807,6 +807,8 @@
       "reminderLimit": "Os lembretes só chegam enquanto a Nota de mesa está aberta. Depois de fechar, a hora não toca.",
       "reminderSeconds": "Segundos que o lembrete fica no ecrã",
       "reminderSecondsHint": "Se não abrir, esconde-se quando o tempo acabar.",
+      "captureShortcut": "Atalho para uma nova nota",
+      "captureShortcutHint": "Deixe vazio para desligar. A predefinição é Ctrl+Alt+N.",
       "openAtLogin": "Abrir ao iniciar sessão",
       "extensions": "Extensões de texto",
       "extensionsHint": "Separe por vírgulas. As caixas são os tipos que este editor já abria.",

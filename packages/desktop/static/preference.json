@@ -41,6 +41,7 @@
   "deskmarkTasks": true,
   "deskmarkReminders": true,
   "deskmarkReminderSeconds": 30,
+  "deskmarkCaptureAccelerator": "CommandOrControl+Alt+N",
   "deskmarkWordCount": true,
   "imageInsertAction": "path",
   "imagePreferRelativeDirectory": false,

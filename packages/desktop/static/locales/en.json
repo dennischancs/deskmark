@@ -807,6 +807,8 @@
       "reminderLimit": "Reminders only arrive while Deskmark is open. After you quit, a due time does not ring.",
       "reminderSeconds": "Seconds a reminder stays on screen",
       "reminderSecondsHint": "If you do not open it, it hides when the time is up.",
+      "captureShortcut": "Shortcut for a new sticky note",
+      "captureShortcutHint": "Leave empty to turn it off. The default is Ctrl+Alt+N.",
       "openAtLogin": "Open at login",
       "extensions": "Plain text extensions",
       "extensionsHint": "Separate with commas. The boxes are the kinds this editor already opens.",

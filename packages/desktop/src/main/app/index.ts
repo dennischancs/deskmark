@@ -21,6 +21,7 @@ import { onInternalChannel } from '../utils/internalIpc'
 import { WindowType } from '../windows/base'
 import EditorWindow from '../windows/editor'
 import { StickyHost, markQuitting, resolveTrayIcon, setStickyHost } from '../deskmark/stickies'
+import { applyCaptureShortcut, clearCaptureShortcut } from '../deskmark/captureShortcut'
 import { startReminderLoop } from '../deskmark/reminderLoop'
 import type { DeskmarkReminderNotice } from '@shared/types/ipc'
 import { DESKMARK_APP_USER_MODEL_ID, installedShortcutCandidates, sameExecutable, shortcutWriteOperation, toastShortcutPlan } from '../deskmark/windowsToast'
@@ -147,6 +148,7 @@ class App {
 
     app.on('before-quit', () => {
       markQuitting()
+      clearCaptureShortcut()
     })
 
     app.on('activate', () => {
@@ -462,6 +464,16 @@ class App {
       this.showMainWindow()
     })
     setStickyHost(stickyHost)
+    const bindCaptureShortcut = (): void => {
+      applyCaptureShortcut(
+        this._accessor.preferences.getItem('deskmarkCaptureAccelerator'),
+        () => stickyHost.capture()
+      )
+    }
+    bindCaptureShortcut()
+    onInternalChannel('broadcast-preferences-changed', (change: Partial<IUserPreferences>) => {
+      if (Object.prototype.hasOwnProperty.call(change, 'deskmarkCaptureAccelerator')) bindCaptureShortcut()
+    })
     const trayIcon = resolveTrayIcon(process.resourcesPath, process.cwd(), existsSync)
     if (trayIcon) stickyHost.createTray(trayIcon)
     const openReminder = (vault: string, notePath: string, line: number | null): void => {

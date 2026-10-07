@@ -37,6 +37,18 @@
           >
         </label>
         <p class="seconds-hint">{{ t('preferences.deskmark.reminderSecondsHint') }}</p>
+        <label class="scan-label">
+          {{ t('preferences.deskmark.captureShortcut') }}
+          <input
+            class="scan-text"
+            type="text"
+            :value="deskmarkCaptureAccelerator"
+            @change="setShortcut(($event.target as HTMLInputElement).value)"
+          >
+        </label>
+        <p class="seconds-hint">
+          {{ t('preferences.deskmark.captureShortcutHint') }}
+        </p>
         <bool
           :description="t('preferences.deskmark.wordCount')"
           :bool="deskmarkWordCount"
@@ -128,6 +140,7 @@ import type { PreferencesState } from '@/store/preferences'
 import Compound from '../common/compound/index.vue'
 import Bool from '../common/bool/index.vue'
 import { normalizeReminderSeconds } from 'common/reminderSeconds'
+import { normalizeCaptureAccelerator } from 'common/captureShortcut'
 import { normalizeExtensions, PLAIN_TEXT_EXTENSIONS } from '../../../../../../deskmark-core/src/extensions.ts'
 
 const { t } = useI18n()
@@ -137,6 +150,7 @@ const {
   deskmarkTasks,
   deskmarkReminders,
   deskmarkReminderSeconds,
+  deskmarkCaptureAccelerator,
   deskmarkWordCount,
   deskmarkScanExtensions,
   deskmarkRuleTaskLine,
@@ -165,6 +179,10 @@ const setText = (type: 'deskmarkScanExtensions' | 'deskmarkExtraPrefixes', value
 
 const setSeconds = (value: string): void => {
   preferenceStore.SET_SINGLE_PREFERENCE({ type: 'deskmarkReminderSeconds', value: normalizeReminderSeconds(value) })
+}
+
+const setShortcut = (value: string): void => {
+  preferenceStore.SET_SINGLE_PREFERENCE({ type: 'deskmarkCaptureAccelerator', value: normalizeCaptureAccelerator(value) })
 }
 
 const extensionOn = (ext: string): boolean => normalizeExtensions(deskmarkScanExtensions.value).includes(ext)

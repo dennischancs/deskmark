@@ -807,6 +807,8 @@
       "reminderLimit": "Erinnerungen kommen nur, solange Tischzettel geöffnet ist. Nach dem Beenden klingelt nichts.",
       "reminderSeconds": "Sekunden, die eine Erinnerung sichtbar bleibt",
       "reminderSecondsHint": "Ohne Öffnen verschwindet sie nach dieser Zeit.",
+      "captureShortcut": "Tastenkürzel für eine neue Notiz",
+      "captureShortcutHint": "Leer lassen zum Ausschalten. Voreinstellung ist Strg+Alt+N.",
       "openAtLogin": "Beim Anmelden öffnen",
       "extensions": "Textdateiendungen",
       "extensionsHint": "Mit Kommas trennen. Die Häkchen sind die Arten, die dieser Editor schon öffnet.",

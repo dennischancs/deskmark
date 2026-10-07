@@ -807,6 +807,8 @@
       "reminderLimit": "通知はデスクメモが開いているときだけ届きます。終了したあとは、時間になっても鳴りません。",
       "reminderSeconds": "通知を画面に出しておく秒数",
       "reminderSecondsHint": "開かなければ、その秒数で隠れます。",
+      "captureShortcut": "新しい付箋のショートカット",
+      "captureShortcutHint": "空にすると無効。初期値は Ctrl+Alt+N。",
       "openAtLogin": "ログイン時に開く",
       "extensions": "テキストの拡張子",
       "extensionsHint": "コンマで区切ります。チェックは、このエディタがもともと開ける種類です。",

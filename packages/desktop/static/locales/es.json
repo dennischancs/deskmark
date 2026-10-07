@@ -807,6 +807,8 @@
       "reminderLimit": "Los avisos solo llegan mientras Nota de mesa está abierta. Si se cierra, la hora no suena.",
       "reminderSeconds": "Segundos que el aviso permanece",
       "reminderSecondsHint": "Si no lo abres, se oculta al cumplirse el tiempo.",
+      "captureShortcut": "Atajo para una nota nueva",
+      "captureShortcutHint": "Déjalo vacío para desactivarlo. El predeterminado es Ctrl+Alt+N.",
       "openAtLogin": "Abrir al iniciar sesión",
       "extensions": "Extensiones de texto",
       "extensionsHint": "Sepáralas con comas. Las casillas son los tipos que este editor ya abría.",
