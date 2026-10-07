@@ -10,4 +10,4 @@
 - 这些条件查的是待办，不是把记号当正文去找。后面还可以跟上文字，用来缩小结果。
 - 没有这些条件时，仍然搜索文件名和正文。
 
-这次还没有打 Windows 安装包。macOS 和 Linux 也没有打包。
+Windows x64 安装包是 dist/marktext-win-x64-7.13.0-setup.exe。解包程序文件版本是 7.13.0。macOS 和 Linux 没有打包。
