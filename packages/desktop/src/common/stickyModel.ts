@@ -17,6 +17,9 @@ export interface StickyRecord {
   fontSize: number
   opacity: number
   edgeHide: boolean
+  locked: boolean
+  pass: boolean
+  bottom: boolean
 }
 
 export interface UiStateFile {
@@ -33,8 +36,8 @@ export function normalizeNotePath(notePath: string): string {
   return notePath.replaceAll('\\', '/').replace(/\/+$/, '')
 }
 
-export function normalizeColor(color: string): string {
-  const value = color.trim()
+export function normalizeColor(color: unknown): string {
+  const value = typeof color === 'string' ? color.trim() : ''
   const full = /^#([0-9a-fA-F]{6})$/.exec(value)
   if (full) return `#${full[1].toLowerCase()}`
   const short = /^#([0-9a-fA-F]{3})$/.exec(value)
@@ -156,7 +159,15 @@ export function findSticky(state: UiStateFile, notePath: string): StickyRecord |
 }
 
 function normalizeSticky(record: StickyRecord): StickyRecord {
-  const raw = record as StickyRecord & { fontSize?: unknown, opacity?: unknown, edgeHide?: unknown }
+  const raw = record as StickyRecord & {
+    fontSize?: unknown
+    opacity?: unknown
+    edgeHide?: unknown
+    locked?: unknown
+    pass?: unknown
+    bottom?: unknown
+    pinned?: unknown
+  }
   return {
     path: normalizeNotePath(record.path),
     x: record.x,
@@ -167,7 +178,10 @@ function normalizeSticky(record: StickyRecord): StickyRecord {
     color: normalizeColor(record.color),
     fontSize: normalizeStickyFont(raw.fontSize),
     opacity: normalizeStickyOpacity(raw.opacity),
-    edgeHide: raw.edgeHide !== false
+    edgeHide: raw.edgeHide !== false,
+    locked: raw.locked === true,
+    pass: raw.pass === true,
+    bottom: raw.bottom === true && raw.pinned === false
   }
 }
 

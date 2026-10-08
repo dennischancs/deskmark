@@ -141,6 +141,13 @@ export interface IpcInvokeChannels {
   'mt::deskmark::sticky-font': { args: [notePath: string, fontSize: number]; ret: void }
   'mt::deskmark::sticky-opacity': { args: [notePath: string, opacity: number]; ret: boolean }
   'mt::deskmark::sticky-edge-hide': { args: [notePath: string, enabled: boolean]; ret: void }
+  'mt::deskmark::sticky-lock': { args: [notePath: string, locked: boolean]; ret: void }
+  'mt::deskmark::sticky-pass': { args: [notePath: string, enabled: boolean]; ret: void }
+  'mt::deskmark::sticky-pass-hit': { args: [notePath: string, ignore: boolean]; ret: void }
+  'mt::deskmark::sticky-bottom': { args: [notePath: string, enabled: boolean]; ret: void }
+  'mt::deskmark::sticky-list': { args: [notePath: string]; ret: { path: string, name: string }[] }
+  'mt::deskmark::sticky-show': { args: [notePath: string]; ret: void }
+  'mt::deskmark::sticky-settings': { args: []; ret: void }
   'mt::deskmark::journal-task': {
     args: [root: string, day: string, text: string]
     ret: { path: string, relative: string, line: number } | null

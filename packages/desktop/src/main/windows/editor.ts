@@ -68,6 +68,9 @@ class EditorWindow extends BaseWindow {
   public stickyFont = 16
   public stickyOpacity = 100
   public stickyEdgeHide = true
+  public stickyLocked = false
+  public stickyPass = false
+  public stickyBottom = false
   public stickyAdjusting = false
   public onStickyDrag: (() => void) | null = null
   public onStickyBounds: ((bounds: { x: number, y: number, width: number, height: number }) => void) | null = null
@@ -121,6 +124,9 @@ class EditorWindow extends BaseWindow {
       this.extraQuery.opacity = String(this.stickyOpacity)
       this.extraQuery.color = this.stickyColor
       this.extraQuery.edgeHide = this.stickyEdgeHide ? '1' : '0'
+      this.extraQuery.locked = this.stickyLocked ? '1' : '0'
+      this.extraQuery.pass = this.stickyPass ? '1' : '0'
+      this.extraQuery.bottom = this.stickyBottom ? '1' : '0'
       const displays = screen.getAllDisplays().map((display) => ({
         x: display.workArea.x,
         y: display.workArea.y,

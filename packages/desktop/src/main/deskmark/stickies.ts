@@ -1,8 +1,10 @@
 import { appendFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { app, Menu, Tray, nativeImage, screen } from 'electron'
+import { spawn } from 'node:child_process'
+import { app, ipcMain, Menu, Tray, nativeImage, screen } from 'electron'
 import type { BrowserWindow, MenuItemConstructorOptions } from 'electron'
 import type { WindowRect } from 'common/windowRect'
+import { hwndFromBuffer } from 'common/stickyHandle'
 import {
   closeSticky,
   findSticky,
@@ -121,7 +123,10 @@ export class StickyHost {
       color: '#fff4cc',
       fontSize: 16,
       opacity: 100,
-      edgeHide: true
+      edgeHide: true,
+      locked: false,
+      pass: false,
+      bottom: false
     }
     const editor = new EditorWindow(this.accessor)
     editor.stickyProbe = true
@@ -131,6 +136,9 @@ export class StickyHost {
     editor.stickyFont = record.fontSize
     editor.stickyOpacity = record.opacity
     editor.stickyEdgeHide = record.edgeHide
+    editor.stickyLocked = record.locked
+    editor.stickyPass = record.pass
+    editor.stickyBottom = record.bottom
     const logical = { x: record.x, y: record.y, width: record.width, height: record.height }
     this.docks.set(key, {
       edgeHide: record.edgeHide,
@@ -147,7 +155,7 @@ export class StickyHost {
     }
     editor.onStickyDrag = () => {
       const dock = this.docks.get(key)
-      if (!dock || Date.now() < dock.ignoreUntil) return
+      if (!dock || editor.stickyLocked || Date.now() < dock.ignoreUntil) return
       dock.dragging = true
       dock.ignoreUntil = 0
       this.cancelHide(dock)
@@ -160,8 +168,13 @@ export class StickyHost {
       height: record.height,
       frame: false,
       transparent: false,
-      alwaysOnTop: record.pinned,
+      alwaysOnTop: record.pinned && !record.bottom,
       backgroundColor: record.color
+    })
+    this.applyWindow(editor)
+    if (record.bottom) this.lower(editor)
+    editor.browserWindow?.on('blur', () => {
+      if (editor.stickyBottom) this.lower(editor)
     })
     this.windowManager.add(editor)
     this.windows.set(key, editor)
@@ -185,7 +198,8 @@ export class StickyHost {
     const editor = this.windows.get(normalizeNotePath(notePath))
     if (!editor?.browserWindow) return
     editor.stickyPinned = pinned
-    editor.browserWindow.setAlwaysOnTop(pinned, 'floating')
+    if (pinned) editor.stickyBottom = false
+    this.applyWindow(editor)
     this.remember(notePath, this.snapshot(editor, notePath, editor.browserWindow.getBounds()))
   }
 
@@ -236,6 +250,71 @@ export class StickyHost {
     this.remember(notePath, this.snapshot(editor, notePath, dock.logical))
   }
 
+  setLocked(notePath: string, locked: boolean): void {
+    const key = normalizeNotePath(notePath)
+    const editor = this.windows.get(key)
+    const dock = this.docks.get(key)
+    if (!editor?.browserWindow || !dock) return
+    editor.stickyLocked = locked
+    if (locked) {
+      dock.edge = null
+      this.cancelHide(dock)
+      this.reveal(editor, key, false)
+    }
+    this.applyWindow(editor)
+    this.remember(notePath, this.snapshot(editor, notePath, dock.logical))
+    if (!locked) this.settle(editor, notePath, dock.logical)
+  }
+
+  setPass(notePath: string, enabled: boolean): void {
+    const editor = this.windows.get(normalizeNotePath(notePath))
+    if (!editor?.browserWindow) return
+    editor.stickyPass = enabled
+    this.applyWindow(editor)
+    this.remember(notePath, this.snapshot(editor, notePath, editor.browserWindow.getBounds()))
+  }
+
+  setPassHit(notePath: string, ignore: boolean): void {
+    const editor = this.windows.get(normalizeNotePath(notePath))
+    const win = editor?.browserWindow
+    if (!editor?.stickyPass || !win || win.isDestroyed()) return
+    try {
+      win.setIgnoreMouseEvents(ignore, { forward: true })
+    } catch {
+      // Some sessions cannot forward mouse events. The note stays clickable.
+    }
+  }
+
+  setBottom(notePath: string, enabled: boolean): void {
+    const editor = this.windows.get(normalizeNotePath(notePath))
+    if (!editor?.browserWindow) return
+    editor.stickyBottom = enabled
+    if (enabled) editor.stickyPinned = false
+    this.applyWindow(editor)
+    if (enabled) this.lower(editor)
+    this.remember(notePath, this.snapshot(editor, notePath, editor.browserWindow.getBounds()))
+  }
+
+  listOthers(notePath: string): { path: string, name: string }[] {
+    const key = normalizeNotePath(notePath)
+    const notes: { path: string, name: string }[] = []
+    for (const [path, editor] of this.windows) {
+      if (path === key || !editor.browserWindow || editor.browserWindow.isDestroyed()) continue
+      notes.push({ path, name: path.split('/').pop() || path })
+    }
+    return notes
+  }
+
+  showNote(notePath: string): void {
+    const editor = this.windows.get(normalizeNotePath(notePath))
+    if (!editor?.browserWindow || editor.browserWindow.isDestroyed()) return
+    editor.bringToFront()
+  }
+
+  openSettings(): void {
+    ipcMain.emit('app-create-settings-window', 'deskmark')
+  }
+
   capture(): void {
     if (!this.vaultRoot) return
     const inbox = join(this.vaultRoot, 'inbox.md')
@@ -283,8 +362,53 @@ export class StickyHost {
       color: editor.stickyColor,
       fontSize: editor.stickyFont,
       opacity: editor.stickyOpacity,
-      edgeHide: editor.stickyEdgeHide
+      edgeHide: editor.stickyEdgeHide,
+      locked: editor.stickyLocked,
+      pass: editor.stickyPass,
+      bottom: editor.stickyBottom
     }
+  }
+
+  private applyWindow(editor: EditorWindow): void {
+    const win = editor.browserWindow
+    if (!win || win.isDestroyed()) return
+    try {
+      win.setMovable(!editor.stickyLocked)
+      win.setResizable(!editor.stickyLocked)
+    } catch {
+      // A frameless window on some desktops rejects these flags.
+    }
+    if (editor.stickyBottom) win.setAlwaysOnTop(false)
+    else win.setAlwaysOnTop(editor.stickyPinned, 'floating')
+    try {
+      if (editor.stickyPass) win.setIgnoreMouseEvents(true, { forward: true })
+      else win.setIgnoreMouseEvents(false)
+    } catch {
+      // Click-through is unavailable. The note still opens.
+    }
+  }
+
+  // setAlwaysOnTop(false) only clears the topmost flag. HWND_BOTTOM is what
+  // puts the note under ordinary windows.
+  private lower(editor: EditorWindow): void {
+    const win = editor.browserWindow
+    if (!win || win.isDestroyed() || !editor.stickyBottom) return
+    win.setAlwaysOnTop(false)
+    if (process.platform !== 'win32') {
+      win.blur()
+      return
+    }
+    const hwnd = hwndFromBuffer(win.getNativeWindowHandle())
+    if (hwnd == null || hwnd === 0n) return
+    const command = [
+      "Add-Type -TypeDefinition 'using System;using System.Runtime.InteropServices;",
+      'public class DeskmarkZ{[DllImport("user32.dll")]public static extern bool SetWindowPos(IntPtr h,IntPtr a,int x,int y,int w,int hgt,uint f);}\';',
+      `[DeskmarkZ]::SetWindowPos([IntPtr]${hwnd},[IntPtr]1,0,0,0,0,19) | Out-Null`
+    ].join(' ')
+    spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-Command', command], {
+      windowsHide: true,
+      stdio: 'ignore'
+    })
   }
 
   private settle(editor: EditorWindow, notePath: string, bounds: Frame): void {
@@ -293,6 +417,7 @@ export class StickyHost {
     const win = editor.browserWindow
     if (!dock || !win || win.isDestroyed()) return
     if (editor.stickyAdjusting) return
+    if (editor.stickyLocked) return
     let displays: ReturnType<typeof screen.getAllDisplays> = []
     try {
       displays = screen.getAllDisplays()

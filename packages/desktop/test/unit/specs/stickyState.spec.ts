@@ -17,7 +17,10 @@ describe('sticky note state', () => {
       color: '#fff4cc',
       fontSize: 16,
       opacity: 100,
-      edgeHide: true
+      edgeHide: true,
+      locked: false,
+      pass: false,
+      bottom: false
     })
     const second = upsertSticky(first, {
       path: 'D:\\notes\\a.md',
@@ -29,7 +32,10 @@ describe('sticky note state', () => {
       color: '#336699',
       fontSize: 12,
       opacity: 4,
-      edgeHide: true
+      edgeHide: true,
+      locked: false,
+      pass: false,
+      bottom: false
     })
     expect(second.stickies).toHaveLength(1)
     expect(second.stickies[0]).toMatchObject({ x: 40, y: 50, pinned: false, color: '#336699', fontSize: 16, opacity: 10 })
@@ -43,7 +49,10 @@ describe('sticky note state', () => {
       color: '#abc',
       fontSize: 18,
       opacity: 40,
-      edgeHide: true
+      edgeHide: true,
+      locked: false,
+      pass: false,
+      bottom: false
     })
     expect(custom.stickies[0]).toMatchObject({ color: '#aabbcc', fontSize: 18, opacity: 40 })
     expect(JSON.stringify(second)).not.toContain('买牛奶')
@@ -66,7 +75,10 @@ describe('sticky note state', () => {
       color: '#d6e6ff',
       fontSize: 20,
       opacity: 95,
-      edgeHide: true
+      edgeHide: true,
+      locked: false,
+      pass: false,
+      bottom: false
     }))
     expect(loadUiState(root).stickies[0]?.color).toBe('#d6e6ff')
     expect(loadUiState(root).stickies[0]?.fontSize).toBe(20)

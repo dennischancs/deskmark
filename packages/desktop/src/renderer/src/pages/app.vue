@@ -3,7 +3,7 @@
     <side-bar v-if="init && !stickyProbe" />
     <div
       class="editor-middle"
-      :class="{ 'sticky-window': stickyProbe }"
+      :class="{ 'sticky-window': stickyProbe, 'sticky-locked': stickyProbe && locked }"
     >
       <div
         v-if="stickyProbe"
@@ -62,6 +62,23 @@
             </option>
           </select>
         </label>
+        <sticky-menu
+          :pinned="pinned"
+          :edge-hide="edgeHide"
+          :locked="locked"
+          :pass="passThrough"
+          :bottom="bottom"
+          :others="otherNotes"
+          @pin="setPinnedFromMenu"
+          @edge="setEdgeFromMenu"
+          @lock="setLockedFromMenu"
+          @pass="setPassFromMenu"
+          @bottom="setBottomFromMenu"
+          @settings="openStickySettings"
+          @close="closeSticky"
+          @show="showOtherSticky"
+          @others="loadOtherStickies"
+        />
       </div>
       <title-bar
         :project="projectTree"
@@ -117,6 +134,7 @@ import ImportModal from '@/components/import/index.vue'
 import TaskProperties from '@/components/taskProperties.vue'
 import CalendarView from '@/components/calendarView.vue'
 import StickyPalette from '@/components/stickyPalette.vue'
+import StickyMenu from '@/components/stickyMenu.vue'
 import { useDeskmarkStore } from '@/store/deskmark'
 import { useI18n } from 'vue-i18n'
 import { normalizeColor, normalizeStickyFont, normalizeStickyOpacity, STICKY_COLORS, STICKY_FONT_SIZES } from 'common/stickyModel'
@@ -159,7 +177,12 @@ const stickyOpacity = ref(normalizeStickyOpacity(stickyQuery.get('opacity')))
 const opacityLocked = ref(false)
 const pinned = ref(true)
 const edgeHide = ref(stickyQuery.get('edgeHide') !== '0')
+const locked = ref(stickyQuery.get('locked') === '1')
+const passThrough = ref(stickyQuery.get('pass') === '1')
+const bottom = ref(stickyQuery.get('bottom') === '1')
+const otherNotes = ref<{ path: string, name: string }[]>([])
 const { t } = useI18n()
+let mouseIgnored = passThrough.value
 
 const setPinned = (): void => {
   if (!stickyNote) return
@@ -168,10 +191,91 @@ const setPinned = (): void => {
   })
 }
 
+const setPinnedFromMenu = (value: boolean): void => {
+  pinned.value = value
+  if (value) bottom.value = false
+  setPinned()
+}
+
+const setEdgeFromMenu = (value: boolean): void => {
+  edgeHide.value = value
+  setEdgeHide()
+}
+
 const setEdgeHide = (): void => {
   if (!stickyNote) return
   window.electron.ipcRenderer.invoke('mt::deskmark::sticky-edge-hide', stickyNote, edgeHide.value).catch((error) => {
     console.error(error)
+  })
+}
+
+const setLockedFromMenu = (value: boolean): void => {
+  locked.value = value
+  if (!stickyNote) return
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-lock', stickyNote, value).catch((error) => {
+    console.error(error)
+  })
+}
+
+const setPassFromMenu = (value: boolean): void => {
+  passThrough.value = value
+  mouseIgnored = value
+  if (!stickyNote) return
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-pass', stickyNote, value).catch((error) => {
+    console.error(error)
+  })
+}
+
+const setBottomFromMenu = (value: boolean): void => {
+  bottom.value = value
+  if (value) pinned.value = false
+  if (!stickyNote) return
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-bottom', stickyNote, value).catch((error) => {
+    console.error(error)
+  })
+}
+
+const openStickySettings = (): void => {
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-settings').catch((error) => {
+    console.error(error)
+  })
+}
+
+const closeSticky = (): void => {
+  window.electron.windowControl.close()
+}
+
+const loadOtherStickies = (): void => {
+  if (!stickyNote) return
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-list', stickyNote).then((notes) => {
+    otherNotes.value = notes
+  }).catch((error) => {
+    console.error(error)
+  })
+}
+
+const showOtherSticky = (path: string): void => {
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-show', path).catch((error) => {
+    console.error(error)
+  })
+}
+
+const onStickyMouse = (event: MouseEvent): void => {
+  if (!passThrough.value || !stickyNote) return
+  const target = event.target
+  const chrome = target instanceof Element && !!target.closest('.sticky-toolbar, .title-bar, .sticky-menu, .sticky-palette, .sticky-menu-host')
+  const ignore = !chrome
+  if (ignore === mouseIgnored) return
+  mouseIgnored = ignore
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-pass-hit', stickyNote, ignore).catch((error) => {
+    console.error(error)
+  })
+}
+
+if (stickyProbe) {
+  window.addEventListener('mousemove', onStickyMouse)
+  onBeforeUnmount(() => {
+    window.removeEventListener('mousemove', onStickyMouse)
   })
 }
 
@@ -408,6 +512,9 @@ onMounted(async () => {
     height: 100%;
     min-height: 0;
     padding-top: var(--titleBarHeight);
+  }
+  &.sticky-locked :deep(.title-bar) {
+    -webkit-app-region: no-drag;
   }
   & > .editor {
     flex: 1;

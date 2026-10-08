@@ -95,6 +95,27 @@ export const registerDeskmarkHandlers = (): void => {
   ipcMain.handle('mt::deskmark::sticky-edge-hide', async(_event, notePath: string, enabled: boolean) => {
     getStickyHost()?.setEdgeHide(notePath, enabled)
   })
+  ipcMain.handle('mt::deskmark::sticky-lock', async(_event, notePath: string, locked: boolean) => {
+    getStickyHost()?.setLocked(notePath, locked)
+  })
+  ipcMain.handle('mt::deskmark::sticky-pass', async(_event, notePath: string, enabled: boolean) => {
+    getStickyHost()?.setPass(notePath, enabled)
+  })
+  ipcMain.handle('mt::deskmark::sticky-pass-hit', async(_event, notePath: string, ignore: boolean) => {
+    getStickyHost()?.setPassHit(notePath, ignore)
+  })
+  ipcMain.handle('mt::deskmark::sticky-bottom', async(_event, notePath: string, enabled: boolean) => {
+    getStickyHost()?.setBottom(notePath, enabled)
+  })
+  ipcMain.handle('mt::deskmark::sticky-list', async(_event, notePath: string) => {
+    return getStickyHost()?.listOthers(notePath) ?? []
+  })
+  ipcMain.handle('mt::deskmark::sticky-show', async(_event, notePath: string) => {
+    getStickyHost()?.showNote(notePath)
+  })
+  ipcMain.handle('mt::deskmark::sticky-settings', async() => {
+    getStickyHost()?.openSettings()
+  })
 
   ipcMain.handle('mt::deskmark::journal-task', async(_event, root: string, day: string, text: string) => {
     try {

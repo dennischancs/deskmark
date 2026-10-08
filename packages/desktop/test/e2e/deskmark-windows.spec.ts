@@ -275,6 +275,32 @@ test('a sticky palette stays on top and sets a custom color and opacity', async(
   }
 })
 
+test('the sticky menu stays on top and opens the lock list', async() => {
+  test.setTimeout(45000)
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'deskmark-menu-'))
+  fs.writeFileSync(path.join(dir, 'milk.md'), '# Hello\n\nOne two three.\n', 'utf8')
+  const launched = await launchElectron([dir], { preferences: { language: 'zh-CN' } })
+  const { app, page } = launched
+  try {
+    await page.locator('.side-bar').waitFor({ state: 'visible', timeout: 15000 })
+    await page.evaluate((root) => {
+      return window.electron.ipcRenderer.invoke('mt::deskmark::sticky-open', root, root + '\\\\milk.md')
+    }, dir)
+    const sticky = await stickyPage(app)
+    await sticky.locator('[data-testid="sticky-menu-trigger"]').click({ timeout: 10000 })
+    await expectFloatingLayerOnTop(sticky, 'sticky-menu')
+    await sticky.locator('[data-testid="sticky-menu-lock"]').click()
+    await expect(sticky.locator('[data-testid="sticky-menu-lock-list"]')).toContainText('桌面锁定')
+    await expect(sticky.locator('[data-testid="sticky-menu-lock-list"]')).toContainText('鼠标穿透')
+    await expect(sticky.locator('[data-testid="sticky-menu-lock-list"]')).toContainText('置底')
+    await sticky.keyboard.press('Escape')
+    await expect(sticky.locator('[data-testid="sticky-menu"]')).toBeHidden()
+  } finally {
+    stopApp(app)
+    removeTree(dir)
+  }
+})
+
 test('dragging a calendar chip moves that task onto another day', async() => {
   test.setTimeout(45000)
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'deskmark-drag-'))

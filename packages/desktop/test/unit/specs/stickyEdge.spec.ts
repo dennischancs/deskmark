@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { emptyUiState, upsertSticky } from '../../../src/common/stickyModel'
+import { emptyUiState, readUiState, upsertSticky } from '../../../src/common/stickyModel'
+import { hwndFromBuffer } from '../../../src/common/stickyHandle'
 import {
   concealEdge,
   concealedFrame,
@@ -40,11 +41,30 @@ describe('sticky edge snap', () => {
       color: '#fff4cc',
       fontSize: 16,
       opacity: 100,
-      edgeHide: true
+      edgeHide: true,
+      locked: false,
+      pass: false,
+      bottom: false
     }
     const kept = upsertSticky(emptyUiState(), { ...base, edgeHide: false })
     expect(kept.stickies[0]?.edgeHide).toBe(false)
     const implied = upsertSticky(emptyUiState(), { ...base, edgeHide: undefined as unknown as boolean })
     expect(implied.stickies[0]?.edgeHide).toBe(true)
+  })
+
+  it('keeps lock, click-through, and bottom off unless chosen', () => {
+    const saved = readUiState(JSON.stringify({
+      version: 1,
+      stickies: [{ path: 'a.md', x: 1, y: 2, locked: true, pass: true, pinned: true, bottom: true }]
+    }))
+    expect(saved.stickies[0]).toMatchObject({ locked: true, pass: true, bottom: false, pinned: true })
+  })
+
+  it('reads a native window handle from a little-endian buffer', () => {
+    const buffer = new Uint8Array(8)
+    const view = new DataView(buffer.buffer)
+    view.setBigUint64(0, 0x12345678n, true)
+    expect(hwndFromBuffer(buffer)).toBe(0x12345678n)
+    expect(hwndFromBuffer(new Uint8Array(2))).toBeNull()
   })
 })
