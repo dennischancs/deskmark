@@ -10,4 +10,4 @@
 - 主窗口、便签和设置窗口都会跟着关掉，进程结束。
 - 平常点窗口的关闭按钮仍然只是藏起来，托盘还在。
 
-这次还没有打 Windows 安装包。macOS 和 Linux 也没有打包。
+Windows x64 安装包是 dist/marktext-win-x64-7.24.1-setup.exe。解包程序和安装包的文件版本都是 7.24.1。macOS 和 Linux 没有打包。
