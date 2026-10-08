@@ -10,4 +10,4 @@
 - 只写出有截止日期的待办。没有日期的不进去。
 - 文件是 iCalendar，别的日历可以打开。这一版不读外部日历。
 
-这次还没有打 Windows 安装包。macOS 和 Linux 也没有打包。
+Windows x64 安装包是 dist/marktext-win-x64-7.16.0-setup.exe。解包程序和安装包的文件版本都是 7.16.0。macOS 和 Linux 没有打包。
