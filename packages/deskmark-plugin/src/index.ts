@@ -199,6 +199,16 @@ export function createDeadline(timeoutMs: number, now = Date.now()): { expired: 
   }
 }
 
+export const PLUGIN_READ_LIMIT_BYTES = 2 * 1024 * 1024
+
+// A plugin read runs on the main process. A huge file or a call that already
+// missed its deadline would stall saving the note the user is editing.
+export function pluginReadGate(bytes: number, expired: boolean): string | null {
+  if (expired) return '这个小功能没有及时完成'
+  if (bytes > PLUGIN_READ_LIMIT_BYTES) return '这篇笔记太大，小功能不读'
+  return null
+}
+
 export interface PluginCall {
   id: string
   method: string

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { PluginHost, answerPluginCall, authorize, createDeadline, inspectPlugin, noteInsideVault, readManifest, readPluginSettings } from '../src/index.ts'
+import { PluginHost, PLUGIN_READ_LIMIT_BYTES, answerPluginCall, authorize, createDeadline, inspectPlugin, noteInsideVault, pluginReadGate, readManifest, readPluginSettings } from '../src/index.ts'
 
 const good = {
   id: 'wordcount',
@@ -67,6 +67,9 @@ test('超过时限就停下来，不继续做', () => {
   const deadline = createDeadline(5, Date.now() - 10)
   assert.equal(deadline.expired(), true)
   assert.throws(() => deadline.assert(), /及时/)
+  assert.equal(pluginReadGate(12, true), '这个小功能没有及时完成')
+  assert.equal(pluginReadGate(PLUGIN_READ_LIMIT_BYTES + 1, false), '这篇笔记太大，小功能不读')
+  assert.equal(pluginReadGate(PLUGIN_READ_LIMIT_BYTES, false), null)
 })
 
 test('主进程只把当前笔记交给已允许的读取，外面的路径读不到', () => {

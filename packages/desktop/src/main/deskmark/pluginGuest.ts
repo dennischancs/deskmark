@@ -1,12 +1,14 @@
 import { app, webContents, type WebPreferences } from 'electron'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readFileSync, statSync } from 'node:fs'
 import { join, resolve, sep } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { samePluginEntry } from './pluginEntry'
 import {
   answerPluginCall,
+  createDeadline,
   inspectPlugin,
   noteInsideVault,
+  pluginReadGate,
   readPluginSettings,
   type NoteSnapshot,
   type PluginTaskView,
@@ -110,6 +112,7 @@ export function retainPluginWebview(webPreferences: WebPreferences, params: { sr
 
 export function handlePluginCall(call: { id?: string, method?: string, path?: string }): { id: string, ok: boolean, result?: unknown, error?: string } {
   if (!manifest) return { id: call.id || '', ok: false, error: '这个小功能没能打开' }
+  const deadline = createDeadline(200)
   const tasks: PluginTaskView[] = []
   if (call.method === 'tasks.read' && snapshot) {
     try {
@@ -140,6 +143,8 @@ export function handlePluginCall(call: { id?: string, method?: string, path?: st
       const prefix = root.endsWith(sep) ? root : root + sep
       if (full !== root && !full.startsWith(prefix)) return null
       if (!existsSync(full)) return null
+      const blocked = pluginReadGate(statSync(full).size, deadline.expired())
+      if (blocked) throw new Error(blocked)
       return readFileSync(full, 'utf8')
     }
   })
