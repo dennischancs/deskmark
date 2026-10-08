@@ -116,6 +116,7 @@ class EditorWindow extends BaseWindow {
       if (this.stickyPath) this.extraQuery.note = this.stickyPath
       this.extraQuery.font = String(this.stickyFont)
       this.extraQuery.opacity = String(this.stickyOpacity)
+      this.extraQuery.color = this.stickyColor
       const displays = screen.getAllDisplays().map((display) => ({
         x: display.workArea.x,
         y: display.workArea.y,

@@ -1100,6 +1100,7 @@
     "font": "Tamaño",
     "opacity": "Opacidad",
     "opacityLimit": "Este sistema no puede aclarar la nota",
+    "customColor": "Color propio",
     "wayland": "Este escritorio quizá no pueda dejar la nota delante.",
     "capture": "Nueva nota",
     "newFile": "Archivo nuevo",

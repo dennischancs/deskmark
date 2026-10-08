@@ -25,9 +25,18 @@
           :key="color"
           type="button"
           class="sticky-color"
+          :class="{ chosen: color === stickyColor }"
           :style="{ background: color }"
           @click="setStickyColor(color)"
         />
+        <label class="sticky-font">
+          {{ t('sticky.customColor') }}
+          <input
+            type="color"
+            :value="stickyColor"
+            @input="setStickyColor(($event.target as HTMLInputElement).value)"
+          >
+        </label>
         <label class="sticky-font">
           {{ t('sticky.font') }}
           <select
@@ -47,13 +56,14 @@
           {{ t('sticky.opacity') }}
           <input
             type="range"
-            min="90"
+            min="10"
             max="100"
             step="1"
             :value="stickyOpacity"
             :disabled="opacityLocked"
             @change="setStickyOpacity(Number(($event.target as HTMLInputElement).value))"
           >
+          <span>{{ stickyOpacity }}%</span>
         </label>
         <p
           v-if="opacityLocked"
@@ -117,7 +127,7 @@ import TaskProperties from '@/components/taskProperties.vue'
 import CalendarView from '@/components/calendarView.vue'
 import { useDeskmarkStore } from '@/store/deskmark'
 import { useI18n } from 'vue-i18n'
-import { normalizeStickyFont, normalizeStickyOpacity, STICKY_COLORS, STICKY_FONT_SIZES } from 'common/stickyModel'
+import { normalizeColor, normalizeStickyFont, normalizeStickyOpacity, STICKY_COLORS, STICKY_FONT_SIZES } from 'common/stickyModel'
 import bus from '@/bus'
 import { DEFAULT_STYLE } from '@/config'
 import { useLayoutStore } from '@/store/layout'
@@ -151,6 +161,7 @@ const stickyNote = new URLSearchParams(window.location.search).get('note') || ''
 const stickyColors = STICKY_COLORS
 const stickyFontSizes = STICKY_FONT_SIZES
 const stickyQuery = new URLSearchParams(window.location.search)
+const stickyColor = ref(normalizeColor(stickyQuery.get('color') || STICKY_COLORS[0]))
 const stickyFont = ref(normalizeStickyFont(stickyQuery.get('font')))
 const stickyOpacity = ref(normalizeStickyOpacity(stickyQuery.get('opacity')))
 const opacityLocked = ref(false)
@@ -165,8 +176,10 @@ const setPinned = (): void => {
 }
 
 const setStickyColor = (color: string): void => {
+  const next = normalizeColor(color)
+  stickyColor.value = next
   if (!stickyNote) return
-  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-color', stickyNote, color).catch((error) => {
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-color', stickyNote, next).catch((error) => {
     console.error(error)
   })
 }
@@ -411,6 +424,17 @@ onMounted(async () => {
   padding: 0;
   border: 1px solid var(--floatBorderColor, color-mix(in srgb, var(--editorColor) 25%, transparent));
   border-radius: 2px;
+}
+.sticky-color.chosen {
+  outline: 2px solid var(--themeColor);
+  outline-offset: 1px;
+}
+.sticky-font input[type='color'] {
+  width: 28px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 .sticky-font {
   display: flex;

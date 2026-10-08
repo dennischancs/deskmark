@@ -25,12 +25,24 @@ describe('sticky note state', () => {
       width: 400,
       height: 300,
       pinned: false,
-      color: 'not-a-color',
+      color: '#336699',
       fontSize: 12,
-      opacity: 40
+      opacity: 4
     })
     expect(second.stickies).toHaveLength(1)
-    expect(second.stickies[0]).toMatchObject({ x: 40, y: 50, pinned: false, color: '#fff4cc', fontSize: 16, opacity: 90 })
+    expect(second.stickies[0]).toMatchObject({ x: 40, y: 50, pinned: false, color: '#336699', fontSize: 16, opacity: 10 })
+    const custom = upsertSticky(second, {
+      path: 'D:/notes/a.md',
+      x: 40,
+      y: 50,
+      width: 400,
+      height: 300,
+      pinned: false,
+      color: '#abc',
+      fontSize: 18,
+      opacity: 40
+    })
+    expect(custom.stickies[0]).toMatchObject({ color: '#aabbcc', fontSize: 18, opacity: 40 })
     expect(JSON.stringify(second)).not.toContain('买牛奶')
     const closed = closeSticky(second, 'D:/notes/a.md')
     expect(closed.stickies).toHaveLength(0)

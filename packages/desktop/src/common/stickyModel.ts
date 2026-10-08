@@ -3,7 +3,7 @@ export const STICKY_COLORS = ['#fff4cc', '#fde2e4', '#e2f0cb', '#d6e6ff', '#f8e1
 export type StickyColor = (typeof STICKY_COLORS)[number]
 export const STICKY_FONT_SIZES = [14, 16, 18, 20] as const
 export const DEFAULT_STICKY_FONT = 16
-export const MIN_STICKY_OPACITY = 90
+export const MIN_STICKY_OPACITY = 10
 export const MAX_STICKY_OPACITY = 100
 
 export interface StickyRecord {
@@ -32,9 +32,17 @@ export function normalizeNotePath(notePath: string): string {
   return notePath.replaceAll('\\', '/').replace(/\/+$/, '')
 }
 
-export function normalizeColor(color: string): StickyColor {
+export function normalizeColor(color: string): string {
+  const value = color.trim()
+  const full = /^#([0-9a-fA-F]{6})$/.exec(value)
+  if (full) return `#${full[1].toLowerCase()}`
+  const short = /^#([0-9a-fA-F]{3})$/.exec(value)
+  if (short) {
+    const [r, g, b] = short[1].split('')
+    return `#${r}${r}${g}${g}${b}${b}`.toLowerCase()
+  }
   const known = STICKY_COLORS as readonly string[]
-  return known.includes(color) ? color as StickyColor : STICKY_COLORS[0]
+  return known.includes(value) ? value : STICKY_COLORS[0]
 }
 
 export function normalizeStickyFont(value: unknown): number {

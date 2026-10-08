@@ -1100,6 +1100,7 @@
     "font": "字級",
     "opacity": "不透明度",
     "opacityLimit": "這個系統不能把便條變淡",
+    "customColor": "自訂顏色",
     "wayland": "這個桌面可能無法讓便條一直留在最前面。",
     "capture": "新建一條",
     "newFile": "新增檔案",
