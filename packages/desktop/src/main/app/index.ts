@@ -25,7 +25,7 @@ import { applyCaptureShortcut, clearCaptureShortcut } from '../deskmark/captureS
 import { startReminderLoop } from '../deskmark/reminderLoop'
 import type { DeskmarkReminderNotice } from '@shared/types/ipc'
 import { DESKMARK_APP_USER_MODEL_ID, installedShortcutCandidates, sameExecutable, shortcutWriteOperation, toastShortcutPlan } from '../deskmark/windowsToast'
-import { retainPluginWebview } from '../deskmark/pluginGuest'
+import { retainPluginWebview, setPluginSettingsSource } from '../deskmark/pluginGuest'
 import { join as pathJoin } from 'node:path'
 import SettingWindow from '../windows/setting'
 import { setLanguage } from '../i18n'
@@ -505,6 +505,7 @@ class App {
         }
       }
     })
+    setPluginSettingsSource(() => this._accessor.preferences.getAll())
     ipcMain.on('mt::deskmark::reminder-open', (_event, notice: DeskmarkReminderNotice) => {
       if (!notice.notePath) return
       openReminder(notice.vault, notice.notePath, notice.line)

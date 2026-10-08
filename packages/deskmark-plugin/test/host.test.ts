@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { PluginHost, answerPluginCall, authorize, createDeadline, noteInsideVault, readManifest } from '../src/index.ts'
+import { PluginHost, answerPluginCall, authorize, createDeadline, noteInsideVault, readManifest, readPluginSettings } from '../src/index.ts'
 
 const good = {
   id: 'wordcount',
@@ -109,6 +109,37 @@ test('即使声明了写入，现在也不会假装已经写上', () => {
   assert.equal(note.ok, false)
   assert.match(note.error ?? '', /写入/)
   assert.equal(task.ok, false)
+})
+
+test('声明了设置才返回桌笺设置，读不到就不假装成功', () => {
+  const manifest = readManifest({ ...good, permissions: ['settings'] })
+  const missing = answerPluginCall({
+    manifest,
+    call: { id: '11', method: 'settings.read' },
+    snapshot: null,
+    readVaultFile: () => null
+  })
+  assert.equal(missing.ok, false)
+  assert.match(missing.error ?? '', /设置/)
+  const result = answerPluginCall({
+    manifest,
+    call: { id: '12', method: 'settings.read' },
+    snapshot: null,
+    readVaultFile: () => null,
+    settings: readPluginSettings({
+      deskmarkCalendar: false,
+      deskmarkReminderSeconds: 9999,
+      deskmarkExtraPrefixes: 'TODO:'
+    })
+  })
+  assert.equal(result.ok, true)
+  const settings = (result.result as { settings: ReturnType<typeof readPluginSettings> }).settings
+  assert.equal(settings.calendar, false)
+  assert.equal(settings.tasks, true)
+  assert.equal(settings.dateInText, false)
+  assert.equal(settings.reminderSeconds, 600)
+  assert.equal(settings.extraPrefixes, 'TODO:')
+  assert.throws(() => authorize(readManifest(good), 'settings.read'), /允许/)
 })
 
 test('声明了任务读取才返回待办，库外路径不出现', () => {

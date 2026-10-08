@@ -210,12 +210,65 @@ export interface PluginTaskView {
   done: boolean
 }
 
+export interface PluginSettingsView {
+  calendar: boolean
+  tasks: boolean
+  reminders: boolean
+  reminderSeconds: number
+  captureShortcut: string
+  wordCount: boolean
+  extensions: string
+  taskLine: boolean
+  commentMeta: boolean
+  frontMatter: boolean
+  dateInText: boolean
+  extraPrefixes: string
+}
+
+const DEFAULT_EXTENSIONS = 'markdown,mdown,mkdn,md,mkd,mdwn,mdtxt,mdtext,mdx,text,txt'
+const DEFAULT_CAPTURE = 'CommandOrControl+Alt+N'
+
+function flag(source: Record<string, unknown>, key: string, fallback: boolean): boolean {
+  const value = source[key]
+  return typeof value === 'boolean' ? value : fallback
+}
+
+function text(source: Record<string, unknown>, key: string, fallback: string): string {
+  const value = source[key]
+  return typeof value === 'string' ? value : fallback
+}
+
+function reminderSeconds(value: unknown): number {
+  const seconds = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(seconds)) return 30
+  return Math.min(600, Math.max(1, Math.round(seconds)))
+}
+
+export function readPluginSettings(source: object | null | undefined): PluginSettingsView {
+  const raw = (source ?? {}) as Record<string, unknown>
+  return {
+    calendar: flag(raw, 'deskmarkCalendar', true),
+    tasks: flag(raw, 'deskmarkTasks', true),
+    reminders: flag(raw, 'deskmarkReminders', true),
+    reminderSeconds: reminderSeconds(raw.deskmarkReminderSeconds),
+    captureShortcut: text(raw, 'deskmarkCaptureAccelerator', DEFAULT_CAPTURE),
+    wordCount: flag(raw, 'deskmarkWordCount', true),
+    extensions: text(raw, 'deskmarkScanExtensions', DEFAULT_EXTENSIONS),
+    taskLine: flag(raw, 'deskmarkRuleTaskLine', true),
+    commentMeta: flag(raw, 'deskmarkRuleComment', true),
+    frontMatter: flag(raw, 'deskmarkRuleFrontMatter', true),
+    dateInText: flag(raw, 'deskmarkRuleDateInText', false),
+    extraPrefixes: text(raw, 'deskmarkExtraPrefixes', '')
+  }
+}
+
 export function answerPluginCall(input: {
   manifest: PluginManifest
   call: PluginCall
   snapshot: NoteSnapshot | null
   readVaultFile: (relativePath: string) => string | null
   tasks?: PluginTaskView[]
+  settings?: PluginSettingsView | null
 }): { id: string, ok: boolean, result?: unknown, error?: string } {
   const id = input.call.id || ''
   if (!input.call.id || !input.call.method) {
@@ -229,6 +282,10 @@ export function answerPluginCall(input: {
     }
     if (permission === 'notes.write' || permission === 'tasks.write') {
       return { id, ok: false, error: '这个小功能还不能写入' }
+    }
+    if (permission === 'settings') {
+      if (!input.settings) return { id, ok: false, error: '这个小功能还不能读取设置' }
+      return { id, ok: true, result: { settings: input.settings } }
     }
     if (permission !== 'notes.read') {
       return { id, ok: true, result: { accepted: true } }

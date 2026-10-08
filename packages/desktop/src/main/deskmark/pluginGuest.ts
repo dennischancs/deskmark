@@ -6,6 +6,7 @@ import { samePluginEntry } from './pluginEntry'
 import {
   answerPluginCall,
   noteInsideVault,
+  readPluginSettings,
   readManifest,
   type NoteSnapshot,
   type PluginTaskView,
@@ -16,6 +17,11 @@ import { readTaskGroups } from './tasks'
 let snapshot: NoteSnapshot | null = null
 let manifest: PluginManifest | null = null
 let entryUrl = ''
+let settingsSource: (() => object) | null = null
+
+export function setPluginSettingsSource(source: () => object): void {
+  settingsSource = source
+}
 
 export function samplePluginDirectory(): string | null {
   const candidates = [
@@ -87,6 +93,7 @@ export function handlePluginCall(call: { id?: string, method?: string, path?: st
     call: { id: call.id || '', method: call.method || '', path: call.path },
     snapshot,
     tasks,
+    settings: currentPluginSettings(call.method),
     readVaultFile: (relative) => {
       if (!snapshot || !noteInsideVault(relative)) return null
       const root = resolve(snapshot.vault)
@@ -97,4 +104,13 @@ export function handlePluginCall(call: { id?: string, method?: string, path?: st
       return readFileSync(full, 'utf8')
     }
   })
+}
+
+function currentPluginSettings(method: string | undefined) {
+  if (method !== 'settings.read' || !settingsSource) return null
+  try {
+    return readPluginSettings(settingsSource())
+  } catch {
+    return null
+  }
 }
