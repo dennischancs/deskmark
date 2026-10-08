@@ -1101,6 +1101,7 @@
     "opacity": "Opacité",
     "opacityLimit": "Ce système ne peut pas éclaircir le pense-bête",
     "customColor": "Couleur choisie",
+    "palette": "Palette",
     "wayland": "Ce bureau peut ne pas garder le pense-bête devant.",
     "capture": "Nouvelle note",
     "newFile": "Nouveau fichier",

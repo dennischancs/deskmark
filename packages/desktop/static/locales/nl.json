@@ -1101,6 +1101,7 @@
     "opacity": "Dekking",
     "opacityLimit": "Dit systeem kan het briefje niet lichter maken",
     "customColor": "Eigen kleur",
+    "palette": "Palet",
     "wayland": "Dit bureaublad kan het briefje misschien niet vooraan houden.",
     "capture": "Nieuw briefje",
     "newFile": "Nieuw bestand",

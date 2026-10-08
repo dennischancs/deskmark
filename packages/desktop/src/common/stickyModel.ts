@@ -45,6 +45,67 @@ export function normalizeColor(color: string): string {
   return known.includes(value) ? value : STICKY_COLORS[0]
 }
 
+export interface StickyHsv {
+  /** Degrees, 0 inclusive to 360 exclusive. Gray has no hue, so this is 0. */
+  h: number
+  /** Saturation from 0 to 1. */
+  s: number
+  /** Value from 0 to 1. */
+  v: number
+}
+
+export function hexToHsv(color: string): StickyHsv {
+  const hex = normalizeColor(color).slice(1)
+  const r = Number.parseInt(hex.slice(0, 2), 16) / 255
+  const g = Number.parseInt(hex.slice(2, 4), 16) / 255
+  const b = Number.parseInt(hex.slice(4, 6), 16) / 255
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  const delta = max - min
+  let h = 0
+  if (delta !== 0) {
+    if (max === r) h = ((g - b) / delta) % 6
+    else if (max === g) h = (b - r) / delta + 2
+    else h = (r - g) / delta + 4
+    h *= 60
+    if (h < 0) h += 360
+  }
+  return { h, s: max === 0 ? 0 : delta / max, v: max }
+}
+
+export function hsvToHex(h: number, s: number, v: number): string {
+  const hue = ((h % 360) + 360) % 360
+  const sat = Math.min(1, Math.max(0, s))
+  const val = Math.min(1, Math.max(0, v))
+  const chroma = val * sat
+  const x = chroma * (1 - Math.abs((hue / 60) % 2 - 1))
+  const match = val - chroma
+  let red = 0
+  let green = 0
+  let blue = 0
+  if (hue < 60) {
+    red = chroma
+    green = x
+  } else if (hue < 120) {
+    red = x
+    green = chroma
+  } else if (hue < 180) {
+    green = chroma
+    blue = x
+  } else if (hue < 240) {
+    green = x
+    blue = chroma
+  } else if (hue < 300) {
+    red = x
+    blue = chroma
+  } else {
+    red = chroma
+    blue = x
+  }
+  const channel = (part: number): string => Math.round((part + match) * 255).toString(16).padStart(2, '0')
+  return `#${channel(red)}${channel(green)}${channel(blue)}`
+}
+
 export function normalizeStickyFont(value: unknown): number {
   const size = typeof value === 'number' ? value : Number(value)
   return (STICKY_FONT_SIZES as readonly number[]).includes(size) ? size : DEFAULT_STICKY_FONT

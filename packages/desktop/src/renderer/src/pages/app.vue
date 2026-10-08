@@ -1,7 +1,10 @@
 <template>
   <div class="editor-container">
     <side-bar v-if="init && !stickyProbe" />
-    <div class="editor-middle">
+    <div
+      class="editor-middle"
+      :class="{ 'sticky-window': stickyProbe }"
+    >
       <div
         v-if="stickyProbe"
         class="sticky-toolbar deskmark-ui"
@@ -29,14 +32,13 @@
           :style="{ background: color }"
           @click="setStickyColor(color)"
         />
-        <label class="sticky-font">
-          {{ t('sticky.customColor') }}
-          <input
-            type="color"
-            :value="stickyColor"
-            @input="setStickyColor(($event.target as HTMLInputElement).value)"
-          >
-        </label>
+        <sticky-palette
+          :color="stickyColor"
+          :opacity="stickyOpacity"
+          :locked="opacityLocked"
+          @pick="setStickyColor"
+          @fade="setStickyOpacity"
+        />
         <label class="sticky-font">
           {{ t('sticky.font') }}
           <select
@@ -52,25 +54,6 @@
             </option>
           </select>
         </label>
-        <label class="sticky-font">
-          {{ t('sticky.opacity') }}
-          <input
-            type="range"
-            min="10"
-            max="100"
-            step="1"
-            :value="stickyOpacity"
-            :disabled="opacityLocked"
-            @change="setStickyOpacity(Number(($event.target as HTMLInputElement).value))"
-          >
-          <span>{{ stickyOpacity }}%</span>
-        </label>
-        <p
-          v-if="opacityLocked"
-          class="sticky-limit"
-        >
-          {{ t('sticky.opacityLimit') }}
-        </p>
       </div>
       <title-bar
         :project="projectTree"
@@ -125,6 +108,7 @@ import Rename from '@/components/rename/index.vue'
 import ImportModal from '@/components/import/index.vue'
 import TaskProperties from '@/components/taskProperties.vue'
 import CalendarView from '@/components/calendarView.vue'
+import StickyPalette from '@/components/stickyPalette.vue'
 import { useDeskmarkStore } from '@/store/deskmark'
 import { useI18n } from 'vue-i18n'
 import { normalizeColor, normalizeStickyFont, normalizeStickyOpacity, STICKY_COLORS, STICKY_FONT_SIZES } from 'common/stickyModel'
@@ -402,6 +386,13 @@ onMounted(async () => {
   flex: 1;
   min-height: 100vh;
   position: relative;
+  &.sticky-window {
+    /* The title bar is fixed over the top of a frameless note. */
+    box-sizing: border-box;
+    height: 100%;
+    min-height: 0;
+    padding-top: var(--titleBarHeight);
+  }
   & > .editor {
     flex: 1;
   }
@@ -428,13 +419,6 @@ onMounted(async () => {
 .sticky-color.chosen {
   outline: 2px solid var(--themeColor);
   outline-offset: 1px;
-}
-.sticky-font input[type='color'] {
-  width: 28px;
-  height: 18px;
-  padding: 0;
-  border: 0;
-  background: transparent;
 }
 .sticky-font {
   display: flex;

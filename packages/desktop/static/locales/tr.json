@@ -1101,6 +1101,7 @@
     "opacity": "Opaklık",
     "opacityLimit": "Bu sistem notu soluklaştıramaz",
     "customColor": "Kendi rengi",
+    "palette": "Palet",
     "wayland": "Bu masaüstü notu önde tutamayabilir.",
     "capture": "Yeni not",
     "newFile": "Yeni dosya",

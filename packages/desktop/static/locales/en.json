@@ -1101,6 +1101,7 @@
     "opacity": "Opacity",
     "opacityLimit": "This system cannot fade the note",
     "customColor": "Custom color",
+    "palette": "Palette",
     "wayland": "This desktop may not keep the note in front.",
     "capture": "New note",
     "newFile": "New file",

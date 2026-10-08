@@ -53,6 +53,34 @@ const menuOnScreen = async(page: Page): Promise<void> => {
   await expect(menu.locator('[data-label="deskmark:todo"]')).toBeVisible()
 }
 
+const expectFloatingLayerOnTop = async(page: Page, testId: string): Promise<void> => {
+  await expect.poll(() => page.evaluate((targetTestId) => {
+    const element = document.querySelector<HTMLElement>(`[data-testid="${targetTestId}"]`)
+    if (!element) return { ok: false, reason: 'missing' }
+    const rect = element.getBoundingClientRect()
+    const centerX = Math.min(Math.max(rect.left + rect.width / 2, 0), window.innerWidth - 1)
+    const centerY = Math.min(Math.max(rect.top + rect.height / 2, 0), window.innerHeight - 1)
+    const topElement = document.elementFromPoint(centerX, centerY)
+    const isTop = Boolean(topElement && (element === topElement || element.contains(topElement)))
+    const withinViewport = rect.left >= 0 &&
+      rect.top >= 0 &&
+      rect.right <= window.innerWidth &&
+      rect.bottom <= window.innerHeight
+    return { ok: isTop && withinViewport, isTop, withinViewport }
+  }, testId)).toMatchObject({ ok: true })
+}
+
+const stickyPage = async(app: ElectronApplication): Promise<Page> => {
+  const deadline = Date.now() + 10000
+  while (Date.now() < deadline) {
+    for (const candidate of app.windows()) {
+      if (candidate.url().includes('sticky=1')) return candidate
+    }
+    await new Promise((resolve) => setTimeout(resolve, 200))
+  }
+  throw new Error('sticky window did not open')
+}
+
 test('typing slash on an empty line opens the insert menu on screen', async() => {
   test.setTimeout(45000)
   const launched = await launchWithMarkdown('# Hello\n\n\n', {
@@ -195,6 +223,52 @@ test('a sticky note uses the width of its window', async() => {
       return box.width / window.innerWidth
     })
     expect(ratio).toBeGreaterThan(0.85)
+  } finally {
+    stopApp(app)
+    removeTree(dir)
+  }
+})
+
+test('a sticky palette stays on top and sets a custom color and opacity', async() => {
+  test.setTimeout(45000)
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'deskmark-palette-'))
+  fs.writeFileSync(path.join(dir, 'milk.md'), '# Hello\n\nOne two three.\n', 'utf8')
+  const launched = await launchElectron([dir], { preferences: { language: 'zh-CN' } })
+  const { app, page } = launched
+  try {
+    await page.locator('.side-bar').waitFor({ state: 'visible', timeout: 15000 })
+    await page.evaluate((root) => {
+      return window.electron.ipcRenderer.invoke('mt::deskmark::sticky-open', root, root + '\\\\milk.md')
+    }, dir)
+    const sticky = await stickyPage(app)
+    await sticky.locator('[data-testid="sticky-palette-trigger"]').click({ timeout: 10000 })
+    await expectFloatingLayerOnTop(sticky, 'sticky-palette')
+    const hex = sticky.locator('[data-testid="sticky-palette-hex"]')
+    await hex.fill('#336699')
+    await hex.press('Enter')
+    await expect.poll(() => sticky.locator('[data-testid="sticky-palette-trigger"] .sticky-palette-chip').evaluate((element) => {
+      return getComputedStyle(element).backgroundColor
+    })).toBe('rgb(51, 102, 153)')
+    await sticky.locator('[data-testid="sticky-palette-opacity"]').evaluate((element) => {
+      const input = element as HTMLInputElement
+      input.value = '40'
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      input.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+    await expect(sticky.locator('.opacity-row')).toContainText('40%')
+    await expect.poll(() => app.evaluate(({ BrowserWindow }) => {
+      const win = BrowserWindow.getAllWindows().find(item => item.webContents.getURL().includes('sticky=1'))
+      return {
+        color: win?.getBackgroundColor().toLowerCase() ?? '',
+        opacity: win?.getOpacity() ?? 1
+      }
+    })).toMatchObject({ color: expect.stringContaining('336699'), opacity: 0.4 })
+    await sticky.keyboard.press('Escape')
+    await expect(sticky.locator('[data-testid="sticky-palette"]')).toBeHidden()
+    await sticky.locator('[data-testid="sticky-palette-trigger"]').click()
+    await expect(sticky.locator('[data-testid="sticky-palette"]')).toBeVisible()
+    await sticky.locator('.sticky-palette-scrim').click({ position: { x: 4, y: 280 } })
+    await expect(sticky.locator('[data-testid="sticky-palette"]')).toBeHidden()
   } finally {
     stopApp(app)
     removeTree(dir)

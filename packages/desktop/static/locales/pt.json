@@ -1101,6 +1101,7 @@
     "opacity": "Opacidade",
     "opacityLimit": "Este sistema não consegue clarear a nota",
     "customColor": "Cor escolhida",
+    "palette": "Paleta",
     "wayland": "Esta área de trabalho pode não manter a nota à frente.",
     "capture": "Nova nota",
     "newFile": "Novo ficheiro",

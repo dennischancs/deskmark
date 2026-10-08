@@ -1101,6 +1101,7 @@
     "opacity": "不透明度",
     "opacityLimit": "このシステムでは付箋を薄くできません",
     "customColor": "好きな色",
+    "palette": "パレット",
     "wayland": "このデスクトップでは手前に固定できないことがあります。",
     "capture": "新しいメモ",
     "newFile": "新しいファイル",

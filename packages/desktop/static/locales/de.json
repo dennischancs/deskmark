@@ -1101,6 +1101,7 @@
     "opacity": "Deckkraft",
     "opacityLimit": "Dieses System kann die Notiz nicht aufhellen",
     "customColor": "Eigene Farbe",
+    "palette": "Palette",
     "wayland": "Diese Oberfläche kann den Zettel vielleicht nicht vorne halten.",
     "capture": "Neue Notiz",
     "newFile": "Neue Datei",
