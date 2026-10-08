@@ -47,6 +47,21 @@
         v-else-if="pluginView"
         :title="t('plugin.words')"
       />
+      <div
+        v-else-if="rightColumn === 'user-plugin'"
+        class="user-plugin"
+      >
+        <p
+          v-if="userPluginName"
+          class="user-plugin-name"
+        >
+          {{ userPluginName }}
+        </p>
+        <div
+          ref="userPluginHost"
+          class="user-plugin-frame"
+        />
+      </div>
     </div>
     <div
       v-show="rightColumn"
@@ -86,9 +101,14 @@ const editorStore = useEditorStore()
 const deskmarkStore = useDeskmarkStore()
 const preferenceStore = usePreferencesStore()
 const { deskmarkCalendar, deskmarkTasks, deskmarkWordCount } = storeToRefs(preferenceStore)
+const { deskmarkPluginPath } = storeToRefs(preferenceStore)
 
 const sideBar = ref<HTMLDivElement | null>(null)
 const dragBar = ref<HTMLDivElement | null>(null)
+const userPluginHost = ref<HTMLDivElement | null>(null)
+const userPluginName = ref('')
+const userPluginSrc = ref('')
+const USER_PLUGIN_COMMAND = 'deskmark:loaded-plugin'
 
 const openedFiles = ref<TabDescriptor[]>([])
 const sideBarViewWidth = ref(280)
@@ -135,6 +155,65 @@ try {
 } catch (error) {
   console.error(error)
 }
+
+const commandCenterForPlugin = useCommandCenterStore()
+
+const forgetUserPluginCommand = (): void => {
+  const list = commandCenterForPlugin.rootCommand.subcommands
+  const index = list.findIndex(item => item.id === USER_PLUGIN_COMMAND)
+  if (index >= 0) list.splice(index, 1)
+}
+
+const showUserPlugin = (): void => {
+  layoutStore.SET_LAYOUT({ rightColumn: 'user-plugin', showSideBar: true })
+}
+
+const mountUserPlugin = async (): Promise<void> => {
+  await nextTick()
+  const host = userPluginHost.value
+  if (!host) return
+  host.replaceChildren()
+  if (rightColumn.value !== 'user-plugin' || !userPluginSrc.value) return
+  const frame = document.createElement('webview')
+  frame.setAttribute('src', userPluginSrc.value)
+  frame.setAttribute('partition', 'deskmark-plugin')
+  host.append(frame)
+}
+
+const applyUserPlugin = async (dir: string): Promise<void> => {
+  const result = await window.electron.ipcRenderer.invoke('mt::deskmark::plugin-load', dir || null)
+  forgetUserPluginCommand()
+  userPluginName.value = ''
+  userPluginSrc.value = ''
+  if (!result?.ok || !result.active) {
+    if (rightColumn.value === 'user-plugin') layoutStore.SET_LAYOUT({ rightColumn: 'files' })
+    return
+  }
+  userPluginName.value = result.manifest.name
+  if (result.manifest.permissions.includes('ui.panel')) userPluginSrc.value = result.src
+  if (result.manifest.permissions.includes('ui.command')) {
+    commandCenterForPlugin.REGISTER_COMMAND({
+      id: USER_PLUGIN_COMMAND,
+      description: result.manifest.name,
+      execute: () => {
+        showUserPlugin()
+      }
+    })
+  }
+  await mountUserPlugin()
+}
+
+watch(deskmarkPluginPath, (dir) => {
+  applyUserPlugin(dir || '').catch((error) => {
+    console.error(error)
+  })
+}, { immediate: true })
+
+watch([rightColumn, userPluginSrc], () => {
+  mountUserPlugin().catch((error) => {
+    console.error(error)
+  })
+})
 const sideBarIcons = computed(() => [
   ...builtinSideBarIcons.filter((icon) => {
     if (icon.id === 'calendar') return deskmarkCalendar.value !== false
@@ -336,5 +415,19 @@ const handleLeftBottomClick = (name: string): void => {
 
 .drag-bar:hover {
   border-right: 2px solid var(--iconColor);
+}
+.user-plugin {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: var(--sideBarColor);
+  background: var(--sideBarBgColor);
+}
+.user-plugin-name {
+  margin: 8px 12px;
+}
+.user-plugin-frame {
+  flex: 1;
+  min-height: 0;
 }
 </style>

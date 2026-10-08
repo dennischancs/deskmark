@@ -67,6 +67,15 @@ export function readManifest(raw: unknown): PluginManifest {
   }
 }
 
+export function inspectPlugin(raw: string): { ok: true, manifest: PluginManifest } | { ok: false, error: string } {
+  try {
+    return { ok: true, manifest: readManifest(JSON.parse(raw)) }
+  } catch (error) {
+    if (error instanceof SyntaxError) return { ok: false, error: '清单不是对象' }
+    return { ok: false, error: error instanceof Error ? error.message : '这个小功能没能打开' }
+  }
+}
+
 export function assertPermission(manifest: PluginManifest, permission: Permission): void {
   if (!manifest.permissions.includes(permission)) {
     throw new PluginError('这个小功能没有得到相应允许')

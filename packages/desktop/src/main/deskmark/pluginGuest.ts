@@ -5,9 +5,9 @@ import { pathToFileURL } from 'node:url'
 import { samePluginEntry } from './pluginEntry'
 import {
   answerPluginCall,
+  inspectPlugin,
   noteInsideVault,
   readPluginSettings,
-  readManifest,
   type NoteSnapshot,
   type PluginTaskView,
   type PluginManifest
@@ -37,14 +37,53 @@ export function pluginPreloadPath(): string {
 
 export function loadSamplePlugin(): { src: string, preload: string, manifest: PluginManifest } | null {
   const dir = samplePluginDirectory()
-  if (!dir) return null
-  try {
-    manifest = readManifest(JSON.parse(readFileSync(join(dir, 'manifest.json'), 'utf8')))
-  } catch {
+  if (!dir) {
     manifest = null
     entryUrl = ''
     return null
   }
+  return loadDirectory(dir, true)
+}
+
+export function loadUserPlugin(dir: string | null): { ok: true, active: false } | { ok: true, active: true, src: string, manifest: PluginManifest } | { ok: false, error: string } {
+  const trimmed = dir?.trim() || ''
+  if (!trimmed) {
+    loadSamplePlugin()
+    return { ok: true, active: false }
+  }
+  try {
+    const loaded = loadDirectory(trimmed, false)
+    if (!loaded) return { ok: false, error: '这个小功能没能打开' }
+    return { ok: true, active: true, src: loaded.src, manifest: loaded.manifest }
+  } catch (error) {
+    loadSamplePlugin()
+    const message = error instanceof Error ? error.message : '这个小功能没能打开'
+    return { ok: false, error: /清单|插件|入口|权限|接口/.test(message) ? message : '这个小功能没能打开' }
+  }
+}
+
+function loadDirectory(dir: string, builtin: boolean): { src: string, preload: string, manifest: PluginManifest } | null {
+  let text = ''
+  try {
+    text = readFileSync(join(dir, 'manifest.json'), 'utf8')
+  } catch (error) {
+    if (builtin) {
+      manifest = null
+      entryUrl = ''
+      return null
+    }
+    throw error
+  }
+  const inspected = inspectPlugin(text)
+  if (!inspected.ok) {
+    if (builtin) {
+      manifest = null
+      entryUrl = ''
+      return null
+    }
+    throw new Error(inspected.error)
+  }
+  manifest = inspected.manifest
   entryUrl = pathToFileURL(join(dir, manifest.entry)).href
   return { src: entryUrl, preload: pluginPreloadPath(), manifest }
 }

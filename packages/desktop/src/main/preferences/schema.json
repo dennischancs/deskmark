@@ -273,6 +273,11 @@
     "type": "string",
     "default": ""
   },
+  "deskmarkPluginPath": {
+    "description": "Deskmark--Local folder of an extra plugin. Empty means none.",
+    "type": "string",
+    "default": ""
+  },
   "hideLinkPopup": {
     "description": "Editor--Hide link popup when the cursor is hover on the link",
     "type": "boolean",

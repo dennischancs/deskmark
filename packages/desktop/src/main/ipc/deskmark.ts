@@ -1,17 +1,24 @@
-import { ipcMain } from 'electron'
+import { BrowserWindow, dialog, ipcMain } from 'electron'
 import log from 'electron-log'
 import { join } from 'node:path'
 import type { InlinePatch } from '../../../../deskmark-core/src/index.ts'
 import type { DeskmarkScanOptions } from '@shared/types/ipc'
 import { getStickyHost } from '../deskmark/stickies'
 import { setReminderVault } from '../deskmark/reminderLoop'
-import { handlePluginCall, loadSamplePlugin, rememberPluginNote } from '../deskmark/pluginGuest'
+import { handlePluginCall, loadSamplePlugin, loadUserPlugin, rememberPluginNote } from '../deskmark/pluginGuest'
 import { appendJournalTask, blankJournal, blankTodoNote, createUlid, journalPath, todoNotePath } from '../../../../deskmark-core/src/index.ts'
 import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname } from 'node:path'
 
 export const registerDeskmarkHandlers = (): void => {
   ipcMain.handle('mt::deskmark::plugin-info', async() => loadSamplePlugin())
+  ipcMain.handle('mt::deskmark::plugin-load', async(_event, dir: string | null) => loadUserPlugin(dir))
+  ipcMain.handle('mt::deskmark::pick-plugin-dir', async(event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    if (!win) return ''
+    const { filePaths } = await dialog.showOpenDialog(win, { properties: ['openDirectory'] })
+    return filePaths[0] || ''
+  })
   ipcMain.handle('mt::deskmark::plugin-note', async(_event, note: { vault?: string, path?: string, markdown?: string } | null) => {
     if (!note?.vault || !note.path) {
       rememberPluginNote(null)

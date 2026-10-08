@@ -55,6 +55,32 @@
         <p class="seconds-hint">
           {{ t('preferences.deskmark.pluginSettingsHint') }}
         </p>
+        <label class="scan-label">
+          {{ t('preferences.deskmark.pluginPath') }}
+          <input
+            class="scan-text"
+            type="text"
+            :value="deskmarkPluginPath"
+            @change="setPluginPath(($event.target as HTMLInputElement).value)"
+          >
+        </label>
+        <div class="plugin-actions">
+          <button
+            type="button"
+            @click="pickPlugin"
+          >
+            {{ t('preferences.deskmark.pluginPick') }}
+          </button>
+          <button
+            type="button"
+            @click="unloadPlugin"
+          >
+            {{ t('preferences.deskmark.pluginUnload') }}
+          </button>
+        </div>
+        <p class="seconds-hint">
+          {{ pluginStatus }}
+        </p>
         <p
           v-for="item of pluginSettings"
           :key="item.id"
@@ -171,10 +197,12 @@ const {
   deskmarkRuleComment,
   deskmarkRuleFrontMatter,
   deskmarkRuleDateInText,
-  deskmarkExtraPrefixes
+  deskmarkExtraPrefixes,
+  deskmarkPluginPath
 } =
   storeToRefs(preferenceStore)
 const openAtLogin = ref(false)
+const pluginStatus = ref('')
 const knownExtensions = PLAIN_TEXT_EXTENSIONS
 const pluginSettings = computed(() => {
   const host = new PluginHost()
@@ -199,6 +227,7 @@ onMounted(() => {
   window.electron.ipcRenderer.invoke('mt::deskmark::login-get').then((enabled) => {
     openAtLogin.value = enabled === true
   }).catch(() => {})
+  loadPlugin(deskmarkPluginPath.value || '').catch(() => {})
 })
 
 const onSelectChange = (type: keyof PreferencesState, value: boolean): void => {
@@ -207,6 +236,43 @@ const onSelectChange = (type: keyof PreferencesState, value: boolean): void => {
 
 const setText = (type: 'deskmarkScanExtensions' | 'deskmarkExtraPrefixes', value: string): void => {
   preferenceStore.SET_SINGLE_PREFERENCE({ type, value })
+}
+
+const showPluginResult = (result: { ok: true, active: boolean, manifest?: { name: string } } | { ok: false, error: string } | null): void => {
+  if (!result || (result.ok && !result.active)) {
+    pluginStatus.value = t('preferences.deskmark.pluginNone')
+    return
+  }
+  if (!result.ok) {
+    pluginStatus.value = t('preferences.deskmark.pluginFailed', { error: result.error })
+    return
+  }
+  pluginStatus.value = t('preferences.deskmark.pluginLoaded', { name: result.manifest?.name || '' })
+}
+
+const loadPlugin = async (dir: string): Promise<void> => {
+  const result = await window.electron.ipcRenderer.invoke('mt::deskmark::plugin-load', dir || null)
+  showPluginResult(result)
+}
+
+const setPluginPath = (value: string): void => {
+  preferenceStore.SET_SINGLE_PREFERENCE({ type: 'deskmarkPluginPath', value })
+  loadPlugin(value).catch(() => {
+    pluginStatus.value = t('preferences.deskmark.pluginFailed', { error: t('plugin.failed') })
+  })
+}
+
+const pickPlugin = (): void => {
+  window.electron.ipcRenderer.invoke('mt::deskmark::pick-plugin-dir').then((dir) => {
+    if (!dir) return
+    setPluginPath(dir)
+  }).catch(() => {
+    pluginStatus.value = t('preferences.deskmark.pluginFailed', { error: t('plugin.failed') })
+  })
+}
+
+const unloadPlugin = (): void => {
+  setPluginPath('')
 }
 
 const setSeconds = (value: string): void => {
@@ -270,5 +336,18 @@ const setLogin = (enabled: boolean): void => {
 }
 .ext-list input[type='checkbox'] {
   accent-color: var(--themeColor);
+}
+.plugin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 8px;
+}
+.plugin-actions button {
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--floatBorderColor, color-mix(in srgb, currentColor 18%, transparent));
+  border-radius: 4px;
+  padding: 3px 8px;
 }
 </style>

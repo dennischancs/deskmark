@@ -37,6 +37,7 @@ export interface IUserPreferences {
   deskmarkRuleFrontMatter?: boolean
   deskmarkRuleDateInText?: boolean
   deskmarkExtraPrefixes?: string
+  deskmarkPluginPath?: string
   hideLinkPopup?: boolean
   autoPairBracket?: boolean
   autoPairMarkdownSyntax?: boolean

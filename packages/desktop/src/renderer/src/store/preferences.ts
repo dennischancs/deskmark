@@ -74,6 +74,7 @@ export interface PreferencesState {
   deskmarkRuleFrontMatter: boolean
   deskmarkRuleDateInText: boolean
   deskmarkExtraPrefixes: string
+  deskmarkPluginPath: string
   imageInsertAction: ImageInsertAction | string
   imagePreferRelativeDirectory: boolean
   imageRelativeDirectoryBase: ImageRelativeDirectoryBase | string
@@ -207,6 +208,7 @@ export const usePreferencesStore = defineStore('preferences', {
     deskmarkRuleFrontMatter: true,
     deskmarkRuleDateInText: false,
     deskmarkExtraPrefixes: '',
+    deskmarkPluginPath: '',
     imageInsertAction: 'folder',
     imagePreferRelativeDirectory: false,
     imageRelativeDirectoryBase: 'file',

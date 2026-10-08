@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { PluginHost, answerPluginCall, authorize, createDeadline, noteInsideVault, readManifest, readPluginSettings } from '../src/index.ts'
+import { PluginHost, answerPluginCall, authorize, createDeadline, inspectPlugin, noteInsideVault, readManifest, readPluginSettings } from '../src/index.ts'
 
 const good = {
   id: 'wordcount',
@@ -15,6 +15,10 @@ test('坏清单不能当插件打开', () => {
   assert.throws(() => readManifest({ ...good, id: '../bad' }), /编号/)
   assert.throws(() => readManifest({ ...good, entry: '../index.html' }), /入口/)
   assert.throws(() => readManifest({ ...good, permissions: ['shell'] }), /权限/)
+  assert.equal(inspectPlugin('{').ok, false)
+  const inspected = inspectPlugin(JSON.stringify({ ...good, permissions: ['shell'] }))
+  assert.equal(inspected.ok, false)
+  if (!inspected.ok) assert.match(inspected.error, /权限/)
 })
 
 test('主版本不一致就拒绝', () => {

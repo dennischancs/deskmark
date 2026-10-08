@@ -162,6 +162,14 @@ export interface IpcInvokeChannels {
     args: []
     ret: { src: string, preload: string, manifest: { id: string, name: string, api: number, entry: string, permissions: string[] } } | null
   }
+  'mt::deskmark::plugin-load': {
+    args: [dir: string | null]
+    ret: { ok: true, active: false } | { ok: true, active: true, src: string, manifest: { id: string, name: string, api: number, entry: string, permissions: string[] } } | { ok: false, error: string }
+  }
+  'mt::deskmark::pick-plugin-dir': {
+    args: []
+    ret: string
+  }
   'mt::deskmark::plugin-note': {
     args: [note: { vault: string, path: string, markdown: string } | null]
     ret: void
