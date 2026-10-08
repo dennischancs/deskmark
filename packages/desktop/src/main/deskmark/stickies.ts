@@ -311,6 +311,20 @@ export class StickyHost {
     editor.bringToFront()
   }
 
+  openInMain(notePath: string): void {
+    const sticky = this.windows.get(normalizeNotePath(notePath))
+    const filePath = sticky?.stickyPath || notePath
+    this.showMain()
+    const editors = this.windowManager.getWindowsByType('editor')
+    const main = editors.find(entry => !(entry.win as EditorWindow).stickyPath)
+    const editor = main?.win as EditorWindow | undefined
+    const browser = editor?.browserWindow
+    if (!editor || !browser || browser.isDestroyed()) return
+    this.whenReady(browser, () => {
+      if (!browser.isDestroyed()) editor.openTab(filePath, {}, true)
+    })
+  }
+
   openSettings(): void {
     ipcMain.emit('app-create-settings-window', 'deskmark')
   }

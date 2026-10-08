@@ -94,6 +94,14 @@
         <button
           type="button"
           role="menuitem"
+          data-testid="sticky-menu-main"
+          @click="choose('main')"
+        >
+          {{ t('sticky.openMain') }}
+        </button>
+        <button
+          type="button"
+          role="menuitem"
           data-testid="sticky-menu-close"
           @click="choose('close')"
         >
@@ -153,6 +161,7 @@ const emit = defineEmits<{
   bottom: [value: boolean]
   settings: []
   close: []
+  main: []
   show: [path: string]
   others: []
 }>()
@@ -196,8 +205,9 @@ const close = (): void => {
   othersOpen.value = false
 }
 
-const choose = (kind: 'settings' | 'close'): void => {
+const choose = (kind: 'settings' | 'close' | 'main'): void => {
   if (kind === 'settings') emit('settings')
+  else if (kind === 'main') emit('main')
   else emit('close')
   close()
 }

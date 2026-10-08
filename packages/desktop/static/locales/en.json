@@ -1106,6 +1106,7 @@
     "bottom": "Send to back",
     "top": "Keep on top",
     "close": "Close note",
+    "openMain": "Open in main window",
     "others": "Other notes",
     "only": "Only this note",
     "font": "Font size",

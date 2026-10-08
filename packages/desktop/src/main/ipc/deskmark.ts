@@ -113,6 +113,9 @@ export const registerDeskmarkHandlers = (): void => {
   ipcMain.handle('mt::deskmark::sticky-show', async(_event, notePath: string) => {
     getStickyHost()?.showNote(notePath)
   })
+  ipcMain.handle('mt::deskmark::sticky-main', async(_event, notePath: string) => {
+    getStickyHost()?.openInMain(notePath)
+  })
   ipcMain.handle('mt::deskmark::sticky-settings', async() => {
     getStickyHost()?.openSettings()
   })

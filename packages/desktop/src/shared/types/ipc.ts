@@ -147,6 +147,7 @@ export interface IpcInvokeChannels {
   'mt::deskmark::sticky-bottom': { args: [notePath: string, enabled: boolean]; ret: void }
   'mt::deskmark::sticky-list': { args: [notePath: string]; ret: { path: string, name: string }[] }
   'mt::deskmark::sticky-show': { args: [notePath: string]; ret: void }
+  'mt::deskmark::sticky-main': { args: [notePath: string]; ret: void }
   'mt::deskmark::sticky-settings': { args: []; ret: void }
   'mt::deskmark::journal-task': {
     args: [root: string, day: string, text: string]

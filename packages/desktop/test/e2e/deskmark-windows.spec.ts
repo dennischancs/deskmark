@@ -295,6 +295,9 @@ test('the sticky menu stays on top and opens the lock list', async() => {
     await expect(sticky.locator('[data-testid="sticky-menu-lock-list"]')).toContainText('置底')
     await sticky.keyboard.press('Escape')
     await expect(sticky.locator('[data-testid="sticky-menu"]')).toBeHidden()
+    await sticky.locator('[data-testid="sticky-menu-trigger"]').click()
+    await sticky.locator('[data-testid="sticky-menu-main"]').click()
+    await expect(page.locator('.mu-paragraph').first()).toContainText('One two three', { timeout: 10000 })
   } finally {
     stopApp(app)
     removeTree(dir)

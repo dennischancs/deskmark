@@ -76,6 +76,7 @@
           @bottom="setBottomFromMenu"
           @settings="openStickySettings"
           @close="closeSticky"
+          @main="openStickyInMain"
           @show="showOtherSticky"
           @others="loadOtherStickies"
         />
@@ -243,6 +244,13 @@ const openStickySettings = (): void => {
 
 const closeSticky = (): void => {
   window.electron.windowControl.close()
+}
+
+const openStickyInMain = (): void => {
+  if (!stickyNote) return
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-main', stickyNote).catch((error) => {
+    console.error(error)
+  })
 }
 
 const loadOtherStickies = (): void => {
