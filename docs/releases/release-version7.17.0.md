@@ -10,4 +10,4 @@
 - 没有这份设置时，不再假装已经读到。
 - 没有声明设置权限时，调用仍然被拒绝。
 
-这次还没有打 Windows 安装包。macOS 和 Linux 也没有打包。
+Windows x64 安装包是 dist/marktext-win-x64-7.17.0-setup.exe。解包程序和安装包的文件版本都是 7.17.0。macOS 和 Linux 没有打包。
