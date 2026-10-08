@@ -10,4 +10,4 @@
 - 超过 2MB 的笔记不交给小功能读。
 - 这样主进程不会卡在一篇大笔记上，当前笔记仍然可以保存。
 
-这次还没有打 Windows 安装包。macOS 和 Linux 也没有打包。
+Windows x64 安装包是 dist/marktext-win-x64-7.20.1-setup.exe。解包程序和安装包的文件版本都是 7.20.1。macOS 和 Linux 没有打包。
