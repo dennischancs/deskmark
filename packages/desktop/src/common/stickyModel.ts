@@ -1,6 +1,10 @@
 export const STICKY_COLORS = ['#fff4cc', '#fde2e4', '#e2f0cb', '#d6e6ff', '#f8e1ff', '#ffe8d6'] as const
 
 export type StickyColor = (typeof STICKY_COLORS)[number]
+export const STICKY_FONT_SIZES = [14, 16, 18, 20] as const
+export const DEFAULT_STICKY_FONT = 16
+export const MIN_STICKY_OPACITY = 90
+export const MAX_STICKY_OPACITY = 100
 
 export interface StickyRecord {
   path: string
@@ -10,6 +14,8 @@ export interface StickyRecord {
   height: number
   pinned: boolean
   color: string
+  fontSize: number
+  opacity: number
 }
 
 export interface UiStateFile {
@@ -29,6 +35,17 @@ export function normalizeNotePath(notePath: string): string {
 export function normalizeColor(color: string): StickyColor {
   const known = STICKY_COLORS as readonly string[]
   return known.includes(color) ? color as StickyColor : STICKY_COLORS[0]
+}
+
+export function normalizeStickyFont(value: unknown): number {
+  const size = typeof value === 'number' ? value : Number(value)
+  return (STICKY_FONT_SIZES as readonly number[]).includes(size) ? size : DEFAULT_STICKY_FONT
+}
+
+export function normalizeStickyOpacity(value: unknown): number {
+  const opacity = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(opacity)) return MAX_STICKY_OPACITY
+  return Math.min(MAX_STICKY_OPACITY, Math.max(MIN_STICKY_OPACITY, Math.round(opacity)))
 }
 
 export function readUiState(json: string): UiStateFile {
@@ -69,6 +86,7 @@ export function findSticky(state: UiStateFile, notePath: string): StickyRecord |
 }
 
 function normalizeSticky(record: StickyRecord): StickyRecord {
+  const raw = record as StickyRecord & { fontSize?: unknown, opacity?: unknown }
   return {
     path: normalizeNotePath(record.path),
     x: record.x,
@@ -76,7 +94,9 @@ function normalizeSticky(record: StickyRecord): StickyRecord {
     width: record.width >= 80 ? record.width : 360,
     height: record.height >= 80 ? record.height : 320,
     pinned: record.pinned !== false,
-    color: normalizeColor(record.color)
+    color: normalizeColor(record.color),
+    fontSize: normalizeStickyFont(raw.fontSize),
+    opacity: normalizeStickyOpacity(raw.opacity)
   }
 }
 

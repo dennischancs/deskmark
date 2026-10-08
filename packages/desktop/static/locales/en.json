@@ -1097,6 +1097,9 @@
   "sticky": {
     "open": "Stick on desktop",
     "pin": "Pin",
+    "font": "Font size",
+    "opacity": "Opacity",
+    "opacityLimit": "This system cannot fade the note",
     "wayland": "This desktop may not keep the note in front.",
     "capture": "New note",
     "newFile": "New file",

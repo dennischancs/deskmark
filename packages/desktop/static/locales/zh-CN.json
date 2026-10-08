@@ -1097,6 +1097,9 @@
   "sticky": {
     "open": "贴到桌面",
     "pin": "钉住",
+    "font": "字号",
+    "opacity": "不透明度",
+    "opacityLimit": "这个系统不能把便签变淡",
     "wayland": "这个桌面可能没法让便签一直留在最前面。",
     "capture": "新建一条",
     "newFile": "新建文件",

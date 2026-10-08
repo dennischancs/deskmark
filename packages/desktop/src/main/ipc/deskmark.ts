@@ -86,6 +86,12 @@ export const registerDeskmarkHandlers = (): void => {
   ipcMain.handle('mt::deskmark::sticky-color', async(_event, notePath: string, color: string) => {
     getStickyHost()?.setColor(notePath, color)
   })
+  ipcMain.handle('mt::deskmark::sticky-font', async(_event, notePath: string, fontSize: number) => {
+    getStickyHost()?.setFont(notePath, fontSize)
+  })
+  ipcMain.handle('mt::deskmark::sticky-opacity', async(_event, notePath: string, opacity: number) => {
+    return getStickyHost()?.setOpacity(notePath, opacity) ?? false
+  })
 
   ipcMain.handle('mt::deskmark::journal-task', async(_event, root: string, day: string, text: string) => {
     try {

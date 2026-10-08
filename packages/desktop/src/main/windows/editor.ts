@@ -65,6 +65,8 @@ class EditorWindow extends BaseWindow {
   public stickyPath: string | null = null
   public stickyPinned = true
   public stickyColor = '#fff4cc'
+  public stickyFont = 16
+  public stickyOpacity = 100
   public onStickyBounds: ((bounds: { x: number, y: number, width: number, height: number }) => void) | null = null
 
   /**
@@ -112,6 +114,8 @@ class EditorWindow extends BaseWindow {
         this.extraQuery.stickyLimit = 'wayland'
       }
       if (this.stickyPath) this.extraQuery.note = this.stickyPath
+      this.extraQuery.font = String(this.stickyFont)
+      this.extraQuery.opacity = String(this.stickyOpacity)
       const displays = screen.getAllDisplays().map((display) => ({
         x: display.workArea.x,
         y: display.workArea.y,
@@ -183,6 +187,13 @@ class EditorWindow extends BaseWindow {
 
     let win: BrowserWindow | null = (this.browserWindow = new BrowserWindow(winOptions))
     win.setTitle(t('app.displayName'))
+    if (this.stickyProbe) {
+      try {
+        win.setOpacity(this.stickyOpacity / 100)
+      } catch {
+        // Some desktops ignore window opacity. The note still opens.
+      }
+    }
 
     // Give every editor window a stable id for session buffer persistence.
     // We cant use win.id as it might collide with same IDs from closed windows

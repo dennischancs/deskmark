@@ -1097,6 +1097,9 @@
   "sticky": {
     "open": "Coller sur le bureau",
     "pin": "Épingler",
+    "font": "Taille",
+    "opacity": "Opacité",
+    "opacityLimit": "Ce système ne peut pas éclaircir le pense-bête",
     "wayland": "Ce bureau peut ne pas garder le pense-bête devant.",
     "capture": "Nouvelle note",
     "newFile": "Nouveau fichier",

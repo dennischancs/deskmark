@@ -1097,6 +1097,9 @@
   "sticky": {
     "open": "Masaüstüne yapıştır",
     "pin": "Sabitle",
+    "font": "Yazı boyutu",
+    "opacity": "Opaklık",
+    "opacityLimit": "Bu sistem notu soluklaştıramaz",
     "wayland": "Bu masaüstü notu önde tutamayabilir.",
     "capture": "Yeni not",
     "newFile": "Yeni dosya",

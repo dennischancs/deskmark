@@ -28,6 +28,39 @@
           :style="{ background: color }"
           @click="setStickyColor(color)"
         />
+        <label class="sticky-font">
+          {{ t('sticky.font') }}
+          <select
+            :value="stickyFont"
+            @change="setStickyFont(Number(($event.target as HTMLSelectElement).value))"
+          >
+            <option
+              v-for="size of stickyFontSizes"
+              :key="size"
+              :value="size"
+            >
+              {{ size }}
+            </option>
+          </select>
+        </label>
+        <label class="sticky-font">
+          {{ t('sticky.opacity') }}
+          <input
+            type="range"
+            min="90"
+            max="100"
+            step="1"
+            :value="stickyOpacity"
+            :disabled="opacityLocked"
+            @change="setStickyOpacity(Number(($event.target as HTMLInputElement).value))"
+          >
+        </label>
+        <p
+          v-if="opacityLocked"
+          class="sticky-limit"
+        >
+          {{ t('sticky.opacityLimit') }}
+        </p>
       </div>
       <title-bar
         :project="projectTree"
@@ -84,7 +117,7 @@ import TaskProperties from '@/components/taskProperties.vue'
 import CalendarView from '@/components/calendarView.vue'
 import { useDeskmarkStore } from '@/store/deskmark'
 import { useI18n } from 'vue-i18n'
-import { STICKY_COLORS } from 'common/stickyModel'
+import { normalizeStickyFont, normalizeStickyOpacity, STICKY_COLORS, STICKY_FONT_SIZES } from 'common/stickyModel'
 import bus from '@/bus'
 import { DEFAULT_STYLE } from '@/config'
 import { useLayoutStore } from '@/store/layout'
@@ -116,6 +149,11 @@ const stickyProbe = new URLSearchParams(window.location.search).get('sticky') ==
 const waylandLimit = new URLSearchParams(window.location.search).get('stickyLimit') === 'wayland'
 const stickyNote = new URLSearchParams(window.location.search).get('note') || ''
 const stickyColors = STICKY_COLORS
+const stickyFontSizes = STICKY_FONT_SIZES
+const stickyQuery = new URLSearchParams(window.location.search)
+const stickyFont = ref(normalizeStickyFont(stickyQuery.get('font')))
+const stickyOpacity = ref(normalizeStickyOpacity(stickyQuery.get('opacity')))
+const opacityLocked = ref(false)
 const pinned = ref(true)
 const { t } = useI18n()
 
@@ -130,6 +168,32 @@ const setStickyColor = (color: string): void => {
   if (!stickyNote) return
   window.electron.ipcRenderer.invoke('mt::deskmark::sticky-color', stickyNote, color).catch((error) => {
     console.error(error)
+  })
+}
+
+const setStickyFont = (size: number): void => {
+  stickyFont.value = size
+  preferencesStore.fontSize = size
+  if (!stickyNote) return
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-font', stickyNote, size).catch((error) => {
+    console.error(error)
+  })
+}
+
+const setStickyOpacity = (opacity: number): void => {
+  stickyOpacity.value = opacity
+  if (!stickyNote) return
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-opacity', stickyNote, opacity).then((ok) => {
+    opacityLocked.value = ok === false
+  }).catch(() => {
+    opacityLocked.value = true
+  })
+}
+
+if (stickyProbe) {
+  preferencesStore.fontSize = stickyFont.value
+  watch(() => preferencesStore.fontSize, (size) => {
+    if (size !== stickyFont.value) preferencesStore.fontSize = stickyFont.value
   })
 }
 
@@ -217,6 +281,11 @@ const setupDragDropHandler = (): void => {
 onMounted(async () => {
   if (window.marktext?.initialState) {
     preferencesStore.SET_USER_PREFERENCE(window.marktext.initialState)
+  }
+  if (stickyProbe) preferencesStore.fontSize = stickyFont.value
+  if (stickyProbe && stickyNote) {
+    const ok = await window.electron.ipcRenderer.invoke('mt::deskmark::sticky-opacity', stickyNote, stickyOpacity.value).catch(() => false)
+    opacityLocked.value = ok === false
   }
 
   mainStore.LISTEN_WIN_STATUS()
@@ -342,5 +411,16 @@ onMounted(async () => {
   padding: 0;
   border: 1px solid var(--floatBorderColor, color-mix(in srgb, var(--editorColor) 25%, transparent));
   border-radius: 2px;
+}
+.sticky-font {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+}
+.sticky-font select,
+.sticky-font input {
+  color: inherit;
+  background: transparent;
 }
 </style>

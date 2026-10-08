@@ -14,7 +14,9 @@ describe('sticky note state', () => {
       width: 360,
       height: 320,
       pinned: true,
-      color: '#fff4cc'
+      color: '#fff4cc',
+      fontSize: 16,
+      opacity: 100
     })
     const second = upsertSticky(first, {
       path: 'D:\\notes\\a.md',
@@ -23,10 +25,12 @@ describe('sticky note state', () => {
       width: 400,
       height: 300,
       pinned: false,
-      color: 'not-a-color'
+      color: 'not-a-color',
+      fontSize: 12,
+      opacity: 40
     })
     expect(second.stickies).toHaveLength(1)
-    expect(second.stickies[0]).toMatchObject({ x: 40, y: 50, pinned: false, color: '#fff4cc' })
+    expect(second.stickies[0]).toMatchObject({ x: 40, y: 50, pinned: false, color: '#fff4cc', fontSize: 16, opacity: 90 })
     expect(JSON.stringify(second)).not.toContain('买牛奶')
     const closed = closeSticky(second, 'D:/notes/a.md')
     expect(closed.stickies).toHaveLength(0)
@@ -44,9 +48,13 @@ describe('sticky note state', () => {
       width: 360,
       height: 320,
       pinned: true,
-      color: '#d6e6ff'
+      color: '#d6e6ff',
+      fontSize: 20,
+      opacity: 95
     }))
     expect(loadUiState(root).stickies[0]?.color).toBe('#d6e6ff')
+    expect(loadUiState(root).stickies[0]?.fontSize).toBe(20)
+    expect(loadUiState(root).stickies[0]?.opacity).toBe(95)
     expect(readFileSync(note, 'utf8')).toBe('原文\n')
   })
 })

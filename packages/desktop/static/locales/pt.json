@@ -1097,6 +1097,9 @@
   "sticky": {
     "open": "Colar na área de trabalho",
     "pin": "Fixar",
+    "font": "Tamanho",
+    "opacity": "Opacidade",
+    "opacityLimit": "Este sistema não consegue clarear a nota",
     "wayland": "Esta área de trabalho pode não manter a nota à frente.",
     "capture": "Nova nota",
     "newFile": "Novo ficheiro",

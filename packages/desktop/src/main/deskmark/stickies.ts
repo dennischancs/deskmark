@@ -92,15 +92,19 @@ export class StickyHost {
       path: notePath,
       ...DEFAULT_BOUNDS,
       pinned: true,
-      color: '#fff4cc'
+      color: '#fff4cc',
+      fontSize: 16,
+      opacity: 100
     }
     const editor = new EditorWindow(this.accessor)
     editor.stickyProbe = true
     editor.stickyPath = notePath
     editor.stickyPinned = record.pinned
     editor.stickyColor = record.color
+    editor.stickyFont = record.fontSize
+    editor.stickyOpacity = record.opacity
     editor.onStickyBounds = (bounds) => {
-      this.remember(notePath, { ...record, ...bounds, pinned: editor.stickyPinned, color: editor.stickyColor })
+      this.remember(notePath, this.snapshot(editor, notePath, bounds))
     }
     editor.createWindow(null, [notePath], [], {
       x: record.x,
@@ -137,7 +141,9 @@ export class StickyHost {
       path: notePath,
       ...bounds,
       pinned,
-      color: editor.stickyColor
+      color: editor.stickyColor,
+      fontSize: editor.stickyFont,
+      opacity: editor.stickyOpacity
     })
   }
 
@@ -151,8 +157,46 @@ export class StickyHost {
       path: notePath,
       ...bounds,
       pinned: editor.stickyPinned,
-      color
+      color,
+      fontSize: editor.stickyFont,
+      opacity: editor.stickyOpacity
     })
+  }
+
+  setFont(notePath: string, fontSize: number): void {
+    const editor = this.windows.get(normalizeNotePath(notePath))
+    if (!editor?.browserWindow) return
+    editor.stickyFont = fontSize
+    const bounds = editor.browserWindow.getBounds()
+    this.remember(notePath, {
+      path: notePath,
+      ...bounds,
+      pinned: editor.stickyPinned,
+      color: editor.stickyColor,
+      fontSize,
+      opacity: editor.stickyOpacity
+    })
+  }
+
+  setOpacity(notePath: string, opacity: number): boolean {
+    const editor = this.windows.get(normalizeNotePath(notePath))
+    if (!editor?.browserWindow) return false
+    try {
+      editor.browserWindow.setOpacity(opacity / 100)
+    } catch {
+      return false
+    }
+    editor.stickyOpacity = opacity
+    const bounds = editor.browserWindow.getBounds()
+    this.remember(notePath, {
+      path: notePath,
+      ...bounds,
+      pinned: editor.stickyPinned,
+      color: editor.stickyColor,
+      fontSize: editor.stickyFont,
+      opacity
+    })
+    return true
   }
 
   capture(): void {
@@ -190,6 +234,17 @@ export class StickyHost {
   private remember(notePath: string, record: StickyRecord): void {
     if (!this.vaultRoot) return
     saveUiState(this.vaultRoot, upsertSticky(loadUiState(this.vaultRoot), record))
+  }
+
+  private snapshot(editor: EditorWindow, notePath: string, bounds: { x: number, y: number, width: number, height: number }): StickyRecord {
+    return {
+      path: notePath,
+      ...bounds,
+      pinned: editor.stickyPinned,
+      color: editor.stickyColor,
+      fontSize: editor.stickyFont,
+      opacity: editor.stickyOpacity
+    }
   }
 
   private applyLogin(enabled: boolean): void {

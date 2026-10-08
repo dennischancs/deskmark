@@ -1097,6 +1097,9 @@
   "sticky": {
     "open": "Pegar en el escritorio",
     "pin": "Fijar",
+    "font": "Tamaño",
+    "opacity": "Opacidad",
+    "opacityLimit": "Este sistema no puede aclarar la nota",
     "wayland": "Este escritorio quizá no pueda dejar la nota delante.",
     "capture": "Nueva nota",
     "newFile": "Archivo nuevo",
