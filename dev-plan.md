@@ -96,6 +96,19 @@ fixtures/deskmark/           往返和重复的黄金文件
 
 拖动便签，以及改底色、字号、不透明度、贴边隐藏、桌面锁定、鼠标穿透、置底，都只写 `.deskmark/ui-state.json`。这些不进 Markdown。
 
+应用设置也不进 Markdown，并且不使用 `.deskmark/config.json`。它们放在应用数据目录的 `preferences.json`，和 MarkText 原来的主题、编辑模式放在一起：
+
+- `deskmarkCalendar`、`deskmarkTasks`、`deskmarkReminders`、`deskmarkWordCount`：日历、待办、到点提醒、字数。默认都开。
+- `deskmarkReminderSeconds`：通知在屏幕上停留的秒数。默认 30，范围 1 到 600。到时自己收起。
+- `deskmarkCaptureAccelerator`：新建便签的全局快捷键。默认 `CommandOrControl+Alt+N`，留空则关掉。
+- `deskmarkScanExtensions`：扫描时当成纯文本的扩展名。默认是编辑器本来能打开的 markdown 和 txt 那一组，逗号分开。
+- `deskmarkRuleTaskLine`、`deskmarkRuleComment`、`deskmarkRuleFrontMatter`：待办行、行尾注释、整篇 front matter。默认开。
+- `deskmarkRuleDateInText`：待办文字里的 `YYYY-MM-DD`。默认关。
+- `deskmarkExtraPrefixes`：额外行开头，例如 `TODO:`。默认空。
+- `deskmarkPluginPath`：额外插件目录。默认空。
+
+「登录时打开」记在 `ui-state.json` 的 `openAtLogin`，并交给操作系统的登录项。已经响过哪些提醒记在应用数据目录的 `reminder-state.json`。这些都可以删掉或换机器后重来，笔记内容不受影响。换电脑时，系统登录项要在那台机器上再开一次。
+
 ## 3. 技术难度
 
 难度按「一个人做完并在三台目标系统上验过」估计，不是按代码行数。
@@ -203,7 +216,7 @@ fixtures/deskmark/           往返和重复的黄金文件
 
 时间：2 人周。
 
-工作：SQLite、全量重建、按文件增量更新、单篇解析失败不影响其他笔记。驱动沿用仓库现有的原生模块工具链，不新增语言运行时。具体包在这个阶段选定。
+工作：SQLite、全量重建、按文件增量更新、单篇解析失败不影响其他笔记。扫描哪些扩展名、用哪几条规则认待办，读 `preferences.json`，不改用户文件。驱动沿用仓库现有的原生模块工具链，不新增语言运行时。具体包在这个阶段选定。
 
 出口：杀掉索引进程后能重建。同一保险库不出现两个写入者。
 
@@ -219,7 +232,7 @@ fixtures/deskmark/           往返和重复的黄金文件
 
 时间：2 人周。
 
-工作：把探针 B 收成产品。钉住、六种底色和调色板、字号、10% 到 100% 的不透明度、贴边吸附和贴边隐藏、桌面锁定、鼠标穿透、置底、菜单里的设置、在主窗口打开、关闭和其他便签。关闭不删笔记。在主窗口打开的是同一篇，不另存。托盘驻留。主窗口关闭后便签还在。自启动只负责恢复窗口。上面这些窗口习惯都存在 `ui-state.json`，不写进 Markdown。两块屏幕相接的边只吸附，不把便签藏到另一块屏幕上。鼠标穿透不把窗口贴进壁纸层。
+工作：把探针 B 收成产品。钉住、六种底色和调色板、字号、10% 到 100% 的不透明度、贴边吸附和贴边隐藏、桌面锁定、鼠标穿透、置底、菜单里的设置、在主窗口打开、关闭和其他便签。关闭不删笔记。在主窗口打开的是同一篇，不另存。托盘驻留。主窗口关闭后便签还在。自启动只负责恢复窗口，开关记在同一份 `ui-state.json` 的 `openAtLogin`。上面这些窗口习惯都不写进 Markdown。两块屏幕相接的边只吸附，不把便签藏到另一块屏幕上。鼠标穿透不把窗口贴进壁纸层。
 
 出口：PRD 的便签 P0，外加 REQ-ST-06、REQ-ST-09 到 REQ-ST-13。Wayland 的失败文案出现在界面上，不只写在文档里。
 
@@ -234,7 +247,7 @@ fixtures/deskmark/           往返和重复的黄金文件
 2. 全库带日期的待办都出现在对应日期上。点回去定位到原来那一行，不把文字复制进日记。
 3. 给现有 `/` 菜单增加待办、日期、提醒、今天的日记。句子用语言包的键，先落英文和简体中文，其余 10 种在阶段 7 补齐，但键从这里就建好。
 4. `@` 探针：行首或空白后打开同一个菜单的提及项，能选日期或一篇笔记。`a@b.com` 不打开。探针失败就删除这一项，不新做浮层，发布说明里写明只用 `/`。
-5. 主进程通知、错过汇总、重复推进。提醒调度不放进插件。
+5. 主进程通知、错过汇总、重复推进。停留秒数读 `preferences.json`，已响过的条目标在 `reminder-state.json`。提醒调度不放进插件。
 
 出口：固定样例的逾期、今天、下一次重复和「只汇总一次」通过。从日历新建的行在日记里。从别的笔记用 `/` 加上的待办留在原文件，并出现在日历上。ICS 导出若时间不够，标成候选版的 P1，不挡阶段 6。
 
@@ -248,6 +261,7 @@ fixtures/deskmark/           往返和重复的黄金文件
 - 第三方运行在关闭 Node 集成、开启上下文隔离的沙箱页面里。桥消息带请求 id，主进程查 manifest 权限。
 - 权限至少覆盖 PRD 的 `notes.read`、`notes.write`、`tasks.read`、`tasks.write`、`ui.panel`、`ui.command`、`settings`。
 - 关于页写明当前隔离是应用内沙箱，不是独立进程。开商店前再升级，协议保持消息不变。
+- 额外插件的目录记在 `preferences.json` 的 `deskmarkPluginPath`。卸掉就是把这项清空，不改笔记。
 
 出口：示例插件源码不引用 `packages/desktop` 或 `packages/muya` 的内部路径。卸载后命令消失。插件死循环不能挡住当前笔记保存。做不到就在本阶段加强隔离，不降低验收。
 
