@@ -13,6 +13,7 @@ import { WindowType } from '../windows/base'
 import type { WindowTypeValue } from '../windows/base'
 import type EditorWindow from '../windows/editor'
 import { getStickyHost, isQuitting } from '../deskmark/stickies'
+import { closeHidesWindow } from '../deskmark/trayMenu'
 
 class WindowActivityList {
   // Oldest             Newest
@@ -398,7 +399,7 @@ class WindowManager extends TypedEmitter<WindowManagerEvents> {
         this.forceClose(win)
         return
       }
-      if (win && getStickyHost()?.trayAvailable) {
+      if (win && closeHidesWindow(getStickyHost()?.trayAvailable === true, isQuitting())) {
         win.hide()
         return
       }

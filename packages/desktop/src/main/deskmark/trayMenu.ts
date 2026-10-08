@@ -20,3 +20,9 @@ export function trayMenuEntries(): TrayEntry[] {
     { action: 'quit', labelKey: 'sticky.quit' }
   ]
 }
+
+// The main window hides while the tray is still running. Quit has to close it,
+// or Electron cancels app.quit() and the process stays up.
+export function closeHidesWindow(trayAvailable: boolean, quitting: boolean): boolean {
+  return trayAvailable && !quitting
+}

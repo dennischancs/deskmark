@@ -639,7 +639,10 @@ export class StickyHost {
     else if (action === 'note') this.openSticky()
     else if (action === 'show') this.showMain()
     else if (action === 'login') this.toggleLogin()
-    else if (action === 'quit') app.quit()
+    else if (action === 'quit') {
+      markQuitting()
+      app.quit()
+    }
   }
 
   private publishTrayHook(): void {

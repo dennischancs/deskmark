@@ -7,6 +7,7 @@ import type Accessor from '../app/accessor'
 import { centerWindowOptions } from './utils'
 import { TITLE_BAR_HEIGHT, preferencesWinOptions, isLinux, isOsx } from '../config'
 import log from 'electron-log'
+import { isQuitting } from '../deskmark/stickies'
 
 class SettingWindow extends BaseWindow {
   /**
@@ -85,6 +86,7 @@ class SettingWindow extends BaseWindow {
     })
 
     win.on('close', (event) => {
+      if (isQuitting()) return
       this.emit('window-close')
 
       event.preventDefault()

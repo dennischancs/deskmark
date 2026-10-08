@@ -15,6 +15,7 @@ import fs from 'fs'
 import { t } from '../i18n'
 import { restoreWindowRect } from 'common/windowRect'
 import { readProbeBounds, writeProbeBounds } from './probeBounds'
+import { isQuitting } from '../deskmark/stickies'
 
 type RawMarkdownDocument = Awaited<ReturnType<typeof loadMarkdownFile>>
 
@@ -325,8 +326,10 @@ class EditorWindow extends BaseWindow {
       }
     )
 
-    // Before closed. We cancel the action and ask the editor further instructions.
+    // Ask the editor before a normal close. Quit must not be cancelled, or the
+    // tray's exit leaves the process running.
     win.on('close', (event) => {
+      if (isQuitting()) return
       this.emit('window-close')
 
       event.preventDefault()
