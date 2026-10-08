@@ -1097,6 +1097,7 @@
   "sticky": {
     "open": "Colar na área de trabalho",
     "pin": "Fixar",
+    "edgeHide": "Ocultar na borda",
     "font": "Tamanho",
     "opacity": "Opacidade",
     "opacityLimit": "Este sistema não consegue clarear a nota",

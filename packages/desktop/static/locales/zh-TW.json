@@ -1097,6 +1097,7 @@
   "sticky": {
     "open": "貼到桌面",
     "pin": "釘住",
+    "edgeHide": "貼邊隱藏",
     "font": "字級",
     "opacity": "不透明度",
     "opacityLimit": "這個系統不能把便條變淡",

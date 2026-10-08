@@ -67,6 +67,9 @@ class EditorWindow extends BaseWindow {
   public stickyColor = '#fff4cc'
   public stickyFont = 16
   public stickyOpacity = 100
+  public stickyEdgeHide = true
+  public stickyAdjusting = false
+  public onStickyDrag: (() => void) | null = null
   public onStickyBounds: ((bounds: { x: number, y: number, width: number, height: number }) => void) | null = null
 
   /**
@@ -117,6 +120,7 @@ class EditorWindow extends BaseWindow {
       this.extraQuery.font = String(this.stickyFont)
       this.extraQuery.opacity = String(this.stickyOpacity)
       this.extraQuery.color = this.stickyColor
+      this.extraQuery.edgeHide = this.stickyEdgeHide ? '1' : '0'
       const displays = screen.getAllDisplays().map((display) => ({
         x: display.workArea.x,
         y: display.workArea.y,
@@ -344,13 +348,25 @@ class EditorWindow extends BaseWindow {
       const userDataPath = env.paths.userDataPath
       const persistBounds = (): void => {
         if (!win || win.isDestroyed()) return
+        if (this.stickyAdjusting) return
         const bounds = win.getBounds()
         if (this.onStickyBounds) this.onStickyBounds(bounds)
         else writeProbeBounds(userDataPath, bounds)
       }
       win.setAlwaysOnTop(this.stickyPinned, 'floating')
-      win.on('move', persistBounds)
-      win.on('resize', persistBounds)
+      // Snap after the drag rests. `move` keeps firing while the pointer is down.
+      let pending: ReturnType<typeof setTimeout> | null = null
+      const scheduleSettle = (): void => {
+        if (this.stickyAdjusting) return
+        this.onStickyDrag?.()
+        if (pending) clearTimeout(pending)
+        pending = setTimeout(() => {
+          pending = null
+          persistBounds()
+        }, 160)
+      }
+      win.on('move', scheduleSettle)
+      win.on('resize', scheduleSettle)
       persistBounds()
     }
 

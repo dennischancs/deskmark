@@ -1097,6 +1097,7 @@
   "sticky": {
     "open": "Auf den Desktop",
     "pin": "Anheften",
+    "edgeHide": "Am Rand verbergen",
     "font": "Schriftgröße",
     "opacity": "Deckkraft",
     "opacityLimit": "Dieses System kann die Notiz nicht aufhellen",

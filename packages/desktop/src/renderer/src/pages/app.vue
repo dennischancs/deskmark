@@ -23,6 +23,14 @@
           >
           {{ t('sticky.pin') }}
         </label>
+        <label>
+          <input
+            v-model="edgeHide"
+            type="checkbox"
+            @change="setEdgeHide"
+          >
+          {{ t('sticky.edgeHide') }}
+        </label>
         <button
           v-for="color of stickyColors"
           :key="color"
@@ -150,11 +158,19 @@ const stickyFont = ref(normalizeStickyFont(stickyQuery.get('font')))
 const stickyOpacity = ref(normalizeStickyOpacity(stickyQuery.get('opacity')))
 const opacityLocked = ref(false)
 const pinned = ref(true)
+const edgeHide = ref(stickyQuery.get('edgeHide') !== '0')
 const { t } = useI18n()
 
 const setPinned = (): void => {
   if (!stickyNote) return
   window.electron.ipcRenderer.invoke('mt::deskmark::sticky-pin', stickyNote, pinned.value).catch((error) => {
+    console.error(error)
+  })
+}
+
+const setEdgeHide = (): void => {
+  if (!stickyNote) return
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-edge-hide', stickyNote, edgeHide.value).catch((error) => {
     console.error(error)
   })
 }

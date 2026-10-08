@@ -1097,6 +1097,7 @@
   "sticky": {
     "open": "Op het bureaublad",
     "pin": "Vastzetten",
+    "edgeHide": "Verbergen aan rand",
     "font": "Lettergrootte",
     "opacity": "Dekking",
     "opacityLimit": "Dit systeem kan het briefje niet lichter maken",

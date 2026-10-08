@@ -1097,6 +1097,7 @@
   "sticky": {
     "open": "Masaüstüne yapıştır",
     "pin": "Sabitle",
+    "edgeHide": "Kenarda gizle",
     "font": "Yazı boyutu",
     "opacity": "Opaklık",
     "opacityLimit": "Bu sistem notu soluklaştıramaz",

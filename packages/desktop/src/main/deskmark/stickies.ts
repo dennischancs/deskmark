@@ -1,6 +1,6 @@
 import { appendFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
-import { app, Menu, Tray, nativeImage } from 'electron'
+import { app, Menu, Tray, nativeImage, screen } from 'electron'
 import type { BrowserWindow, MenuItemConstructorOptions } from 'electron'
 import type { WindowRect } from 'common/windowRect'
 import {
@@ -10,6 +10,18 @@ import {
   upsertSticky,
   type StickyRecord
 } from 'common/stickyModel'
+import {
+  concealEdge,
+  concealedFrame,
+  frameContains,
+  framesEqual,
+  mostlyOnScreen,
+  outerEdges,
+  peekFrame,
+  snapToWorkArea,
+  type Frame,
+  type StickyEdge
+} from 'common/stickyEdge'
 import { loadUiState, saveUiState } from 'common/stickyFile'
 import { t } from '../i18n'
 import EditorWindow from '../windows/editor'
@@ -18,6 +30,18 @@ import type Accessor from '../app/accessor'
 import { trayMenuEntries, type TrayAction } from './trayMenu'
 
 const DEFAULT_BOUNDS = { x: 80, y: 80, width: 360, height: 320 }
+
+interface Dock {
+  edgeHide: boolean
+  logical: Frame
+  edge: StickyEdge | null
+  concealed: boolean
+  dragging: boolean
+  hideTimer: ReturnType<typeof setTimeout> | null
+  slide: number
+  /** Trailing move events from a tuck must not replace the parked place. */
+  ignoreUntil: number
+}
 
 // The packaged icon lives in resources/static. A dev run still has static/ next to the working directory.
 export function resolveTrayIcon(
@@ -40,6 +64,8 @@ export class StickyHost {
   private trayClicksBound = false
   trayAvailable = false
   private trayPops = 0
+  private readonly docks = new Map<string, Dock>()
+  private cursorWatch: ReturnType<typeof setInterval> | null = null
 
   constructor(
     private readonly accessor: Accessor,
@@ -94,7 +120,8 @@ export class StickyHost {
       pinned: true,
       color: '#fff4cc',
       fontSize: 16,
-      opacity: 100
+      opacity: 100,
+      edgeHide: true
     }
     const editor = new EditorWindow(this.accessor)
     editor.stickyProbe = true
@@ -103,8 +130,28 @@ export class StickyHost {
     editor.stickyColor = record.color
     editor.stickyFont = record.fontSize
     editor.stickyOpacity = record.opacity
+    editor.stickyEdgeHide = record.edgeHide
+    const logical = { x: record.x, y: record.y, width: record.width, height: record.height }
+    this.docks.set(key, {
+      edgeHide: record.edgeHide,
+      logical,
+      edge: null,
+      concealed: false,
+      dragging: false,
+      hideTimer: null,
+      slide: 0,
+      ignoreUntil: 0
+    })
     editor.onStickyBounds = (bounds) => {
-      this.remember(notePath, this.snapshot(editor, notePath, bounds))
+      this.settle(editor, notePath, bounds)
+    }
+    editor.onStickyDrag = () => {
+      const dock = this.docks.get(key)
+      if (!dock || Date.now() < dock.ignoreUntil) return
+      dock.dragging = true
+      dock.ignoreUntil = 0
+      this.cancelHide(dock)
+      if (dock.concealed) this.reveal(editor, key, false)
     }
     editor.createWindow(null, [notePath], [], {
       x: record.x,
@@ -119,8 +166,10 @@ export class StickyHost {
     this.windowManager.add(editor)
     this.windows.set(key, editor)
     this.remember(notePath, record)
+    this.ensureCursorWatch()
     editor.on('window-closed', () => {
       this.windows.delete(key)
+      this.dropDock(key)
     })
   }
 
@@ -129,6 +178,7 @@ export class StickyHost {
     const state = closeSticky(loadUiState(this.vaultRoot), notePath)
     saveUiState(this.vaultRoot, state)
     this.windows.delete(normalizeNotePath(notePath))
+    this.dropDock(normalizeNotePath(notePath))
   }
 
   setPinned(notePath: string, pinned: boolean): void {
@@ -136,15 +186,7 @@ export class StickyHost {
     if (!editor?.browserWindow) return
     editor.stickyPinned = pinned
     editor.browserWindow.setAlwaysOnTop(pinned, 'floating')
-    const bounds = editor.browserWindow.getBounds()
-    this.remember(notePath, {
-      path: notePath,
-      ...bounds,
-      pinned,
-      color: editor.stickyColor,
-      fontSize: editor.stickyFont,
-      opacity: editor.stickyOpacity
-    })
+    this.remember(notePath, this.snapshot(editor, notePath, editor.browserWindow.getBounds()))
   }
 
   setColor(notePath: string, color: string): void {
@@ -152,30 +194,14 @@ export class StickyHost {
     if (!editor?.browserWindow) return
     editor.stickyColor = color
     editor.browserWindow.setBackgroundColor(color)
-    const bounds = editor.browserWindow.getBounds()
-    this.remember(notePath, {
-      path: notePath,
-      ...bounds,
-      pinned: editor.stickyPinned,
-      color,
-      fontSize: editor.stickyFont,
-      opacity: editor.stickyOpacity
-    })
+    this.remember(notePath, this.snapshot(editor, notePath, editor.browserWindow.getBounds()))
   }
 
   setFont(notePath: string, fontSize: number): void {
     const editor = this.windows.get(normalizeNotePath(notePath))
     if (!editor?.browserWindow) return
     editor.stickyFont = fontSize
-    const bounds = editor.browserWindow.getBounds()
-    this.remember(notePath, {
-      path: notePath,
-      ...bounds,
-      pinned: editor.stickyPinned,
-      color: editor.stickyColor,
-      fontSize,
-      opacity: editor.stickyOpacity
-    })
+    this.remember(notePath, this.snapshot(editor, notePath, editor.browserWindow.getBounds()))
   }
 
   setOpacity(notePath: string, opacity: number): boolean {
@@ -187,16 +213,27 @@ export class StickyHost {
       return false
     }
     editor.stickyOpacity = opacity
-    const bounds = editor.browserWindow.getBounds()
-    this.remember(notePath, {
-      path: notePath,
-      ...bounds,
-      pinned: editor.stickyPinned,
-      color: editor.stickyColor,
-      fontSize: editor.stickyFont,
-      opacity
-    })
+    this.remember(notePath, this.snapshot(editor, notePath, editor.browserWindow.getBounds()))
     return true
+  }
+
+  setEdgeHide(notePath: string, enabled: boolean): void {
+    const key = normalizeNotePath(notePath)
+    const editor = this.windows.get(key)
+    const dock = this.docks.get(key)
+    if (!editor?.browserWindow || !dock) return
+    editor.stickyEdgeHide = enabled
+    dock.edgeHide = enabled
+    dock.ignoreUntil = 0
+    editor.stickyAdjusting = false
+    if (!enabled) {
+      dock.edge = null
+      this.cancelHide(dock)
+      this.reveal(editor, key, true)
+    } else {
+      this.settle(editor, notePath, dock.logical)
+    }
+    this.remember(notePath, this.snapshot(editor, notePath, dock.logical))
   }
 
   capture(): void {
@@ -237,14 +274,180 @@ export class StickyHost {
   }
 
   private snapshot(editor: EditorWindow, notePath: string, bounds: { x: number, y: number, width: number, height: number }): StickyRecord {
+    const dock = this.docks.get(normalizeNotePath(notePath))
+    const placed = dock?.logical ?? bounds
     return {
       path: notePath,
-      ...bounds,
+      ...placed,
       pinned: editor.stickyPinned,
       color: editor.stickyColor,
       fontSize: editor.stickyFont,
-      opacity: editor.stickyOpacity
+      opacity: editor.stickyOpacity,
+      edgeHide: editor.stickyEdgeHide
     }
+  }
+
+  private settle(editor: EditorWindow, notePath: string, bounds: Frame): void {
+    const key = normalizeNotePath(notePath)
+    const dock = this.docks.get(key)
+    const win = editor.browserWindow
+    if (!dock || !win || win.isDestroyed()) return
+    if (editor.stickyAdjusting) return
+    let displays: ReturnType<typeof screen.getAllDisplays> = []
+    try {
+      displays = screen.getAllDisplays()
+    } catch {
+      this.remember(notePath, this.snapshot(editor, notePath, bounds))
+      return
+    }
+    const display = screen.getDisplayMatching(dock.concealed ? dock.logical : bounds)
+    const work = display.workArea
+    if (Date.now() < dock.ignoreUntil && !this.userMoved(dock, bounds, work)) return
+    if (dock.concealed && !mostlyOnScreen(bounds, display.workArea)) return
+    dock.dragging = false
+    dock.ignoreUntil = 0
+    const snapped = snapToWorkArea(bounds, work)
+    const outer = outerEdges(work, displays.map(item => item.bounds))
+    dock.logical = snapped.frame
+    dock.edge = dock.edgeHide ? concealEdge(snapped.edges, outer) : null
+    dock.concealed = false
+    this.cancelHide(dock)
+    if (!framesEqual(bounds, snapped.frame)) this.place(editor, dock, snapped.frame, false)
+    this.remember(notePath, this.snapshot(editor, notePath, snapped.frame))
+    if (dock.edge) this.scheduleHide(editor, key)
+    this.ensureCursorWatch()
+  }
+
+  private scheduleHide(editor: EditorWindow, key: string): void {
+    const dock = this.docks.get(key)
+    if (!dock?.edge || !dock.edgeHide || dock.concealed || dock.dragging || dock.hideTimer) return
+    dock.hideTimer = setTimeout(() => {
+      dock.hideTimer = null
+      if (!dock.dragging && !editor.stickyAdjusting) this.conceal(editor, key)
+    }, 400)
+  }
+
+  private userMoved(dock: Dock, bounds: Frame, work: Frame): boolean {
+    if (!mostlyOnScreen(bounds, work)) return false
+    if (this.nearFrame(bounds, dock.logical)) return false
+    if (dock.edge && this.nearFrame(bounds, concealedFrame(dock.logical, work, dock.edge))) return false
+    return true
+  }
+
+  private nearFrame(a: Frame, b: Frame): boolean {
+    return Math.abs(a.x - b.x) <= 2 && Math.abs(a.y - b.y) <= 2 && a.width === b.width && a.height === b.height
+  }
+
+  private cancelHide(dock: Dock): void {
+    if (!dock.hideTimer) return
+    clearTimeout(dock.hideTimer)
+    dock.hideTimer = null
+  }
+
+  private conceal(editor: EditorWindow, key: string): void {
+    const dock = this.docks.get(key)
+    const win = editor.browserWindow
+    if (!dock?.edge || !win || win.isDestroyed() || dock.concealed) return
+    let work: Frame
+    try {
+      work = screen.getDisplayMatching(dock.logical).workArea
+    } catch {
+      return
+    }
+    dock.concealed = true
+    this.place(editor, dock, concealedFrame(dock.logical, work, dock.edge), true)
+  }
+
+  private reveal(editor: EditorWindow, key: string, animate: boolean): void {
+    const dock = this.docks.get(key)
+    if (!dock) return
+    this.cancelHide(dock)
+    if (!dock.concealed) return
+    dock.concealed = false
+    this.place(editor, dock, dock.logical, animate)
+  }
+
+  private place(editor: EditorWindow, dock: Dock, target: Frame, animate: boolean): void {
+    const win = editor.browserWindow
+    if (!win || win.isDestroyed()) return
+    const token = dock.slide + 1
+    dock.slide = token
+    const finish = (): void => {
+      if (dock.slide !== token) return
+      editor.stickyAdjusting = false
+    }
+    editor.stickyAdjusting = true
+    dock.ignoreUntil = Date.now() + 400
+    if (!animate) {
+      win.setBounds(target)
+      setTimeout(finish, 80)
+      return
+    }
+    const from = win.getBounds()
+    const steps = 6
+    let step = 0
+    const tick = (): void => {
+      if (dock.slide !== token || win.isDestroyed()) return
+      step += 1
+      const t = step / steps
+      editor.stickyAdjusting = true
+      win.setBounds({
+        x: Math.round(from.x + (target.x - from.x) * t),
+        y: Math.round(from.y + (target.y - from.y) * t),
+        width: target.width,
+        height: target.height
+      })
+      if (step < steps) setTimeout(tick, 16)
+      else finish()
+    }
+    tick()
+  }
+
+  private ensureCursorWatch(): void {
+    if (this.cursorWatch) return
+    this.cursorWatch = setInterval(() => this.followCursor(), 80)
+  }
+
+  private followCursor(): void {
+    if (this.docks.size === 0) {
+      if (this.cursorWatch) clearInterval(this.cursorWatch)
+      this.cursorWatch = null
+      return
+    }
+    let point: { x: number, y: number }
+    try {
+      point = screen.getCursorScreenPoint()
+    } catch {
+      return
+    }
+    for (const [key, editor] of this.windows) {
+      const dock = this.docks.get(key)
+      if (!dock?.edge || !dock.edgeHide || dock.dragging || editor.stickyAdjusting) continue
+      let work: Frame
+      try {
+        work = screen.getDisplayMatching(dock.logical).workArea
+      } catch {
+        continue
+      }
+      if (dock.concealed) {
+        const peek = peekFrame(dock.logical, work, dock.edge)
+        if (frameContains(peek, point.x, point.y)) this.reveal(editor, key, true)
+        continue
+      }
+      if (frameContains(dock.logical, point.x, point.y)) {
+        this.cancelHide(dock)
+        continue
+      }
+      this.scheduleHide(editor, key)
+    }
+  }
+
+  private dropDock(key: string): void {
+    const dock = this.docks.get(key)
+    if (!dock) return
+    this.cancelHide(dock)
+    dock.slide += 1
+    this.docks.delete(key)
   }
 
   private applyLogin(enabled: boolean): void {

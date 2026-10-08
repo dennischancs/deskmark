@@ -140,6 +140,7 @@ export interface IpcInvokeChannels {
   'mt::deskmark::sticky-color': { args: [notePath: string, color: string]; ret: void }
   'mt::deskmark::sticky-font': { args: [notePath: string, fontSize: number]; ret: void }
   'mt::deskmark::sticky-opacity': { args: [notePath: string, opacity: number]; ret: boolean }
+  'mt::deskmark::sticky-edge-hide': { args: [notePath: string, enabled: boolean]; ret: void }
   'mt::deskmark::journal-task': {
     args: [root: string, day: string, text: string]
     ret: { path: string, relative: string, line: number } | null

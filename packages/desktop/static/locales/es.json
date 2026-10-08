@@ -1097,6 +1097,7 @@
   "sticky": {
     "open": "Pegar en el escritorio",
     "pin": "Fijar",
+    "edgeHide": "Ocultar al borde",
     "font": "Tamaño",
     "opacity": "Opacidad",
     "opacityLimit": "Este sistema no puede aclarar la nota",
