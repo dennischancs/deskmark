@@ -58,6 +58,14 @@ export function resolveTrayIcon(
   return candidates.find(file => exists(file)) ?? null
 }
 
+// macOS draws a status icon at its pixel size. The menu bar is 22pt, so the
+// 1024px master would hang out of the top of the screen.
+export function trayIconPoints(platform: NodeJS.Platform): number {
+  if (platform === 'darwin') return 22
+  if (platform === 'win32') return 16
+  return 24
+}
+
 export class StickyHost {
   private readonly windows = new Map<string, EditorWindow>()
   private vaultRoot: string | null = null
@@ -77,8 +85,10 @@ export class StickyHost {
 
   createTray(iconPath: string): boolean {
     try {
-      const image = nativeImage.createFromPath(iconPath)
-      if (image.isEmpty()) return false
+      const loaded = nativeImage.createFromPath(iconPath)
+      if (loaded.isEmpty()) return false
+      const points = trayIconPoints(process.platform)
+      const image = loaded.resize({ width: points, height: points, quality: 'best' })
       this.tray = new Tray(image)
       this.tray.setToolTip(t('app.displayName'))
       this.refreshTrayMenu()
