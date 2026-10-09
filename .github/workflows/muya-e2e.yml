@@ -9,16 +9,7 @@ name: Muya E2E
 # below once those are landed.
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - 'packages/muya/src/**'
-      - 'packages/muya/e2e/**'
-      - 'packages/muya/examples/**'
-      - 'packages/muya/package.json'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/muya-e2e.yml'
-
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

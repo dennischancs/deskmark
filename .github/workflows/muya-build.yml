@@ -1,16 +1,7 @@
 name: Muya Build
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - 'packages/muya/src/**'
-      - 'packages/muya/package.json'
-      - 'packages/muya/tsconfig.json'
-      - 'packages/muya/vite.config.ts'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/muya-build.yml'
-
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

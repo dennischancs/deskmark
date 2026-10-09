@@ -1,18 +1,7 @@
 name: Validate Licenses
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-  push:
-    branches:
-      - develop
-    paths:
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

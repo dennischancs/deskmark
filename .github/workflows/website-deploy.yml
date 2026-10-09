@@ -1,20 +1,7 @@
 name: Deploy website
 
 on:
-  push:
-    branches: [develop]
-    paths:
-      - 'packages/website/**'
-      - 'packages/muyajs/**'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/website-deploy.yml'
-  pull_request:
-    paths:
-      - 'packages/website/**'
-      - 'packages/muyajs/**'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/website-deploy.yml'
-
+  workflow_dispatch:
 concurrency:
   group: website-${{ github.ref }}
   cancel-in-progress: true

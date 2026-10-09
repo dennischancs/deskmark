@@ -1,15 +1,7 @@
 name: Muya Circular Dep Check
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - 'packages/muya/src/**'
-      - 'packages/muya/.madgerc'
-      - 'packages/muya/package.json'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/muya-circular.yml'
-
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

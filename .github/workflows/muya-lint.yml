@@ -1,15 +1,7 @@
 name: Muya Lint
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-    paths:
-      - 'packages/muya/**'
-      - '!packages/muya/examples/**'
-      - '!packages/muya/e2e/**'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/muya-lint.yml'
-
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

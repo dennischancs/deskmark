@@ -1,19 +1,7 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - deskmark
-    # packages/muya (TS v2) does not affect the electron desktop build.
-    paths-ignore:
-      - 'packages/muya/**'
-  pull_request:
-    types: [opened, synchronize, reopened]
-    branches:
-      - deskmark
-    paths-ignore:
-      - 'packages/muya/**'
-
+  workflow_dispatch:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
