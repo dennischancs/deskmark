@@ -22,14 +22,43 @@ export interface StickyRecord {
   bottom: boolean
 }
 
+export interface StickyEdges {
+  left: boolean
+  right: boolean
+  top: boolean
+  bottom: boolean
+}
+
+export const defaultStickyEdges = (): StickyEdges => ({
+  left: true,
+  right: true,
+  top: true,
+  bottom: true
+})
+
+export function normalizeEdges(value: unknown): StickyEdges {
+  const raw = value && typeof value === 'object' ? value as Partial<StickyEdges> : {}
+  return {
+    left: raw.left !== false,
+    right: raw.right !== false,
+    top: raw.top !== false,
+    bottom: raw.bottom !== false
+  }
+}
+
+export function edgesOf(state: UiStateFile): StickyEdges {
+  return normalizeEdges(state.edges)
+}
+
 export interface UiStateFile {
   version: 1
   openAtLogin: boolean
+  edges: StickyEdges
   stickies: StickyRecord[]
 }
 
 export function emptyUiState(): UiStateFile {
-  return { version: 1, openAtLogin: false, stickies: [] }
+  return { version: 1, openAtLogin: false, edges: defaultStickyEdges(), stickies: [] }
 }
 
 export function normalizeNotePath(notePath: string): string {
@@ -128,6 +157,7 @@ export function readUiState(json: string): UiStateFile {
     return {
       version: 1,
       openAtLogin: parsed.openAtLogin === true,
+      edges: normalizeEdges((parsed as { edges?: unknown }).edges),
       stickies: stickies.map(normalizeSticky)
     }
   } catch {
@@ -140,6 +170,7 @@ export function upsertSticky(state: UiStateFile, record: StickyRecord): UiStateF
   return {
     version: 1,
     openAtLogin: state.openAtLogin,
+    edges: edgesOf(state),
     stickies: [...state.stickies.filter(item => normalizeNotePath(item.path) !== next.path), next]
   }
 }
@@ -149,8 +180,16 @@ export function closeSticky(state: UiStateFile, notePath: string): UiStateFile {
   return {
     version: 1,
     openAtLogin: state.openAtLogin,
+    edges: edgesOf(state),
     stickies: state.stickies.filter(item => normalizeNotePath(item.path) !== key)
   }
+}
+
+export function renameSticky(state: UiStateFile, oldPath: string, nextPath: string): UiStateFile {
+  const found = findSticky(state, oldPath)
+  if (!found) return state
+  if (normalizeNotePath(found.path) === normalizeNotePath(nextPath)) return state
+  return upsertSticky(closeSticky(state, oldPath), { ...found, path: nextPath })
 }
 
 export function findSticky(state: UiStateFile, notePath: string): StickyRecord | null {

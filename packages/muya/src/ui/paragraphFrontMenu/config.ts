@@ -41,6 +41,18 @@ export const FRONT_MENU = [
 
 export type FrontMenuIcon = (typeof FRONT_MENU)[number];
 
+// A sticky note is too short for the full turn-into grid. These are the
+// blocks a note actually uses, in the order the compact menu shows them.
+export const STICKY_TURN_LABELS = [
+    'paragraph',
+    'atx-heading 1',
+    'atx-heading 2',
+    'atx-heading 3',
+    'bullet-list',
+    'task-list',
+    'block-quote',
+];
+
 export function canTurnIntoMenu(block: Parent) {
     return ALL_MENU_CONFIG.filter(item => canTurnInto(block, item.label));
 }

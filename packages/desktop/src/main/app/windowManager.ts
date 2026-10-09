@@ -7,6 +7,7 @@ import Watcher, {
   WATCHER_STABILITY_POLL_INTERVAL
 } from '../filesystem/watcher'
 import { onInternalChannel } from '../utils/internalIpc'
+import { isSamePathSync } from 'common/filesystem/paths'
 import type BaseWindow from '../windows/base'
 import type Preference from '../preferences'
 import { WindowType } from '../windows/base'
@@ -476,6 +477,27 @@ class WindowManager extends TypedEmitter<WindowManagerEvents> {
         editor.changeOpenedFilePath(pathname, oldPathname)
       }
     )
+    onInternalChannel('note-rename-suppress', (oldPath: string) => {
+      if (typeof oldPath === 'string' && oldPath) this._watcher.suppressUnlink(oldPath)
+    })
+    onInternalChannel('note-renamed', (oldPath: string, newPath: string) => {
+      if (typeof oldPath !== 'string' || typeof newPath !== 'string' || !oldPath || !newPath) return
+      // Slash style does not make a new file. Letter case does: macOS still
+      // opens "Note.md" after it is renamed to "note.md", and the title has to follow.
+      const flat = (value: string): string => value.replaceAll('\\', '/').replace(/\/+$/, '')
+      if (flat(oldPath) === flat(newPath)) return
+      this._watcher.suppressUnlink(oldPath)
+      for (const { win } of this.getWindowsByType('editor')) {
+        const editor = win as EditorWindow
+        if (!editor.openedFiles.some((file) => file === oldPath || isSamePathSync(file, oldPath))) continue
+        editor.changeOpenedFilePath(newPath, oldPath)
+      }
+      getStickyHost()?.rebind(oldPath, newPath)
+      for (const { browserWindow } of this._windows.values()) {
+        if (!browserWindow || browserWindow.isDestroyed()) continue
+        browserWindow.webContents.send('mt::deskmark::note-renamed', oldPath, newPath)
+      }
+    })
 
     onInternalChannel('window-file-saved', (windowId: number, pathname: string) => {
       // A changed event is emitted earliest after the stability threshold.

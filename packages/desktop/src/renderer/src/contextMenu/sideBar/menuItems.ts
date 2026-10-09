@@ -72,6 +72,14 @@ export const getShowInFolder = () => ({
   }
 })
 
+export const getStickOnDesktop = () => ({
+  label: t('contextMenu.sideBar.stickOnDesktop'),
+  id: 'stickOnDesktopMenuItem',
+  click(_menuItem: unknown, _browserWindow: unknown) {
+    contextMenu.stickOnDesktop()
+  }
+})
+
 // Retained for backward compatibility
 export const NEW_FILE = getNewFile()
 export const NEW_DIRECTORY = getNewDirectory()

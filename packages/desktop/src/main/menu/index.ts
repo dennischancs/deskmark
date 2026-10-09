@@ -227,6 +227,11 @@ class AppMenu {
     }
   }
 
+  // Sticky notes have no editor menu. They still need the save shortcut.
+  bindEditorKeys(window: BrowserWindow): void {
+    this._keybindings.registerEditorKeyHandlers(window)
+  }
+
   /**
    * Remove menu from the given window.
    *

@@ -124,3 +124,39 @@
 .mu-front-menu li.turn-into-menu .turn-into-item .icon-wrapper:hover {
     background: var(--float-hover-color);
 }
+
+/* A sticky note cannot show the full front menu without running off the window. */
+.mu-front-menu.compact {
+    width: auto;
+    max-height: calc(100vh - 12px);
+    overflow: auto;
+    font-size: 12px;
+}
+
+.mu-front-menu.compact > ul {
+    flex-flow: row wrap;
+    align-items: center;
+    max-width: 196px;
+    padding: 4px;
+}
+
+.mu-front-menu.compact li.turn-into-menu {
+    display: contents;
+}
+
+.mu-front-menu.compact li.turn-into-menu .turn-into-item,
+.mu-front-menu.compact > ul li.item {
+    width: 26px;
+    height: 26px;
+    padding: 0;
+}
+
+.mu-front-menu.compact > ul li.item {
+    justify-content: center;
+}
+
+.mu-front-menu.compact li.item .text,
+.mu-front-menu.compact li.item .short-cut,
+.mu-front-menu.compact li.divider {
+    display: none;
+}

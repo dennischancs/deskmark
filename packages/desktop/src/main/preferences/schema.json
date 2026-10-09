@@ -278,6 +278,11 @@
     "type": "string",
     "default": ""
   },
+  "deskmarkStickyDir": {
+    "description": "Deskmark--Folder for new sticky notes. Empty means stickies inside the open folder.",
+    "type": "string",
+    "default": ""
+  },
   "hideLinkPopup": {
     "description": "Editor--Hide link popup when the cursor is hover on the link",
     "type": "boolean",

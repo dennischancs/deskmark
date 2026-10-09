@@ -91,6 +91,22 @@
           >
           {{ t('sticky.edgeHide') }}
         </label>
+        <div
+          v-if="edgeHide"
+          class="sticky-edge-sides"
+        >
+          <label
+            v-for="side of edgeSides"
+            :key="side"
+          >
+            <input
+              type="checkbox"
+              :checked="edges[side]"
+              @change="emit('side', side, !edges[side])"
+            >
+            {{ t(`sticky.edge.${side}`) }}
+          </label>
+        </div>
         <button
           type="button"
           role="menuitem"
@@ -98,6 +114,14 @@
           @click="choose('main')"
         >
           {{ t('sticky.openMain') }}
+        </button>
+        <button
+          type="button"
+          role="menuitem"
+          data-testid="sticky-menu-rename"
+          @click="choose('rename')"
+        >
+          {{ t('sticky.rename') }}
         </button>
         <button
           type="button"
@@ -147,21 +171,26 @@ import { placeStickyPalette } from 'common/stickyPalette'
 defineProps<{
   pinned: boolean
   edgeHide: boolean
+  edges: { left: boolean, right: boolean, top: boolean, bottom: boolean }
   locked: boolean
   pass: boolean
   bottom: boolean
   others: { path: string, name: string }[]
 }>()
 
+const edgeSides = ['left', 'right', 'top', 'bottom'] as const
+
 const emit = defineEmits<{
   pin: [value: boolean]
   edge: [value: boolean]
+  side: [edge: 'left' | 'right' | 'top' | 'bottom', value: boolean]
   lock: [value: boolean]
   pass: [value: boolean]
   bottom: [value: boolean]
   settings: []
   close: []
   main: []
+  rename: []
   show: [path: string]
   others: []
 }>()
@@ -205,9 +234,10 @@ const close = (): void => {
   othersOpen.value = false
 }
 
-const choose = (kind: 'settings' | 'close' | 'main'): void => {
+const choose = (kind: 'settings' | 'close' | 'main' | 'rename'): void => {
   if (kind === 'settings') emit('settings')
   else if (kind === 'main') emit('main')
+  else if (kind === 'rename') emit('rename')
   else emit('close')
   close()
 }

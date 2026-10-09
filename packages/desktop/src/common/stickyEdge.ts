@@ -77,8 +77,12 @@ export function outerEdges(work: Frame, displays: Frame[]): StickyEdge[] {
   return edges
 }
 
-export function concealEdge(snapped: StickyEdge[], outer: StickyEdge[]): StickyEdge | null {
-  return EDGE_ORDER.find(edge => snapped.includes(edge) && outer.includes(edge)) ?? null
+export function concealEdge(
+  snapped: StickyEdge[],
+  outer: StickyEdge[],
+  allowed: StickyEdge[] = EDGE_ORDER
+): StickyEdge | null {
+  return EDGE_ORDER.find(edge => snapped.includes(edge) && outer.includes(edge) && allowed.includes(edge)) ?? null
 }
 
 export function concealedFrame(frame: Frame, work: Frame, edge: StickyEdge, peek = EDGE_PEEK): Frame {

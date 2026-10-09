@@ -18,7 +18,7 @@ import { isAnyListState, isAtxHeadingState } from '../../state/types';
 import { deepClone, isHTMLElement } from '../../utils';
 import { h, patch } from '../../utils/snabbdom';
 import BaseFloat from '../baseFloat';
-import { canTurnIntoMenu, FRONT_MENU } from './config';
+import { canTurnIntoMenu, FRONT_MENU, STICKY_TURN_LABELS } from './config';
 import './index.css';
 
 function renderIcon({ label, icon }: { label: string; icon: string }) {
@@ -53,11 +53,21 @@ export class ParagraphFrontMenu extends BaseFloat {
     private _oldVNode: VNode | null = null;
     private _block: Parent | null = null;
     private _frontMenuContainer: HTMLDivElement = document.createElement('div');
+    private _compact = false;
 
-    constructor(muya: Muya, options = {}) {
+    constructor(muya: Muya, options: { compact?: boolean } = {}) {
+        const compact = options.compact === true;
         const name = 'mu-front-menu';
-        const opts = Object.assign({}, defaultOptions, options);
+        const opts = Object.assign(
+            {},
+            defaultOptions,
+            compact ? { placement: 'top-start' as const } : {},
+            options,
+        );
         super(muya, name, opts);
+        this._compact = compact;
+        if (compact)
+            this.container?.classList.add('compact');
         const parent = this.container!.parentNode;
         if (isHTMLElement(parent)) {
             Object.assign(parent.style, {
@@ -153,6 +163,7 @@ export class ParagraphFrontMenu extends BaseFloat {
             return h(
                 itemSelector,
                 {
+                    props: this._compact ? { title: i18n.t(text) } : {},
                     on: {
                         click: (event) => {
                             this.selectItem(event, { label });
@@ -168,10 +179,16 @@ export class ParagraphFrontMenu extends BaseFloat {
             children.splice(0, 1);
 
         const subMenu = canTurnIntoMenu(block!);
-        if (subMenu.length) {
+        const turnInto = this._compact
+            ? STICKY_TURN_LABELS.flatMap((label) => {
+                const item = subMenu.find(entry => entry.label === label);
+                return item ? [item] : [];
+            })
+            : subMenu;
+        if (turnInto.length) {
             const line = h('li.divider');
             children.unshift(line);
-            children.unshift(this._renderSubMenu(subMenu));
+            children.unshift(this._renderSubMenu(turnInto));
         }
 
         const vnode = h('ul', children);

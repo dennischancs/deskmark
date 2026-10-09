@@ -38,6 +38,7 @@ export interface IUserPreferences {
   deskmarkRuleDateInText?: boolean
   deskmarkExtraPrefixes?: string
   deskmarkPluginPath?: string
+  deskmarkStickyDir?: string
   hideLinkPopup?: boolean
   autoPairBracket?: boolean
   autoPairMarkdownSyntax?: boolean

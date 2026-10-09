@@ -24,6 +24,14 @@ import { t } from '../i18n'
 import { debouncedSendBufferedState, enableSessionCapture, sendBufferedState } from './bufferedState'
 import { largeFileMode, prefersSourceMode, utf8Bytes } from 'common/sessionRules'
 import { diskChangeChoice } from 'common/diskChange'
+import {
+  loosePath,
+  nextNoteFilename,
+  pathIsRemembered,
+  rememberPath,
+  retargetOpenPath,
+  type TimedPath
+} from 'common/noteRename'
 import type {
   IFileState,
   FileNotification,
@@ -151,6 +159,14 @@ export interface EditorState {
 }
 
 const autoSaveTimers = new Map<string, ReturnType<typeof setTimeout>>()
+let applyingRemoteNote = false
+const renamedAway: TimedPath[] = []
+
+const stickyWindow = (): boolean => new URLSearchParams(window.location.search).get('sticky') === '1'
+
+const notePathsMatch = (left: string, right: string): boolean => {
+  return window.fileUtils.isSamePathSync(left, right) || loosePath(left) === loosePath(right)
+}
 
 export const useEditorStore = defineStore('editor', {
   state: (): EditorState => ({
@@ -803,15 +819,25 @@ export const useEditorStore = defineStore('editor', {
     RENAME(newFilename: string): void {
       if (!this.currentFile) return
       const { id, pathname, filename } = this.currentFile
-      if (typeof filename === 'string' && filename !== newFilename) {
-        const newPathname = window.path.join(window.path.dirname(pathname), newFilename)
-        window.electron.ipcRenderer.send('mt::rename', {
-          id,
-          pathname,
-          newPathname,
-          currentFile: deepClone(this.currentFile)
-        })
+      if (typeof filename !== 'string' || !pathname) return
+      const next = nextNoteFilename(filename, newFilename)
+      if (!next.ok) {
+        if (next.reason === 'invalid') {
+          notice.notify({
+            title: t('sticky.rename'),
+            message: t('sticky.renameInvalid'),
+            type: 'warning',
+            showConfirm: false
+          })
+        }
+        return
       }
+      window.electron.ipcRenderer.send('mt::rename', {
+        id,
+        pathname,
+        newPathname: window.path.join(window.path.dirname(pathname), next.filename),
+        currentFile: deepClone(this.currentFile)
+      })
     },
 
     /**
@@ -819,6 +845,7 @@ export const useEditorStore = defineStore('editor', {
      * Invoked from the sidebar rename flow (project.ts:RENAME_IN_SIDEBAR).
      */
     RENAME_IF_NEEDED({ src, dest }: { src: string; dest: string }): void {
+      rememberPath(renamedAway, src, Date.now(), 3000)
       this.tabs.forEach((tab) => {
         if (tab.pathname === src) {
           tab.pathname = dest
@@ -1422,6 +1449,7 @@ export const useEditorStore = defineStore('editor', {
     },
 
     SET_SAVE_STATUS_WHEN_REMOVE({ pathname }: { pathname: string }): void {
+      if (pathIsRemembered(renamedAway, pathname, Date.now())) return
       let didUpdateSaveStatus = false
       this.tabs.forEach((f) => {
         if (f.pathname === pathname) {
@@ -1472,6 +1500,7 @@ export const useEditorStore = defineStore('editor', {
     }: ContentChangePayload): void {
       const preferencesStore = usePreferencesStore()
       const { autoSave } = preferencesStore
+      const noteWindow = stickyWindow()
       if (!id) {
         throw new Error('Listen for document change but id was not set!')
       } else if (this.tabs.length === 0) {
@@ -1521,9 +1550,9 @@ export const useEditorStore = defineStore('editor', {
           tab.lastSavedHistoryId !== -1 &&
           tab.lastSavedHistoryId !== tab.history.lastInitIndex) // Edge Case: Undo to original content (lastEditIndex === -1) after saving means we cant use the lastEditIndex. Compare it against the lastInitIndex instead.
       const isDirty = history === undefined ? markdown !== oldMarkdown : historyMarksDirty
-      if (isDirty) {
+      if (isDirty && !applyingRemoteNote) {
         tab.isSaved = false
-        if (pathname && autoSave) {
+        if (pathname && (autoSave || noteWindow)) {
           const options = getOptionsFromState(tab)
           this.HANDLE_AUTO_SAVE({
             id,
@@ -1532,6 +1561,9 @@ export const useEditorStore = defineStore('editor', {
             markdown,
             options
           })
+        }
+        if (pathname) {
+          window.electron.ipcRenderer.send('mt::deskmark::note-sync', pathname, markdown)
         }
       } else if (history !== undefined && tab.lastSavedHistoryId !== -1) {
         // Check here is to prevent it from overriding a restored .isSaved state
@@ -1548,6 +1580,7 @@ export const useEditorStore = defineStore('editor', {
       const preferencesStore = usePreferencesStore()
       const projectStore = useProjectStore()
       const { autoSaveDelay } = preferencesStore
+      const delay = stickyWindow() ? Math.min(autoSaveDelay, 800) : autoSaveDelay
 
       if (autoSaveTimers.has(id)) {
         const timer = autoSaveTimers.get(id)
@@ -1571,7 +1604,7 @@ export const useEditorStore = defineStore('editor', {
             defaultPath
           )
         }
-      }, autoSaveDelay)
+      }, delay)
       autoSaveTimers.set(id, timer)
     },
 
@@ -1732,6 +1765,26 @@ export const useEditorStore = defineStore('editor', {
     },
 
     LISTEN_FOR_FILE_CHANGE(): void {
+      window.electron.ipcRenderer.on('mt::deskmark::note-renamed', (_, from: string, to: string) => {
+        if (typeof from !== 'string' || typeof to !== 'string') return
+        rememberPath(renamedAway, from, Date.now(), 3000)
+        const changed = retargetOpenPath(this.tabs, from, to, notePathsMatch)
+        if (this.currentFile?.pathname && notePathsMatch(this.currentFile.pathname, to)) {
+          window.DIRNAME = window.path.dirname(to)
+        }
+        if (changed) debouncedSendBufferedState()
+      })
+      window.electron.ipcRenderer.on('mt::deskmark::note-sync', (_, notePath: string, markdown: string) => {
+        const tab = this.tabs.find(item => item.pathname && window.fileUtils.isSamePathSync(item.pathname, notePath))
+        if (!tab || tab.markdown === markdown) return
+        applyingRemoteNote = true
+        try {
+          tab.markdown = markdown
+          bus.emit('file-changed', { id: tab.id, markdown, isReload: true })
+        } finally {
+          applyingRemoteNote = false
+        }
+      })
       window.electron.ipcRenderer.on('mt::update-file', (_, payload) => {
         const { type, change } = payload
         const { tabs } = this
@@ -1741,6 +1794,7 @@ export const useEditorStore = defineStore('editor', {
           const { id, isSaved, filename } = tab
           switch (type) {
             case 'unlink': {
+              if (pathIsRemembered(renamedAway, pathname, Date.now())) break
               tab.isSaved = false
               this.pushTabNotification({
                 tabId: id,

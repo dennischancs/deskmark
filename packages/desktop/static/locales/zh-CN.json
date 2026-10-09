@@ -219,7 +219,8 @@
       "paste": "粘贴",
       "rename": "重命名",
       "moveToTrash": "移动到废纸篓",
-      "showInFolder": "在文件夹中显示"
+      "showInFolder": "在文件夹中显示",
+      "stickOnDesktop": "把当前笔记贴到桌面"
     },
     "tabs": {
       "close": "关闭",
@@ -812,6 +813,10 @@
       "reminderSecondsHint": "不点的话，到了就藏起来。",
       "captureShortcut": "新建便签的快捷键",
       "captureShortcutHint": "留空就关掉。默认是 Ctrl+Alt+N。",
+      "stickyDir": "便签保存位置",
+      "stickyDirHint": "新的便签会写到这里。留空就用当前打开的文件夹里的 stickies。已经打开的便签仍留在原来的位置。",
+      "stickyDirPick": "选择文件夹",
+      "stickyDirReset": "恢复默认",
       "pluginSettings": "小功能",
       "pluginSettingsHint": "出现在这里的功能已经登记到设置里。",
       "pluginPath": "小功能目录",
@@ -1098,7 +1103,17 @@
     "open": "贴到桌面",
     "pin": "钉住",
     "edgeHide": "贴边隐藏",
+    "saved": "已保存",
+    "unsaved": "未保存",
+    "edge": {
+      "left": "左边",
+      "right": "右边",
+      "top": "上边",
+      "bottom": "下边"
+    },
     "menu": "菜单",
+    "rename": "重命名",
+    "renameInvalid": "这个文件名不能用。",
     "settings": "便签设置",
     "lockMenu": "锁定",
     "lock": "桌面锁定",

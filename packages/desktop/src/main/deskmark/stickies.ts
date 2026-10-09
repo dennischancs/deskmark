@@ -1,4 +1,4 @@
-import { appendFileSync, existsSync } from 'node:fs'
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { spawn } from 'node:child_process'
 import { app, ipcMain, Menu, Tray, nativeImage, screen } from 'electron'
@@ -25,6 +25,9 @@ import {
   type StickyEdge
 } from 'common/stickyEdge'
 import { loadUiState, saveUiState } from 'common/stickyFile'
+import { defaultStickyEdges, edgesOf, normalizeEdges, renameSticky, type StickyEdges } from 'common/stickyModel'
+import { stickyNotesDirectory } from 'common/stickyDir'
+import { createUlid } from '../../../../deskmark-core/src/ulid.ts'
 import { t } from '../i18n'
 import EditorWindow from '../windows/editor'
 import type WindowManager from '../app/windowManager'
@@ -74,6 +77,7 @@ export class StickyHost {
   private trayClicksBound = false
   trayAvailable = false
   private trayPops = 0
+  private edges: StickyEdges = defaultStickyEdges()
   private readonly docks = new Map<string, Dock>()
   private cursorWatch: ReturnType<typeof setInterval> | null = null
 
@@ -104,12 +108,14 @@ export class StickyHost {
 
   setVault(vaultRoot: string): void {
     this.vaultRoot = vaultRoot
+    this.edges = edgesOf(loadUiState(vaultRoot))
     this.refreshTrayMenu()
   }
 
   restore(vaultRoot: string): void {
     this.vaultRoot = vaultRoot
     const state = loadUiState(vaultRoot)
+    this.edges = edgesOf(state)
     this.applyLogin(state.openAtLogin)
     for (const sticky of state.stickies) {
       if (existsSync(sticky.path)) this.open(vaultRoot, sticky.path)
@@ -160,16 +166,18 @@ export class StickyHost {
       slide: 0,
       ignoreUntil: 0
     })
+    const currentKey = (): string => normalizeNotePath(editor.stickyPath || notePath)
     editor.onStickyBounds = (bounds) => {
-      this.settle(editor, notePath, bounds)
+      this.settle(editor, editor.stickyPath || notePath, bounds)
     }
     editor.onStickyDrag = () => {
-      const dock = this.docks.get(key)
+      const keyNow = currentKey()
+      const dock = this.docks.get(keyNow)
       if (!dock || editor.stickyLocked || Date.now() < dock.ignoreUntil) return
       dock.dragging = true
       dock.ignoreUntil = 0
       this.cancelHide(dock)
-      if (dock.concealed) this.reveal(editor, key, false)
+      if (dock.concealed) this.reveal(editor, keyNow, false)
     }
     editor.createWindow(null, [notePath], [], {
       x: record.x,
@@ -179,8 +187,12 @@ export class StickyHost {
       frame: false,
       transparent: false,
       alwaysOnTop: record.pinned && !record.bottom,
-      backgroundColor: record.color
+      backgroundColor: record.color,
+      // A normal macOS window is pushed back inside the menu bar and Dock,
+      // so a note cannot tuck off the top or bottom. A panel can.
+      ...(process.platform === 'darwin' ? { type: 'panel' as const } : {})
     })
+    if (editor.browserWindow) this.accessor.menu.bindEditorKeys(editor.browserWindow)
     this.applyWindow(editor)
     if (record.bottom) this.lower(editor)
     editor.browserWindow?.on('blur', () => {
@@ -191,9 +203,32 @@ export class StickyHost {
     this.remember(notePath, record)
     this.ensureCursorWatch()
     editor.on('window-closed', () => {
-      this.windows.delete(key)
-      this.dropDock(key)
+      const keyNow = currentKey()
+      this.windows.delete(keyNow)
+      this.dropDock(keyNow)
     })
+  }
+
+  rebind(oldPath: string, nextPath: string): void {
+    const oldKey = normalizeNotePath(oldPath)
+    const nextKey = normalizeNotePath(nextPath)
+    const editor = this.windows.get(oldKey)
+    if (editor) {
+      if (oldKey !== nextKey) {
+        this.windows.delete(oldKey)
+        this.windows.set(nextKey, editor)
+      }
+      editor.stickyPath = nextPath
+    }
+    const dock = this.docks.get(oldKey)
+    if (dock && oldKey !== nextKey) {
+      this.docks.delete(oldKey)
+      this.docks.set(nextKey, dock)
+    }
+    if (!this.vaultRoot) return
+    const state = loadUiState(this.vaultRoot)
+    const next = renameSticky(state, oldPath, nextPath)
+    if (next !== state) saveUiState(this.vaultRoot, next)
   }
 
   forget(notePath: string): void {
@@ -339,13 +374,36 @@ export class StickyHost {
     ipcMain.emit('app-create-settings-window', 'deskmark')
   }
 
+  edgeChoices(): StickyEdges {
+    return { ...this.edges }
+  }
+
+  setEdges(edges: StickyEdges): void {
+    this.edges = normalizeEdges(edges)
+    if (this.vaultRoot) {
+      const state = loadUiState(this.vaultRoot)
+      state.edges = this.edges
+      saveUiState(this.vaultRoot, state)
+    }
+    for (const [key, editor] of this.windows) {
+      const dock = this.docks.get(key)
+      if (!dock || !editor.browserWindow || editor.browserWindow.isDestroyed()) continue
+      if (dock.concealed && dock.edge && !this.edges[dock.edge]) this.reveal(editor, key, false)
+      if (editor.stickyPath) this.settle(editor, editor.stickyPath, dock.logical)
+    }
+  }
+
   capture(): void {
     if (!this.vaultRoot) return
-    const inbox = join(this.vaultRoot, 'inbox.md')
-    const line = '- [ ] \n'
-    appendFileSync(inbox, line)
-    this.open(this.vaultRoot, inbox)
-    this.showMain()
+    // One file per note. The tray only opens that file; it does not append to
+    // a shared inbox, because an edit there would shift every later line.
+    const id = createUlid()
+    const configured = this.accessor.preferences.getItem<string>('deskmarkStickyDir') ?? ''
+    const dir = stickyNotesDirectory(this.vaultRoot, configured)
+    const absolute = join(dir, `${id}.md`)
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(absolute, '# \n\n')
+    this.open(this.vaultRoot, absolute)
   }
 
   toggleLogin(): void {
@@ -458,7 +516,8 @@ export class StickyHost {
     const snapped = snapToWorkArea(bounds, work)
     const outer = outerEdges(work, displays.map(item => item.bounds))
     dock.logical = snapped.frame
-    dock.edge = dock.edgeHide ? concealEdge(snapped.edges, outer) : null
+    const allowed = (['left', 'right', 'top', 'bottom'] as const).filter(edge => this.edges[edge])
+    dock.edge = dock.edgeHide ? concealEdge(snapped.edges, outer, [...allowed]) : null
     dock.concealed = false
     this.cancelHide(dock)
     if (!framesEqual(bounds, snapped.frame)) this.place(editor, dock, snapped.frame, false)

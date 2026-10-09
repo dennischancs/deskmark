@@ -216,6 +216,14 @@ export const useProjectStore = defineStore('project', () => {
       const { pathname } = activeItem.value
       window.electron.shell.showItemInFolder(pathname)
     })
+    bus.on('SIDEBAR::stick-on-desktop', () => {
+      const root = projectTree.value?.pathname
+      const note = activeItem.value?.pathname
+      if (!root || !note || !activeItem.value?.isMarkdown) return
+      window.electron.ipcRenderer.invoke('mt::deskmark::sticky-open', root, note).catch((error) => {
+        console.error(error)
+      })
+    })
     bus.on('SIDEBAR::new', (type: unknown) => {
       const { pathname, isDirectory } = activeItem.value
       const dirname = isDirectory ? pathname : window.path.dirname(pathname)

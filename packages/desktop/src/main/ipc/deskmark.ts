@@ -19,6 +19,14 @@ export const registerDeskmarkHandlers = (): void => {
     const { filePaths } = await dialog.showOpenDialog(win, { properties: ['openDirectory'] })
     return filePaths[0] || ''
   })
+  ipcMain.handle('mt::deskmark::pick-sticky-dir', async(event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    if (!win) return ''
+    const { filePaths } = await dialog.showOpenDialog(win, {
+      properties: ['openDirectory', 'createDirectory']
+    })
+    return filePaths[0] || ''
+  })
   ipcMain.handle('mt::deskmark::plugin-note', async(_event, note: { vault?: string, path?: string, markdown?: string } | null) => {
     if (!note?.vault || !note.path) {
       rememberPluginNote(null)
@@ -94,6 +102,19 @@ export const registerDeskmarkHandlers = (): void => {
   })
   ipcMain.handle('mt::deskmark::sticky-edge-hide', async(_event, notePath: string, enabled: boolean) => {
     getStickyHost()?.setEdgeHide(notePath, enabled)
+  })
+  ipcMain.handle('mt::deskmark::sticky-edges', async() => {
+    return getStickyHost()?.edgeChoices() ?? { left: true, right: true, top: true, bottom: true }
+  })
+  ipcMain.handle('mt::deskmark::sticky-edges-set', async(_event, edges: { left: boolean, right: boolean, top: boolean, bottom: boolean }) => {
+    getStickyHost()?.setEdges(edges)
+  })
+  ipcMain.on('mt::deskmark::note-sync', (event, notePath: string, markdown: string) => {
+    if (typeof notePath !== 'string' || typeof markdown !== 'string') return
+    for (const win of BrowserWindow.getAllWindows()) {
+      if (win.isDestroyed() || win.webContents.id === event.sender.id) continue
+      win.webContents.send('mt::deskmark::note-sync', notePath, markdown)
+    }
   })
   ipcMain.handle('mt::deskmark::sticky-lock', async(_event, notePath: string, locked: boolean) => {
     getStickyHost()?.setLocked(notePath, locked)

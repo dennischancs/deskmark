@@ -2,7 +2,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { closeSticky, emptyUiState, findSticky, upsertSticky } from '../../../src/common/stickyModel'
+import { closeSticky, emptyUiState, findSticky, renameSticky, upsertSticky } from '../../../src/common/stickyModel'
 import { loadUiState, saveUiState } from '../../../src/common/stickyFile'
 
 describe('sticky note state', () => {
@@ -84,5 +84,27 @@ describe('sticky note state', () => {
     expect(loadUiState(root).stickies[0]?.fontSize).toBe(20)
     expect(loadUiState(root).stickies[0]?.opacity).toBe(95)
     expect(readFileSync(note, 'utf8')).toBe('原文\n')
+  })
+
+  it('keeps the window record when the note file is renamed', () => {
+    const saved = upsertSticky(emptyUiState(), {
+      path: '/vault/stickies/01.md',
+      x: 12,
+      y: 18,
+      width: 360,
+      height: 320,
+      pinned: true,
+      color: '#fff4cc',
+      fontSize: 16,
+      opacity: 80,
+      edgeHide: true,
+      locked: false,
+      pass: false,
+      bottom: false
+    })
+    const renamed = renameSticky(saved, '/vault/stickies/01.md', '/vault/stickies/list.md')
+    expect(renamed.stickies).toHaveLength(1)
+    expect(findSticky(renamed, '/vault/stickies/01.md')).toBeNull()
+    expect(findSticky(renamed, '/vault/stickies/list.md')).toMatchObject({ x: 12, opacity: 80 })
   })
 })

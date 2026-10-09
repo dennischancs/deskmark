@@ -295,7 +295,8 @@ const handleMenuClick = () => {
 }
 
 const rename = () => {
-  if (props.platform === 'darwin') {
+  const sticky = new URLSearchParams(window.location.search).get('sticky') === '1'
+  if (props.platform === 'darwin' || sticky) {
     editorStore.RESPONSE_FOR_RENAME()
   }
 }

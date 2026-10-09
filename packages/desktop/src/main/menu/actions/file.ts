@@ -624,6 +624,7 @@ ipcMain.on('mt::rename', async(e, { id, pathname, newPathname }: RenamePayload) 
   }
 
   const doRename = (): void => {
+    ipcMain.emit('note-rename-suppress', pathname)
     fsRename(pathname, newPathname, (err: NodeJS.ErrnoException | null) => {
       if (err) {
         log.error(`mt::rename: Cannot rename "${pathname}" to "${newPathname}".\n${err.stack}`)
@@ -631,6 +632,7 @@ ipcMain.on('mt::rename', async(e, { id, pathname, newPathname }: RenamePayload) 
       }
 
       ipcMain.emit('window-change-file-path', win.id, newPathname, pathname)
+      ipcMain.emit('note-renamed', pathname, newPathname)
       e.sender.send('mt::set-pathname', {
         id,
         pathname: newPathname,
@@ -671,6 +673,7 @@ ipcMain.on(
     })
 
     if (filePath && !canceled) {
+      ipcMain.emit('note-rename-suppress', pathname)
       fsRename(pathname, filePath, (err: NodeJS.ErrnoException | null) => {
         if (err) {
           log.error(`mt::rename: Cannot rename "${pathname}" to "${filePath}".\n${err.stack}`)
@@ -678,6 +681,7 @@ ipcMain.on(
         }
 
         ipcMain.emit('window-change-file-path', win.id, filePath, pathname)
+        ipcMain.emit('note-renamed', pathname, filePath)
         e.sender.send('mt::set-pathname', {
           id,
           pathname: filePath,

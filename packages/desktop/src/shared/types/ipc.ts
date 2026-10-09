@@ -141,6 +141,8 @@ export interface IpcInvokeChannels {
   'mt::deskmark::sticky-font': { args: [notePath: string, fontSize: number]; ret: void }
   'mt::deskmark::sticky-opacity': { args: [notePath: string, opacity: number]; ret: boolean }
   'mt::deskmark::sticky-edge-hide': { args: [notePath: string, enabled: boolean]; ret: void }
+  'mt::deskmark::sticky-edges': { args: []; ret: { left: boolean, right: boolean, top: boolean, bottom: boolean } }
+  'mt::deskmark::sticky-edges-set': { args: [edges: { left: boolean, right: boolean, top: boolean, bottom: boolean }]; ret: void }
   'mt::deskmark::sticky-lock': { args: [notePath: string, locked: boolean]; ret: void }
   'mt::deskmark::sticky-pass': { args: [notePath: string, enabled: boolean]; ret: void }
   'mt::deskmark::sticky-pass-hit': { args: [notePath: string, ignore: boolean]; ret: void }
@@ -178,6 +180,10 @@ export interface IpcInvokeChannels {
     ret: { ok: true, active: false } | { ok: true, active: true, src: string, manifest: { id: string, name: string, api: number, entry: string, permissions: string[] } } | { ok: false, error: string }
   }
   'mt::deskmark::pick-plugin-dir': {
+    args: []
+    ret: string
+  }
+  'mt::deskmark::pick-sticky-dir': {
     args: []
     ret: string
   }
@@ -278,6 +284,7 @@ export interface IpcSendChannels {
   'mt::open-keybindings-config': []
   'mt::open-setting-window': []
   'mt::rename': [payload: { id: string; pathname: string; newPathname: string; currentFile?: unknown }]
+  'mt::deskmark::note-sync': [notePath: string, markdown: string]
   'mt::renderer-ready': []
   'mt::request-keybindings': []
   'mt::set-editor-format-menus-enabled': [windowId: number, enabled: boolean]
@@ -372,6 +379,8 @@ export interface IpcMainEventChannels {
   'mt::about-dialog': []
   'mt::ask-for-close': []
   'mt::bootstrap-editor': [config: BootstrapEditorConfig]
+  'mt::deskmark::note-sync': [notePath: string, markdown: string]
+  'mt::deskmark::note-renamed': [from: string, to: string]
   'mt::cm-copy-as-html': []
   'mt::cm-copy-as-rich': []
   'mt::cm-insert-paragraph': [direction: 'before' | 'after']

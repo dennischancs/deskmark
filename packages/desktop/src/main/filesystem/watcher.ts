@@ -4,6 +4,7 @@ import log from 'electron-log'
 import chokidar, { type FSWatcher } from 'chokidar'
 import { exists } from 'common/filesystem'
 import { hasMarkdownExtension, checkPathExcludePattern } from 'common/filesystem/paths'
+import { pathIsRemembered, rememberPath, type TimedPath } from 'common/noteRename'
 import { getUniqueId } from '../utils'
 import { loadMarkdownFile } from '../filesystem/markdown'
 import { isLinux, isOsx } from '../config'
@@ -210,11 +211,13 @@ const unlinkDir = (win: BrowserWindow, pathname: string, type: WatchType, delive
 class Watcher {
   private _preferences: Preference
   private _ignoreChangeEvents: IgnoreEntry[]
+  private _suppressedUnlinks: TimedPath[]
   watchers: Record<string, WatcherEntry>
 
   constructor(preferences: Preference) {
     this._preferences = preferences
     this._ignoreChangeEvents = []
+    this._suppressedUnlinks = []
     this.watchers = {}
   }
 
@@ -347,7 +350,12 @@ class Watcher {
           )
         }
       })
-      .on('unlink', (pathname: string) => unlink(win, pathname, type, deliver))
+      .on('unlink', (pathname: string) => {
+        // A rename is an unlink of the old path. Swallow that for the file
+        // watcher so the other window does not report the note as deleted.
+        if (type === 'file' && pathIsRemembered(this._suppressedUnlinks, pathname, Date.now())) return
+        unlink(win, pathname, type, deliver)
+      })
       .on('addDir', (pathname: string) => addDir(win, pathname, type, deliver))
       .on('unlinkDir', (pathname: string) => unlinkDir(win, pathname, type, deliver))
       .on('ready', () => {
@@ -446,6 +454,10 @@ class Watcher {
       }
     }
     closing.forEach((close) => close())
+  }
+
+  suppressUnlink(pathname: string, duration = 2500): void {
+    rememberPath(this._suppressedUnlinks, pathname, Date.now(), duration)
   }
 
   close(): void {

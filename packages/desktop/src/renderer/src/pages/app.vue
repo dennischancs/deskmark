@@ -1,5 +1,5 @@
 <template>
-  <div class="editor-container">
+  <div class="editor-container" :style="stickyPaper">
     <side-bar v-if="init && !stickyProbe" />
     <div
       class="editor-middle"
@@ -15,22 +15,20 @@
         >
           {{ t('sticky.wayland') }}
         </p>
-        <label>
-          <input
-            v-model="pinned"
-            type="checkbox"
-            @change="setPinned"
-          >
-          {{ t('sticky.pin') }}
-        </label>
-        <label>
-          <input
-            v-model="edgeHide"
-            type="checkbox"
-            @change="setEdgeHide"
-          >
-          {{ t('sticky.edgeHide') }}
-        </label>
+        <button
+          type="button"
+          class="sticky-pin"
+          :class="{ loose: !pinned }"
+          data-testid="sticky-pin"
+          :aria-pressed="pinned"
+          :title="t('sticky.pin')"
+         @click="togglePinned"
+       >
+          <span
+            class="pin-glyph"
+            aria-hidden="true"
+          >📌</span>
+       </button>
         <button
           v-for="color of stickyColors"
           :key="color"
@@ -41,12 +39,24 @@
           @click="setStickyColor(color)"
         />
         <sticky-palette
-          :color="stickyColor"
+          :color="paletteColor"
           :opacity="stickyOpacity"
           :locked="opacityLocked"
-          @pick="setStickyColor"
+          @pick="setPaletteColor"
           @fade="setStickyOpacity"
         />
+        <span
+          class="sticky-save"
+          :data-saved="isSaved ? '1' : '0'"
+        >{{ isSaved ? t('sticky.saved') : t('sticky.unsaved') }}</span>
+        <button
+          type="button"
+          class="sticky-name"
+          data-testid="sticky-rename"
+          @click="renameSticky"
+        >
+          {{ filename }}
+        </button>
         <label class="sticky-font">
           {{ t('sticky.font') }}
           <select
@@ -65,18 +75,21 @@
         <sticky-menu
           :pinned="pinned"
           :edge-hide="edgeHide"
+          :edges="edges"
           :locked="locked"
           :pass="passThrough"
           :bottom="bottom"
           :others="otherNotes"
           @pin="setPinnedFromMenu"
           @edge="setEdgeFromMenu"
+          @side="setEdgeSide"
           @lock="setLockedFromMenu"
           @pass="setPassFromMenu"
           @bottom="setBottomFromMenu"
           @settings="openStickySettings"
           @close="closeSticky"
           @main="openStickyInMain"
+          @rename="renameSticky"
           @show="showOtherSticky"
           @others="loadOtherStickies"
         />
@@ -138,7 +151,7 @@ import StickyPalette from '@/components/stickyPalette.vue'
 import StickyMenu from '@/components/stickyMenu.vue'
 import { useDeskmarkStore } from '@/store/deskmark'
 import { useI18n } from 'vue-i18n'
-import { normalizeColor, normalizeStickyFont, normalizeStickyOpacity, STICKY_COLORS, STICKY_FONT_SIZES } from 'common/stickyModel'
+import { defaultStickyEdges, normalizeColor, normalizeStickyFont, normalizeStickyOpacity, STICKY_COLORS, STICKY_FONT_SIZES, type StickyEdges } from 'common/stickyModel'
 import bus from '@/bus'
 import { DEFAULT_STYLE } from '@/config'
 import { useLayoutStore } from '@/store/layout'
@@ -172,16 +185,32 @@ const notificationStore = useNotificationStore()
 const timer = ref<ReturnType<typeof setTimeout> | null>(null)
 const stickyProbe = new URLSearchParams(window.location.search).get('sticky') === '1'
 const waylandLimit = new URLSearchParams(window.location.search).get('stickyLimit') === 'wayland'
-const stickyNote = new URLSearchParams(window.location.search).get('note') || ''
+let stickyNote = new URLSearchParams(window.location.search).get('note') || ''
 const stickyColors = STICKY_COLORS
 const stickyFontSizes = STICKY_FONT_SIZES
 const stickyQuery = new URLSearchParams(window.location.search)
 const stickyColor = ref(normalizeColor(stickyQuery.get('color') || STICKY_COLORS[0]))
+const paletteColor = ref(stickyColor.value)
 const stickyFont = ref(normalizeStickyFont(stickyQuery.get('font')))
 const stickyOpacity = ref(normalizeStickyOpacity(stickyQuery.get('opacity')))
 const opacityLocked = ref(false)
 const pinned = ref(true)
 const edgeHide = ref(stickyQuery.get('edgeHide') !== '0')
+const edges = ref<StickyEdges>(defaultStickyEdges())
+const stickyPaper = computed(() => {
+  if (!stickyProbe) return undefined
+  return {
+    background: stickyColor.value,
+    '--editorBgColor': stickyColor.value,
+    '--editorColor': '#5c6b63',
+    '--editorColor80': '#5c6b63',
+    '--editorColor50': 'rgba(92, 107, 99, 0.72)',
+    '--editor-color': '#5c6b63',
+    '--editor-color-80': '#5c6b63',
+    '--editor-color-50': 'rgba(92, 107, 99, 0.72)',
+    '--editor-bg-color': stickyColor.value
+  }
+})
 const locked = ref(stickyQuery.get('locked') === '1')
 const passThrough = ref(stickyQuery.get('pass') === '1')
 const bottom = ref(stickyQuery.get('bottom') === '1')
@@ -196,6 +225,12 @@ const setPinned = (): void => {
   })
 }
 
+const togglePinned = (): void => {
+  pinned.value = !pinned.value
+  if (pinned.value) bottom.value = false
+  setPinned()
+}
+
 const setPinnedFromMenu = (value: boolean): void => {
   pinned.value = value
   if (value) bottom.value = false
@@ -205,6 +240,13 @@ const setPinnedFromMenu = (value: boolean): void => {
 const setEdgeFromMenu = (value: boolean): void => {
   edgeHide.value = value
   setEdgeHide()
+}
+
+const setEdgeSide = (edge: keyof StickyEdges, value: boolean): void => {
+  edges.value = { ...edges.value, [edge]: value }
+  window.electron.ipcRenderer.invoke('mt::deskmark::sticky-edges-set', edges.value).catch((error) => {
+    console.error(error)
+  })
 }
 
 const setEdgeHide = (): void => {
@@ -244,6 +286,10 @@ const openStickySettings = (): void => {
   window.electron.ipcRenderer.invoke('mt::deskmark::sticky-settings').catch((error) => {
     console.error(error)
   })
+}
+
+const renameSticky = (): void => {
+  bus.emit('rename')
 }
 
 const closeSticky = (): void => {
@@ -286,8 +332,15 @@ const onStickyMouse = (event: MouseEvent): void => {
 
 if (stickyProbe) {
   window.addEventListener('mousemove', onStickyMouse)
+  const stopRenamed = window.electron.ipcRenderer.on('mt::deskmark::note-renamed', (_event, from: string, to: string) => {
+    if (!stickyNote || typeof from !== 'string' || typeof to !== 'string') return
+    const same = window.fileUtils.isSamePathSync(stickyNote, from) ||
+      stickyNote.replaceAll('\\', '/').replace(/\/+$/, '').toLowerCase() === from.replaceAll('\\', '/').replace(/\/+$/, '').toLowerCase()
+    if (same) stickyNote = to
+  })
   onBeforeUnmount(() => {
     window.removeEventListener('mousemove', onStickyMouse)
+    stopRenamed()
   })
 }
 
@@ -298,6 +351,11 @@ const setStickyColor = (color: string): void => {
   window.electron.ipcRenderer.invoke('mt::deskmark::sticky-color', stickyNote, next).catch((error) => {
     console.error(error)
   })
+}
+
+const setPaletteColor = (color: string): void => {
+  paletteColor.value = normalizeColor(color)
+  setStickyColor(paletteColor.value)
 }
 
 const setStickyFont = (size: number): void => {
@@ -412,6 +470,11 @@ onMounted(async () => {
     preferencesStore.SET_USER_PREFERENCE(window.marktext.initialState)
   }
   if (stickyProbe) preferencesStore.fontSize = stickyFont.value
+  if (stickyProbe) {
+    window.electron.ipcRenderer.invoke('mt::deskmark::sticky-edges').then((value) => {
+      edges.value = value
+    }).catch(() => {})
+  }
   if (stickyProbe && stickyNote) {
     const ok = await window.electron.ipcRenderer.invoke('mt::deskmark::sticky-opacity', stickyNote, stickyOpacity.value).catch(() => false)
     opacityLocked.value = ok === false
@@ -522,6 +585,45 @@ onMounted(async () => {
     height: 100%;
     min-height: 0;
     padding-top: var(--titleBarHeight);
+    color: #5c6b63;
+    background: var(--editorBgColor);
+  }
+  &.sticky-window :deep(.editor-component),
+  &.sticky-window :deep(.mu-container),
+  &.sticky-window :deep(.title-bar) {
+    color: #5c6b63 !important;
+    background-color: var(--editorBgColor) !important;
+  }
+  &.sticky-window :deep(.mu-container h1),
+  &.sticky-window :deep(.mu-container h2),
+  &.sticky-window :deep(.mu-container h3),
+  &.sticky-window :deep(.mu-container h4),
+  &.sticky-window :deep(.mu-container h5),
+  &.sticky-window :deep(.mu-container h6) {
+    color: #5c6b63 !important;
+  }
+  /* Theme checkbox tokens stay dark. On a light note that fills an open task
+     with a black circle and fades checked text to white. */
+  &.sticky-window :deep(li.mu-task-list-item > input[type='checkbox']::before),
+  &.sticky-window :deep(li.mu-task-list-item > span.mu-task-list-checkbox::before) {
+    background-color: transparent;
+    border-color: #5c6b63;
+  }
+  &.sticky-window :deep(li.mu-task-list-item > input.mu-checkbox-checked::before),
+  &.sticky-window :deep(li.mu-task-list-item > span.mu-checkbox-checked::before) {
+    background: #3b6fd8;
+    border-color: #3b6fd8;
+    box-shadow: none;
+  }
+  &.sticky-window :deep(li.mu-task-list-item > input::after),
+  &.sticky-window :deep(li.mu-task-list-item > span.mu-task-list-checkbox::after) {
+    border-color: #fff;
+  }
+  &.sticky-window :deep(li.mu-task-list-item > input.mu-checkbox-checked ~ *),
+  &.sticky-window :deep(li.mu-task-list-item > span.mu-checkbox-checked ~ *) {
+    color: rgba(92, 107, 99, 0.72) !important;
+    text-decoration: line-through;
+    text-decoration-color: rgba(92, 107, 99, 0.72);
   }
   &.sticky-locked :deep(.title-bar) {
     -webkit-app-region: no-drag;
@@ -541,6 +643,24 @@ onMounted(async () => {
   flex: 1 0 100%;
   margin: 0;
   font-size: 12px;
+}
+.sticky-pin {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-size: 16px;
+  line-height: 1;
+}
+.sticky-pin .pin-glyph {
+  display: block;
+  transform-origin: center;
+  transition: transform 160ms ease;
+}
+/* The emoji is already diagonal. Laying it flat means the note is not pinned. */
+.sticky-pin.loose .pin-glyph {
+  transform: rotate(45deg);
 }
 .sticky-color {
   width: 16px;
@@ -563,5 +683,25 @@ onMounted(async () => {
 .sticky-font input {
   color: inherit;
   background: transparent;
+}
+.sticky-save {
+  margin-left: auto;
+  font-size: 12px;
+}
+.sticky-name {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 2px 6px;
+  border: 1px solid var(--floatBorderColor, color-mix(in srgb, var(--editorColor) 25%, transparent));
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+}
+.editor-container :deep(.title-bar),
+.editor-container :deep(.editor-component) {
+  background: var(--editorBgColor);
 }
 </style>

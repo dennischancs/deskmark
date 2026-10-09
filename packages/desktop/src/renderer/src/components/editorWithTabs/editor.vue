@@ -1785,7 +1785,9 @@ onMounted(() => {
     Muya.use(ImageToolBar)
     Muya.use(InlineFormatToolbar)
     Muya.use(ParagraphFrontButton)
-    Muya.use(ParagraphFrontMenu)
+    Muya.use(ParagraphFrontMenu, new URLSearchParams(window.location.search).get('sticky') === '1'
+      ? { compact: true }
+      : {})
     Muya.use(PreviewToolBar)
     Muya.use(LinkTools, {
       jumpClick

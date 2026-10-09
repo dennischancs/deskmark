@@ -541,16 +541,24 @@ class EditorWindow extends BaseWindow {
    * Change a path in the opened file list and update the watcher.
    */
   changeOpenedFilePath(pathname: string, oldPathname: string): void {
-    const { _openedFiles, browserWindow } = this
-    const index = _openedFiles!.findIndex((p) => p === oldPathname)
+    const files = this._openedFiles
+    const browserWindow = this.browserWindow
+    if (!files) return
+    const index = files.findIndex((p) => p === oldPathname || isSamePathSync(p, oldPathname))
+    const stored = files[index]
+    const previous = index === -1 || stored == null ? oldPathname : stored
     if (index === -1) {
       // The old path was not found but add the new one.
-      _openedFiles!.push(pathname)
+      files.push(pathname)
     } else {
-      _openedFiles![index] = pathname
+      files[index] = pathname
     }
-    ipcMain.emit('watcher-unwatch-file', browserWindow, oldPathname)
+    ipcMain.emit('watcher-unwatch-file', browserWindow, previous)
     ipcMain.emit('watcher-watch-file', browserWindow, pathname)
+  }
+
+  get openedFiles(): readonly string[] {
+    return this._openedFiles ?? []
   }
 
   /**

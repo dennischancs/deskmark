@@ -50,6 +50,35 @@
           {{ t('preferences.deskmark.captureShortcutHint') }}
         </p>
         <h6 class="title">
+          {{ t('preferences.deskmark.stickyDir') }}
+        </h6>
+        <p class="seconds-hint">
+          {{ t('preferences.deskmark.stickyDirHint') }}
+        </p>
+        <label class="scan-label">
+          {{ t('preferences.deskmark.stickyDir') }}
+          <input
+            class="scan-text"
+            type="text"
+            :value="deskmarkStickyDir"
+            @change="setStickyDir(($event.target as HTMLInputElement).value)"
+          >
+        </label>
+        <div class="plugin-actions">
+          <button
+            type="button"
+            @click="pickStickyDir"
+          >
+            {{ t('preferences.deskmark.stickyDirPick') }}
+          </button>
+          <button
+            type="button"
+            @click="setStickyDir('')"
+          >
+            {{ t('preferences.deskmark.stickyDirReset') }}
+          </button>
+        </div>
+        <h6 class="title">
           {{ t('preferences.deskmark.pluginSettings') }}
         </h6>
         <p class="seconds-hint">
@@ -198,7 +227,8 @@ const {
   deskmarkRuleFrontMatter,
   deskmarkRuleDateInText,
   deskmarkExtraPrefixes,
-  deskmarkPluginPath
+  deskmarkPluginPath,
+  deskmarkStickyDir
 } =
   storeToRefs(preferenceStore)
 const openAtLogin = ref(false)
@@ -281,6 +311,16 @@ const setSeconds = (value: string): void => {
 
 const setShortcut = (value: string): void => {
   preferenceStore.SET_SINGLE_PREFERENCE({ type: 'deskmarkCaptureAccelerator', value: normalizeCaptureAccelerator(value) })
+}
+
+const setStickyDir = (value: string): void => {
+  preferenceStore.SET_SINGLE_PREFERENCE({ type: 'deskmarkStickyDir', value: value.trim() })
+}
+
+const pickStickyDir = (): void => {
+  window.electron.ipcRenderer.invoke('mt::deskmark::pick-sticky-dir').then((dir) => {
+    if (dir) setStickyDir(dir)
+  }).catch(() => {})
 }
 
 const extensionOn = (ext: string): boolean => normalizeExtensions(deskmarkScanExtensions.value).includes(ext)

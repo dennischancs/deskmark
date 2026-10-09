@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { emptyUiState, readUiState, upsertSticky } from '../../../src/common/stickyModel'
+import { edgesOf, emptyUiState, normalizeEdges, readUiState, upsertSticky } from '../../../src/common/stickyModel'
 import { hwndFromBuffer } from '../../../src/common/stickyHandle'
 import {
   concealEdge,
@@ -27,6 +27,8 @@ describe('sticky edge snap', () => {
     expect(outerEdges(displays[0], displays)).toEqual(['left', 'top', 'bottom'])
     expect(concealEdge(['right'], outerEdges(displays[0], displays))).toBeNull()
     expect(concealEdge(['left', 'top'], outerEdges(displays[0], displays))).toBe('left')
+    expect(concealEdge(['left', 'top'], ['left', 'right', 'top', 'bottom'], ['top', 'bottom'])).toBe('top')
+    expect(concealEdge(['left'], ['left', 'right', 'top', 'bottom'], ['top', 'bottom'])).toBeNull()
     expect(concealedFrame({ ...note, x: 0 }, work, 'left')).toMatchObject({ x: -352 })
   })
 
@@ -66,5 +68,29 @@ describe('sticky edge snap', () => {
     view.setBigUint64(0, 0x12345678n, true)
     expect(hwndFromBuffer(buffer)).toBe(0x12345678n)
     expect(hwndFromBuffer(new Uint8Array(2))).toBeNull()
+  })
+})
+
+describe('sticky edge choices', () => {
+  it('keeps every side unless the saved choice turned one off', () => {
+    expect(normalizeEdges(undefined)).toEqual({ left: true, right: true, top: true, bottom: true })
+    const saved = readUiState(JSON.stringify({ version: 1, edges: { top: false, bottom: false }, stickies: [] }))
+    expect(edgesOf(saved)).toEqual({ left: true, right: true, top: false, bottom: false })
+    const kept = upsertSticky(saved, {
+      path: 'notes/a.md',
+      x: 1,
+      y: 2,
+      width: 360,
+      height: 320,
+      pinned: true,
+      color: '#fff4cc',
+      fontSize: 16,
+      opacity: 100,
+      edgeHide: true,
+      locked: false,
+      pass: false,
+      bottom: false
+    })
+    expect(edgesOf(kept).top).toBe(false)
   })
 })

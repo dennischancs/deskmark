@@ -219,7 +219,8 @@
       "paste": "Paste",
       "rename": "Rename",
       "moveToTrash": "Move To Trash",
-      "showInFolder": "Show In Folder"
+      "showInFolder": "Show In Folder",
+      "stickOnDesktop": "Stick on desktop"
     },
     "tabs": {
       "close": "Close",
@@ -812,6 +813,10 @@
       "reminderSecondsHint": "If you do not open it, it hides when the time is up.",
       "captureShortcut": "Shortcut for a new sticky note",
       "captureShortcutHint": "Leave empty to turn it off. The default is Ctrl+Alt+N.",
+      "stickyDir": "Sticky note folder",
+      "stickyDirHint": "New notes are saved here. Leave this empty to use the stickies folder inside the open folder. Notes that are already open stay where they are.",
+      "stickyDirPick": "Choose folder",
+      "stickyDirReset": "Use default",
       "pluginSettings": "Small features",
       "pluginSettingsHint": "These registered themselves in Settings.",
       "pluginPath": "Plugin folder",
@@ -1098,7 +1103,17 @@
     "open": "Stick on desktop",
     "pin": "Pin",
     "edgeHide": "Hide at edge",
+    "saved": "Saved",
+    "unsaved": "Unsaved",
+    "edge": {
+      "left": "Left",
+      "right": "Right",
+      "top": "Top",
+      "bottom": "Bottom"
+    },
     "menu": "Menu",
+    "rename": "Rename",
+    "renameInvalid": "That file name cannot be used.",
     "settings": "Note settings",
     "lockMenu": "Lock",
     "lock": "Lock in place",

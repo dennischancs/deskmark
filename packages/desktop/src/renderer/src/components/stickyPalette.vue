@@ -10,7 +10,7 @@
   >
     <span
       class="sticky-palette-chip"
-      :style="{ background: color }"
+      :style="{ '--chip': color }"
     />
     {{ t('sticky.palette') }}
   </button>
@@ -275,6 +275,7 @@ const commitHex = (): void => {
 .sticky-palette-chip {
   width: 16px;
   height: 16px;
+  background-color: var(--chip) !important;
   border: 1px solid var(--floatBorderColor, color-mix(in srgb, var(--editorColor) 25%, transparent));
   border-radius: 2px;
 }

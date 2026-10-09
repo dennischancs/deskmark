@@ -55,9 +55,11 @@ export const registerFsHandlers = (): void => {
   ipcMain.handle('mt::fs::output-file', (_e, p: string, data: unknown) =>
     fs.outputFile(p, toBuffer(data) as string | NodeJS.ArrayBufferView)
   )
-  ipcMain.handle('mt::fs::move', (_e, src: string, dest: string) =>
-    fs.move(src, dest, { overwrite: false })
-  )
+  ipcMain.handle('mt::fs::move', async(_e, src: string, dest: string) => {
+    ipcMain.emit('note-rename-suppress', src)
+    await fs.move(src, dest, { overwrite: false })
+    ipcMain.emit('note-renamed', src, dest)
+  })
   ipcMain.handle('mt::fs::stat', async(_e, p: string) => serializeStat(await fs.stat(p)))
 
   ipcMain.handle('mt::fs::write-file', (_e, p: string, data: unknown) =>
