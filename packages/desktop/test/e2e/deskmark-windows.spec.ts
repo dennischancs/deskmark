@@ -15,13 +15,20 @@ const stopApp = (app: ElectronApplication): void => {
   }
   if (!pid) return
   try {
-    execSync(`taskkill /PID ${pid} /T /F`, { stdio: 'ignore' })
-  } catch {
-    try {
-      process.kill(pid)
-    } catch {
-      // The process already exited.
+    if (process.platform === 'win32') {
+      execSync(`taskkill /PID ${pid} /T /F`, { stdio: 'ignore' })
+    } else {
+      // Electron helper processes survive a signal to the parent. Kill the
+      // tree, or Playwright waits out the worker teardown.
+      try {
+        execSync(`pkill -KILL -P ${pid}`, { stdio: 'ignore' })
+      } catch {
+        // No remaining children.
+      }
+      process.kill(pid, 'SIGKILL')
     }
+  } catch {
+    // The process already exited.
   }
 }
 
@@ -204,9 +211,10 @@ test('a sticky note uses the width of its window', async() => {
   const { app, page } = launched
   try {
     await page.locator('.side-bar').waitFor({ state: 'visible', timeout: 15000 })
-    await page.evaluate((root) => {
-      return window.electron.ipcRenderer.invoke('mt::deskmark::sticky-open', root, root + '\\\\milk.md')
-    }, dir)
+    const note = path.join(dir, 'milk.md')
+    await page.evaluate(({ root, note }) => {
+      return window.electron.ipcRenderer.invoke('mt::deskmark::sticky-open', root, note)
+    }, { root: dir, note })
     let sticky: Page | null = null
     const deadline = Date.now() + 10000
     while (!sticky && Date.now() < deadline) {
@@ -237,9 +245,10 @@ test('a sticky palette stays on top and sets a custom color and opacity', async(
   const { app, page } = launched
   try {
     await page.locator('.side-bar').waitFor({ state: 'visible', timeout: 15000 })
-    await page.evaluate((root) => {
-      return window.electron.ipcRenderer.invoke('mt::deskmark::sticky-open', root, root + '\\\\milk.md')
-    }, dir)
+    const note = path.join(dir, 'milk.md')
+    await page.evaluate(({ root, note }) => {
+      return window.electron.ipcRenderer.invoke('mt::deskmark::sticky-open', root, note)
+    }, { root: dir, note })
     const sticky = await stickyPage(app)
     await sticky.locator('[data-testid="sticky-palette-trigger"]').click({ timeout: 10000 })
     await expectFloatingLayerOnTop(sticky, 'sticky-palette')
@@ -283,9 +292,10 @@ test('the sticky menu stays on top and opens the lock list', async() => {
   const { app, page } = launched
   try {
     await page.locator('.side-bar').waitFor({ state: 'visible', timeout: 15000 })
-    await page.evaluate((root) => {
-      return window.electron.ipcRenderer.invoke('mt::deskmark::sticky-open', root, root + '\\\\milk.md')
-    }, dir)
+    const note = path.join(dir, 'milk.md')
+    await page.evaluate(({ root, note }) => {
+      return window.electron.ipcRenderer.invoke('mt::deskmark::sticky-open', root, note)
+    }, { root: dir, note })
     const sticky = await stickyPage(app)
     await sticky.locator('[data-testid="sticky-menu-trigger"]').click({ timeout: 10000 })
     await expectFloatingLayerOnTop(sticky, 'sticky-menu')

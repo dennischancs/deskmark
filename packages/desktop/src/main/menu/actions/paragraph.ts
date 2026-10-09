@@ -227,9 +227,10 @@ export const updateSelectionMenus = (
     isCodeContent
   } = state
 
-  // Reset format menu.
-  const formatMenuItem: MenuItem = applicationMenu.getMenuItemById('formatMenuItem')!
-  formatMenuItem.submenu!.items.forEach((item: MenuItem) => (item.enabled = true))
+  // Reset format menu. Sticky notes have no editor menu, so this is a no-op.
+  const formatMenuItem = applicationMenu.getMenuItemById('formatMenuItem')
+  if (!formatMenuItem?.submenu) return
+  formatMenuItem.submenu.items.forEach((item: MenuItem) => (item.enabled = true))
 
   // Handle menu checked.
   setCheckedMenuItem(applicationMenu, state)
@@ -246,7 +247,7 @@ export const updateSelectionMenus = (
     // Non-formattable code-like content (code/math/html/frontmatter/diagram):
     // disable every format item. Tables never reach here (they return early via
     // isDisabled) so table cells keep formatting.
-    formatMenuItem.submenu!.items.forEach((item: MenuItem) => (item.enabled = false))
+    formatMenuItem.submenu.items.forEach((item: MenuItem) => (item.enabled = false))
 
     // A code line is selected — re-enable the code-fence toggle.
     if (isCodeContent && Object.keys(affiliation).some((b) => /code$/.test(b))) {
@@ -254,12 +255,12 @@ export const updateSelectionMenus = (
     }
   } else if (isMultiline) {
     // Format: link/image are meaningless across a multi-block selection.
-    formatMenuItem.submenu!.items
+    formatMenuItem.submenu.items
       .filter((item: MenuItem) => item.id === 'hyperlinkMenuItem' || item.id === 'imageMenuItem')
       .forEach((item: MenuItem) => (item.enabled = false))
     // Paragraph: enable only the items that have a defined cross-block action.
-    const paragraphMenu = applicationMenu.getMenuItemById('paragraphMenuEntry')!
-    paragraphMenu.submenu!.items.forEach((item: MenuItem) => {
+    const paragraphMenu = applicationMenu.getMenuItemById('paragraphMenuEntry')
+    paragraphMenu?.submenu?.items.forEach((item: MenuItem) => {
       if (item.id) {
         item.enabled = CROSS_BLOCK_ENABLED_PARAGRAPH.includes(item.id)
       }

@@ -1,6 +1,6 @@
 import path from 'path'
 import { BrowserWindow, dialog, ipcMain, screen } from 'electron'
-import type { BrowserWindowConstructorOptions } from 'electron'
+import type { BrowserWindowConstructorOptions, IpcMainEvent } from 'electron'
 import log from 'electron-log'
 import windowStateKeeper from 'electron-window-state'
 import { isChildOfDirectory, isSamePathSync } from 'common/filesystem/paths'
@@ -234,7 +234,13 @@ class EditorWindow extends BaseWindow {
       showEditorContextMenu(win!, event, params, preferences.getItem('spellcheckerEnabled'))
     })
 
-    win.webContents.once('did-finish-load', () => {
+    // The load event can fire before the renderer module registers its listeners.
+    // Hold bootstrap and the note until the page says it is listening.
+    let pageLoaded = false
+    let rendererReady = false
+    const finishStartup = (): void => {
+      if (!pageLoaded || !rendererReady || this.lifecycle === WindowLifecycle.READY) return
+      ipcMain.removeListener('mt::renderer-ready', onRendererReady)
       this.lifecycle = WindowLifecycle.READY
       this.emit('window-ready')
 
@@ -260,6 +266,20 @@ class EditorWindow extends BaseWindow {
         this._doOpenFilesToOpen()
         this._markdownToOpen!.length = 0
       }
+    }
+    const onRendererReady = (event: IpcMainEvent): void => {
+      if (event.sender !== win?.webContents) return
+      rendererReady = true
+      finishStartup()
+    }
+    ipcMain.on('mt::renderer-ready', onRendererReady)
+    win.once('closed', () => {
+      ipcMain.removeListener('mt::renderer-ready', onRendererReady)
+    })
+
+    win.webContents.once('did-finish-load', () => {
+      pageLoaded = true
+      finishStartup()
 
       // Listen on default system mouse zoom event (e.g. Ctrl+MouseWheel on Linux/Windows).
       win!.webContents.on('zoom-changed', (_event, zoomDirection) => {
