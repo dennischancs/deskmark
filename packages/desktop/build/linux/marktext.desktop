@@ -1,17 +1,17 @@
 [Desktop Entry]
-Name=MarkText
-Comment=Next generation markdown editor
-Exec=marktext %F
+Name=Deskmark
+Comment=Local markdown editor with sticky notes, todos, and a calendar
+Exec=deskmark %F
 Terminal=false
 Type=Application
-Icon=marktext
+Icon=deskmark
 Categories=Office;TextEditor;Utility;
 MimeType=text/markdown;
-Keywords=marktext;
-StartupWMClass=marktext
+Keywords=deskmark;
+StartupWMClass=deskmark
 Actions=NewWindow;
 
 [Desktop Action NewWindow]
 Name=New Window
-Exec=marktext --new-window %F
-Icon=marktext
+Exec=deskmark --new-window %F
+Icon=deskmark

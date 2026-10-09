@@ -20,7 +20,7 @@ describe('windows toast shortcut', () => {
     expect(toastShortcutPlan({
       appData,
       packaged: true,
-      execPath: 'C:/Program Files/Deskmark/marktext.exe',
+      execPath: 'C:/Program Files/Deskmark/deskmark.exe',
       installedShortcutReady: true
     })).toBeNull()
   })
@@ -29,7 +29,7 @@ describe('windows toast shortcut', () => {
     const plan = toastShortcutPlan({
       appData,
       packaged: true,
-      execPath: 'D:/deskmark/dist/win-unpacked/marktext.exe',
+      execPath: 'D:/deskmark/dist/win-unpacked/deskmark.exe',
       installedShortcutReady: false
     })
     expect(plan?.path.endsWith('Programs\\Deskmark.lnk') || plan?.path.endsWith('Programs/Deskmark.lnk')).toBe(true)
@@ -60,19 +60,19 @@ describe('windows toast shortcut', () => {
     expect(toastShortcutPlan({
       appData,
       packaged: true,
-      execPath: 'D:/deskmark/dist/win-unpacked/marktext.exe',
+      execPath: 'D:/deskmark/dist/win-unpacked/deskmark.exe',
       installedShortcutReady: false
     })?.appUserModelId).toBe(id)
   })
 
   it('treats a different program path as a different shortcut target', () => {
     expect(sameExecutable(
-      'D:/deskmark/dist/win-unpacked/marktext.exe',
-      'D:\\deskmark\\dist\\win-unpacked\\marktext.exe'
+      'D:/deskmark/dist/win-unpacked/deskmark.exe',
+      'D:\\deskmark\\dist\\win-unpacked\\deskmark.exe'
     )).toBe(true)
     expect(sameExecutable(
-      'D:/deskmark/dist/win-unpacked/marktext.exe',
-      'C:/Program Files/Deskmark/marktext.exe'
+      'D:/deskmark/dist/win-unpacked/deskmark.exe',
+      'C:/Program Files/Deskmark/deskmark.exe'
     )).toBe(false)
   })
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" role="img" aria-label="Deskmark">
+  <!--
+    Square master for later macOS .icns export.
+    The system draws the squircle mask, so this canvas stays square and unclipped.
+    The note's outer box is 72..952, centered on the 1024 canvas.
+  -->
+  <rect width="1024" height="1024" fill="#0E6B5E"/>
+  <path fill="#F3F7F4" d="M156 72h586l210 210v586c0 84-84 84-84 84H156c-84 0-84-84-84-84V156c0-84 84-84 84-84z"/>
+  <path fill="#C9DDD4" d="M742 72l210 210H822c-40 0-80-40-80-80V72z"/>
+  <rect x="236" y="380" width="152" height="152" rx="40" fill="none" stroke="#0E6B5E" stroke-width="32"/>
+  <path fill="none" stroke="#E07A2F" stroke-width="36" stroke-linecap="round" stroke-linejoin="round" d="M272 460l38 40 60-76"/>
+  <rect x="428" y="420" width="360" height="72" rx="36" fill="#0E6B5E"/>
+  <rect x="282" y="572" width="460" height="72" rx="36" fill="#0E6B5E" opacity="0.45"/>
+</svg>

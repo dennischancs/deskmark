@@ -993,7 +993,7 @@
     "fileExists": "Файл существует {filename}",
     "files": "Файлы",
     "importWarning": "Предупреждение импорта",
-    "installPandoc": "Pandoc не найден. Установите его или задайте переменную окружения MARKTEXT_PANDOC с путём к бинарнику pandoc и перезапустите Листок.",
+    "installPandoc": "Pandoc не найден. Установите его или задайте переменную окружения DESKMARK_PANDOC с путём к бинарнику pandoc и перезапустите Листок.",
     "exportWarning": "Предупреждение экспорта",
     "exportWarningMore": "…и ещё {count}",
     "keepOpen": "Оставить открытым",

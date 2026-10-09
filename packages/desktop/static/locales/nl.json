@@ -993,7 +993,7 @@
     "fileExists": "Bestand bestaat al: {filename}",
     "files": "Bestanden",
     "importWarning": "Importwaarschuwing",
-    "installPandoc": "Pandoc is niet gevonden. Installeer het, of stel de omgevingsvariabele MARKTEXT_PANDOC in op het pad naar het pandoc-programma en herstart Bureaubriefje.",
+    "installPandoc": "Pandoc is niet gevonden. Installeer het, of stel de omgevingsvariabele DESKMARK_PANDOC in op het pad naar het pandoc-programma en herstart Bureaubriefje.",
     "exportWarning": "Exportwaarschuwing",
     "exportWarningMore": "…en nog {count}",
     "keepOpen": "Open houden",

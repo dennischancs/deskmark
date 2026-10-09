@@ -993,7 +993,7 @@
     "fileExists": "檔案已存在：{filename}",
     "files": "檔案",
     "importWarning": "匯入警告",
-    "installPandoc": "找不到 Pandoc。請先安裝，或將環境變數 MARKTEXT_PANDOC 設為 pandoc 執行檔的路徑後重新啟動桌箋.",
+    "installPandoc": "找不到 Pandoc。請先安裝，或將環境變數 DESKMARK_PANDOC 設為 pandoc 執行檔的路徑後重新啟動桌箋.",
     "exportWarning": "匯出提示",
     "exportWarningMore": "…另有 {count} 條",
     "keepOpen": "保持開啟",

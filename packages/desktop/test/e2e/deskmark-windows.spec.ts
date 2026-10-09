@@ -172,7 +172,7 @@ test('closing the main window keeps the tray process', async() => {
 
 test('the installed program keeps running after the main window closes', async() => {
   test.setTimeout(45000)
-  const exe = path.resolve(__dirname, '../../../../dist/win-unpacked/marktext.exe')
+  const exe = path.resolve(__dirname, '../../../../dist/win-unpacked/deskmark.exe')
   test.skip(!fs.existsSync(exe), 'packaged exe is not built')
   const userData = fs.mkdtempSync(path.join(os.tmpdir(), 'deskmark-packaged-'))
   const app = await _electron.launch({

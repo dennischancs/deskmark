@@ -993,7 +993,7 @@
     "fileExists": "ファイルが既に存在します: {filename}",
     "files": "ファイル",
     "importWarning": "インポート警告",
-    "installPandoc": "Pandoc が見つかりません。インストールするか、環境変数 MARKTEXT_PANDOC に pandoc の実行ファイルのパスを設定して デスクメモ を再起動してください。",
+    "installPandoc": "Pandoc が見つかりません。インストールするか、環境変数 DESKMARK_PANDOC に pandoc の実行ファイルのパスを設定して デスクメモ を再起動してください。",
     "exportWarning": "エクスポートの警告",
     "exportWarningMore": "…ほか {count} 件",
     "keepOpen": "開いたままにする",

@@ -220,7 +220,7 @@ const isBatchFile = (command: string): boolean =>
   process.platform === 'win32' && /\.(bat|cmd)$/i.test(command.trim())
 
 const resolve = async(): Promise<string | null> => {
-  const override = process.env.MARKTEXT_PANDOC
+  const override = process.env.DESKMARK_PANDOC || process.env.MARKTEXT_PANDOC
   // Naming a batch file is as unusable as naming one that is not there.
   if (override && isBatchFile(override)) return null
   return resolveCommand(pandocCommand, {

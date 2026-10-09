@@ -1,10 +1,16 @@
-name: PR Build
+name: Build
 
 on:
+  push:
+    branches:
+      - deskmark
+    # packages/muya (TS v2) does not affect the electron desktop build.
+    paths-ignore:
+      - 'packages/muya/**'
   pull_request:
     types: [opened, synchronize, reopened]
-    # packages/muya (TS v2) does not affect the electron desktop build.
-    # Skip the multi-platform installer build on muya-only PRs.
+    branches:
+      - deskmark
     paths-ignore:
       - 'packages/muya/**'
 
@@ -82,7 +88,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: marktext-${{ matrix.name }}
+          name: deskmark-${{ matrix.name }}
           retention-days: 30
           path: |
             dist/*.exe
@@ -98,7 +104,7 @@ jobs:
   comment-on-pr:
     name: Comment artifact links on PR
     needs: run-on-pr-head
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write

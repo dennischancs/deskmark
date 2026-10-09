@@ -993,7 +993,7 @@
     "fileExists": "El archivo {filename} ya existe",
     "files": "Archivos",
     "importWarning": "Advertencia de importación",
-    "installPandoc": "No se encontró Pandoc. Instálalo, o define la variable de entorno MARKTEXT_PANDOC con la ruta del ejecutable de pandoc y reinicia Nota de mesa.",
+    "installPandoc": "No se encontró Pandoc. Instálalo, o define la variable de entorno DESKMARK_PANDOC con la ruta del ejecutable de pandoc y reinicia Nota de mesa.",
     "exportWarning": "Advertencia de exportación",
     "exportWarningMore": "…y {count} más",
     "keepOpen": "Mantener abierto",

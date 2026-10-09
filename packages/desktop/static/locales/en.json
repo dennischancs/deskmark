@@ -993,7 +993,7 @@
     "fileExists": "File exists {filename}",
     "files": "Files",
     "importWarning": "Import warning",
-    "installPandoc": "Pandoc was not found. Install it, or set the MARKTEXT_PANDOC environment variable to the pandoc binary and restart Deskmark.",
+    "installPandoc": "Pandoc was not found. Install it, or set the DESKMARK_PANDOC environment variable to the pandoc binary and restart Deskmark.",
     "exportWarning": "Export warning",
     "exportWarningMore": "…and {count} more",
     "keepOpen": "Keep open",
